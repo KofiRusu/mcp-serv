@@ -85,8 +85,11 @@
             </div>
 
             <div class="sidebar-footer">
-                <a href="/sandbox" class="btn btn-primary btn-small sidebar-btn">
-                    💻 Coding Sandbox
+                <a href="/projects" class="btn btn-primary btn-small sidebar-btn">
+                    📦 Projects
+                </a>
+                <a href="/sandbox" class="btn btn-secondary btn-small sidebar-btn">
+                    💻 Sandbox
                 </a>
                 <button class="btn btn-secondary btn-small" onclick="clearChat()">
                     🗑️ Clear Chat
@@ -132,8 +135,16 @@
             </div>
 
             <div class="input-container">
+                <!-- Attachment preview -->
+                <div id="attachment-preview" class="attachment-preview" style="display: none;">
+                    <div id="attachment-list" class="attachment-list"></div>
+                </div>
+                
                 <form id="chat-form" onsubmit="handleSubmit(event)">
                     <div class="input-wrapper">
+                        <button type="button" class="attach-button" onclick="triggerFileUpload()" title="Attach file">
+                            📎
+                        </button>
                         <textarea 
                             id="message-input" 
                             placeholder="Type your message or /command... (Shift+Enter for new line)"
@@ -146,6 +157,11 @@
                     </div>
                     <div class="input-hints" id="input-hints"></div>
                 </form>
+                
+                <!-- Hidden file input -->
+                <input type="file" id="file-input" style="display: none;" 
+                       accept=".py,.js,.ts,.tsx,.jsx,.html,.css,.json,.yaml,.yml,.txt,.md,.sh,.sql"
+                       multiple onchange="handleFileSelect(event)">
             </div>
         </main>
     </div>
@@ -158,6 +174,8 @@
         let isLoading = false;
         let councilInfo = null;
         let commandSuggestions = [];
+        let attachments = [];  // Current attachments
+        let sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
 
         // =============================================================================
         // Initialization
@@ -205,6 +223,8 @@
         }
 
         async function sendMessage(message, useRag) {
+            const attachmentIds = attachments.map(a => a.id);
+            
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -212,6 +232,8 @@
                     message: message,
                     mode: 'normal',
                     use_rag: useRag,
+                    session_id: sessionId,
+                    attachment_ids: attachmentIds.length > 0 ? attachmentIds : null,
                 }),
             });
 
@@ -219,7 +241,109 @@
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
+            // Clear attachments after sending
+            attachments = [];
+            renderAttachmentPreview();
+
             return await response.json();
+        }
+
+        // =============================================================================
+        // File Attachments
+        // =============================================================================
+        
+        function triggerFileUpload() {
+            document.getElementById('file-input').click();
+        }
+
+        async function handleFileSelect(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            
+            for (const file of files) {
+                await uploadFile(file);
+            }
+            
+            event.target.value = '';  // Reset input
+        }
+
+        async function uploadFile(file) {
+            // Check size
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File too large. Max 10MB.');
+                return;
+            }
+            
+            // Read as base64
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64 = e.target.result.split(',')[1];
+                
+                try {
+                    const response = await fetch('/api/attachments', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            filename: file.name,
+                            content_base64: base64,
+                            session_id: sessionId,
+                        }),
+                    });
+                    
+                    if (response.ok) {
+                        const attachment = await response.json();
+                        attachments.push(attachment);
+                        renderAttachmentPreview();
+                    } else {
+                        const err = await response.json();
+                        alert('Upload failed: ' + err.detail);
+                    }
+                } catch (e) {
+                    alert('Upload failed: ' + e.message);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderAttachmentPreview() {
+            const container = document.getElementById('attachment-preview');
+            const list = document.getElementById('attachment-list');
+            
+            if (attachments.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            list.innerHTML = attachments.map((a, i) => `
+                <div class="attachment-item">
+                    <span class="attachment-icon">${getFileIcon(a.original_filename)}</span>
+                    <span class="attachment-name">${a.original_filename}</span>
+                    <span class="attachment-size">${formatFileSize(a.size)}</span>
+                    <button class="attachment-remove" onclick="removeAttachment(${i})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function removeAttachment(index) {
+            attachments.splice(index, 1);
+            renderAttachmentPreview();
+        }
+
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const icons = {
+                'py': '🐍', 'js': '📜', 'ts': '📘', 'json': '📋',
+                'html': '🌐', 'css': '🎨', 'md': '📝', 'txt': '📄',
+                'sh': '⚙️', 'sql': '🗃️',
+            };
+            return icons[ext] || '📎';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
         }
 
         // =============================================================================
