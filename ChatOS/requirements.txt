@@ -1,0 +1,42 @@
+# =============================================================================
+# ChatOS Dependencies
+# =============================================================================
+
+# Core Framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# Request/Response handling
+pydantic>=2.5.0
+python-multipart>=0.0.6
+
+# Templates
+jinja2>=3.1.2
+
+# HTTP client (for future API integrations)
+httpx>=0.26.0
+
+# =============================================================================
+# Optional: Real LLM Backend Support (uncomment as needed)
+# =============================================================================
+
+# For Ollama integration:
+# ollama>=0.1.6
+
+# For sentence embeddings (RAG enhancement):
+# sentence-transformers>=2.2.0
+
+# For vector search:
+# faiss-cpu>=1.7.4
+
+# For HuggingFace models:
+# transformers>=4.37.0
+
+# =============================================================================
+# Development & Testing
+# =============================================================================
+
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+httpx>=0.26.0
+

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatOS</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">⚡</span>
+                    <span class="logo-text">ChatOS</span>
+                </div>
+                <span class="version">v0.1</span>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="section-title">Council Models</h3>
+                <div id="model-list" class="model-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="section-title">Settings</h3>
+                
+                <div class="setting-item">
+                    <label for="mode-select">Mode</label>
+                    <select id="mode-select" class="select-input">
+                        <option value="normal">💬 Normal</option>
+                        <option value="code">⌨️ Code</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="use-rag" checked>
+                        <span class="toggle-switch"></span>
+                        <span>Use RAG</span>
+                    </label>
+                    <small class="setting-hint">Include local document context</small>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="section-title">Strategy</h3>
+                <div class="strategy-badge" id="strategy-display">
+                    <span class="strategy-icon">🎯</span>
+                    <span>Longest wins</span>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary btn-small" onclick="clearChat()">
+                    🗑️ Clear Chat
+                </button>
+                <div class="health-indicator" id="health-indicator">
+                    <span class="health-dot"></span>
+                    <span>Connecting...</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <div class="chat-header">
+                <h1>Council Chat</h1>
+                <p class="chat-subtitle">Multiple models. One answer.</p>
+            </div>
+
+            <div class="chat-container" id="chat-container">
+                <div class="welcome-message" id="welcome-message">
+                    <div class="welcome-icon">🤖</div>
+                    <h2>Welcome to ChatOS</h2>
+                    <p>Start a conversation with your local AI council. Each model will analyze your message and the best response will be selected.</p>
+                    <div class="welcome-tips">
+                        <div class="tip">
+                            <span class="tip-icon">💬</span>
+                            <span>Use <strong>Normal</strong> mode for general chat</span>
+                        </div>
+                        <div class="tip">
+                            <span class="tip-icon">⌨️</span>
+                            <span>Use <strong>Code</strong> mode for programming help</span>
+                        </div>
+                        <div class="tip">
+                            <span class="tip-icon">📚</span>
+                            <span>Enable <strong>RAG</strong> to include document context</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <form id="chat-form" onsubmit="handleSubmit(event)">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="message-input" 
+                            placeholder="Type your message... (Shift+Enter for new line)"
+                            rows="1"
+                            autofocus
+                        ></textarea>
+                        <button type="submit" class="send-button" id="send-button">
+                            <span class="send-icon">➤</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // =============================================================================
+        // State
+        // =============================================================================
+        
+        let isLoading = false;
+        let councilInfo = null;
+
+        // =============================================================================
+        // Initialization
+        // =============================================================================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCouncilInfo();
+            checkHealth();
+            setupTextarea();
+            
+            // Periodic health check
+            setInterval(checkHealth, 30000);
+        });
+
+        // =============================================================================
+        // API Calls
+        // =============================================================================
+        
+        async function loadCouncilInfo() {
+            try {
+                const response = await fetch('/api/council');
+                councilInfo = await response.json();
+                renderModelList(councilInfo.models);
+                updateStrategyDisplay(councilInfo.strategy);
+            } catch (error) {
+                console.error('Failed to load council info:', error);
+            }
+        }
+
+        async function checkHealth() {
+            const indicator = document.getElementById('health-indicator');
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                if (data.status === 'healthy') {
+                    indicator.innerHTML = `
+                        <span class="health-dot healthy"></span>
+                        <span>${data.models_loaded} models • ${data.rag_documents} docs</span>
+                    `;
+                }
+            } catch (error) {
+                indicator.innerHTML = `
+                    <span class="health-dot error"></span>
+                    <span>Connection error</span>
+                `;
+            }
+        }
+
+        async function sendMessage(message, mode, useRag) {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    mode: mode,
+                    use_rag: useRag,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        }
+
+        // =============================================================================
+        // UI Rendering
+        // =============================================================================
+        
+        function renderModelList(models) {
+            const container = document.getElementById('model-list');
+            container.innerHTML = models.map(model => `
+                <div class="model-item" data-model="${model.name}">
+                    <span class="model-icon">${getModelIcon(model.behavior)}</span>
+                    <div class="model-info">
+                        <span class="model-name">${model.name}</span>
+                        <span class="model-behavior">${model.behavior}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getModelIcon(behavior) {
+            const icons = {
+                'thoughtful': '🧠',
+                'concise': '⚡',
+                'creative': '🎨',
+                'analytical': '📊',
+            };
+            return icons[behavior] || '🤖';
+        }
+
+        function updateStrategyDisplay(strategy) {
+            const display = document.getElementById('strategy-display');
+            const strategies = {
+                'longest': { icon: '📏', text: 'Longest wins' },
+                'shortest': { icon: '✂️', text: 'Shortest wins' },
+                'random': { icon: '🎲', text: 'Random selection' },
+                'first': { icon: '1️⃣', text: 'First response' },
+            };
+            const info = strategies[strategy] || strategies['longest'];
+            display.innerHTML = `
+                <span class="strategy-icon">${info.icon}</span>
+                <span>${info.text}</span>
+            `;
+        }
+
+        function hideWelcomeMessage() {
+            const welcome = document.getElementById('welcome-message');
+            if (welcome) {
+                welcome.style.display = 'none';
+            }
+        }
+
+        function appendUserMessage(text) {
+            hideWelcomeMessage();
+            const container = document.getElementById('chat-container');
+            const messageEl = document.createElement('div');
+            messageEl.className = 'message user-message';
+            messageEl.innerHTML = `
+                <div class="message-content">
+                    <div class="message-text">${escapeHtml(text)}</div>
+                </div>
+                <div class="message-avatar user-avatar">You</div>
+            `;
+            container.appendChild(messageEl);
+            scrollToBottom();
+        }
+
+        function appendAssistantMessage(data) {
+            const container = document.getElementById('chat-container');
+            const messageEl = document.createElement('div');
+            messageEl.className = 'message assistant-message';
+            
+            // Format the main answer
+            const formattedAnswer = formatResponse(data.answer);
+            
+            // Build responses list for expansion
+            const responsesHtml = data.responses.map(r => `
+                <div class="model-response ${r.model === data.chosen_model ? 'chosen' : ''}">
+                    <div class="model-response-header">
+                        <span class="model-response-name">${r.model}</span>
+                        ${r.model === data.chosen_model ? '<span class="chosen-badge">✓ Chosen</span>' : ''}
+                    </div>
+                    <div class="model-response-text">${escapeHtml(r.text)}</div>
+                </div>
+            `).join('');
+
+            messageEl.innerHTML = `
+                <div class="message-avatar assistant-avatar">${getModelIcon(getModelBehavior(data.chosen_model))}</div>
+                <div class="message-content">
+                    <div class="message-meta">
+                        <span class="chosen-model">${data.chosen_model}</span>
+                        <span class="meta-separator">•</span>
+                        <span class="memory-summary">${data.memory_summary || ''}</span>
+                    </div>
+                    <div class="message-text">${formattedAnswer}</div>
+                    <details class="responses-details">
+                        <summary class="responses-summary">
+                            <span>Show all ${data.responses.length} responses</span>
+                            <span class="expand-icon">▼</span>
+                        </summary>
+                        <div class="responses-list">
+                            ${responsesHtml}
+                        </div>
+                    </details>
+                </div>
+            `;
+            container.appendChild(messageEl);
+            
+            // Highlight the chosen model in sidebar
+            highlightChosenModel(data.chosen_model);
+            scrollToBottom();
+        }
+
+        function appendLoadingMessage() {
+            const container = document.getElementById('chat-container');
+            const loadingEl = document.createElement('div');
+            loadingEl.className = 'message assistant-message loading-message';
+            loadingEl.id = 'loading-message';
+            loadingEl.innerHTML = `
+                <div class="message-avatar assistant-avatar">⏳</div>
+                <div class="message-content">
+                    <div class="loading-indicator">
+                        <span class="loading-dot"></span>
+                        <span class="loading-dot"></span>
+                        <span class="loading-dot"></span>
+                        <span class="loading-text">Council is deliberating...</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(loadingEl);
+            scrollToBottom();
+        }
+
+        function removeLoadingMessage() {
+            const loading = document.getElementById('loading-message');
+            if (loading) {
+                loading.remove();
+            }
+        }
+
+        function appendErrorMessage(error) {
+            const container = document.getElementById('chat-container');
+            const messageEl = document.createElement('div');
+            messageEl.className = 'message error-message';
+            messageEl.innerHTML = `
+                <div class="message-avatar error-avatar">⚠️</div>
+                <div class="message-content">
+                    <div class="message-text">Error: ${escapeHtml(error)}</div>
+                </div>
+            `;
+            container.appendChild(messageEl);
+            scrollToBottom();
+        }
+
+        function highlightChosenModel(modelName) {
+            // Remove previous highlight
+            document.querySelectorAll('.model-item').forEach(el => {
+                el.classList.remove('chosen');
+            });
+            
+            // Add highlight to chosen model
+            const chosenEl = document.querySelector(`.model-item[data-model="${modelName}"]`);
+            if (chosenEl) {
+                chosenEl.classList.add('chosen');
+            }
+        }
+
+        function getModelBehavior(modelName) {
+            if (!councilInfo) return 'thoughtful';
+            const model = councilInfo.models.find(m => m.name === modelName);
+            return model ? model.behavior : 'thoughtful';
+        }
+
+        // =============================================================================
+        // Event Handlers
+        // =============================================================================
+        
+        async function handleSubmit(event) {
+            event.preventDefault();
+            
+            if (isLoading) return;
+            
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const mode = document.getElementById('mode-select').value;
+            const useRag = document.getElementById('use-rag').checked;
+            
+            // Clear input and show user message
+            input.value = '';
+            resetTextareaHeight();
+            appendUserMessage(message);
+            
+            // Show loading state
+            isLoading = true;
+            updateSendButton(true);
+            appendLoadingMessage();
+            
+            try {
+                const data = await sendMessage(message, mode, useRag);
+                removeLoadingMessage();
+                appendAssistantMessage(data);
+            } catch (error) {
+                removeLoadingMessage();
+                appendErrorMessage(error.message);
+            } finally {
+                isLoading = false;
+                updateSendButton(false);
+            }
+        }
+
+        function clearChat() {
+            const container = document.getElementById('chat-container');
+            container.innerHTML = `
+                <div class="welcome-message" id="welcome-message">
+                    <div class="welcome-icon">🤖</div>
+                    <h2>Welcome to ChatOS</h2>
+                    <p>Start a conversation with your local AI council.</p>
+                </div>
+            `;
+            
+            // Clear model highlight
+            document.querySelectorAll('.model-item').forEach(el => {
+                el.classList.remove('chosen');
+            });
+        }
+
+        // =============================================================================
+        // Utilities
+        // =============================================================================
+        
+        function setupTextarea() {
+            const textarea = document.getElementById('message-input');
+            
+            // Auto-resize
+            textarea.addEventListener('input', () => {
+                textarea.style.height = 'auto';
+                textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+            });
+            
+            // Handle Enter key
+            textarea.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('chat-form').dispatchEvent(new Event('submit'));
+                }
+                
+                if (e.key === 'Escape') {
+                    textarea.value = '';
+                    resetTextareaHeight();
+                }
+            });
+        }
+
+        function resetTextareaHeight() {
+            const textarea = document.getElementById('message-input');
+            textarea.style.height = 'auto';
+        }
+
+        function updateSendButton(loading) {
+            const button = document.getElementById('send-button');
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML = '<span class="send-icon spinning">↻</span>';
+            } else {
+                button.disabled = false;
+                button.innerHTML = '<span class="send-icon">➤</span>';
+            }
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('chat-container');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatResponse(text) {
+            // Basic code block detection and formatting
+            let formatted = escapeHtml(text);
+            
+            // Convert code blocks (```...```)
+            formatted = formatted.replace(/```(\w*)\n?([\s\S]*?)```/g, (match, lang, code) => {
+                return `<pre class="code-block"><code class="language-${lang || 'plaintext'}">${code.trim()}</code></pre>`;
+            });
+            
+            // Convert inline code (`...`)
+            formatted = formatted.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+            
+            // Convert line breaks
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            return formatted;
+        }
+    </script>
+</body>
+</html>
+

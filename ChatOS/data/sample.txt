@@ -1,0 +1,45 @@
+ChatOS Documentation - Sample Document
+
+This is a sample document used by the ChatOS retrieval engine. You can
+place any number of text files in the ChatOS/data directory and the
+RAG engine will include them when constructing prompts.
+
+== About ChatOS ==
+
+ChatOS is inspired by PewDiePie's custom AI setup. It demonstrates how
+to run multiple language models locally and combine their responses
+using a "council of bots" approach. The council queries each model
+independently and then uses a voting/selection strategy to pick the
+best response.
+
+== Features ==
+
+1. Multi-Model Council: Run multiple models simultaneously and get
+   diverse perspectives on each query.
+
+2. Conversation Memory: The system remembers recent conversation turns
+   using a sliding window approach.
+
+3. RAG (Retrieval-Augmented Generation): Local text files can be
+   searched for relevant context to enhance responses.
+
+4. Coding Mode: A special mode optimized for code generation and
+   programming assistance.
+
+== Configuration ==
+
+Key settings in config.py:
+- MEMORY_MAX_TURNS: Number of conversation turns to remember (default: 10)
+- NUM_COUNCIL_MODELS: Number of models in the council (default: 4)
+- COUNCIL_STRATEGY: How to select the winning response (longest/shortest/random/first)
+
+== Adding New Models ==
+
+To add a real LLM backend:
+1. Create a wrapper class with a generate(prompt, mode) method
+2. Register it in models/loader.py
+3. The council will automatically include it in voting
+
+Supported backends include Ollama, llama.cpp, vLLM, and any
+OpenAI-compatible API.
+
