@@ -21,6 +21,41 @@
                 <span class="version">v0.1</span>
             </div>
 
+            <!-- Command Palette -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Commands</h3>
+                <div class="command-list" id="command-list">
+                    <div class="command-item" data-command="research" onclick="insertCommand('research')">
+                        <span class="command-icon">🔬</span>
+                        <div class="command-info">
+                            <span class="command-name">/research</span>
+                            <span class="command-desc">Deep web research</span>
+                        </div>
+                    </div>
+                    <div class="command-item" data-command="deepthinking" onclick="insertCommand('deepthinking')">
+                        <span class="command-icon">🧠</span>
+                        <div class="command-info">
+                            <span class="command-name">/deepthinking</span>
+                            <span class="command-desc">Chain-of-thought</span>
+                        </div>
+                    </div>
+                    <div class="command-item" data-command="swarm" onclick="insertCommand('swarm')">
+                        <span class="command-icon">🐝</span>
+                        <div class="command-info">
+                            <span class="command-name">/swarm</span>
+                            <span class="command-desc">Multi-agent coding</span>
+                        </div>
+                    </div>
+                    <div class="command-item" data-command="code" onclick="insertCommand('code')">
+                        <span class="command-icon">⌨️</span>
+                        <div class="command-info">
+                            <span class="command-name">/code</span>
+                            <span class="command-desc">Code generation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="sidebar-section">
                 <h3 class="section-title">Council Models</h3>
                 <div id="model-list" class="model-list">
@@ -31,14 +66,6 @@
             <div class="sidebar-section">
                 <h3 class="section-title">Settings</h3>
                 
-                <div class="setting-item">
-                    <label for="mode-select">Mode</label>
-                    <select id="mode-select" class="select-input">
-                        <option value="normal">💬 Normal</option>
-                        <option value="code">⌨️ Code</option>
-                    </select>
-                </div>
-
                 <div class="setting-item">
                     <label class="toggle-label">
                         <input type="checkbox" id="use-rag" checked>
@@ -58,6 +85,9 @@
             </div>
 
             <div class="sidebar-footer">
+                <a href="/sandbox" class="btn btn-primary btn-small sidebar-btn">
+                    💻 Coding Sandbox
+                </a>
                 <button class="btn btn-secondary btn-small" onclick="clearChat()">
                     🗑️ Clear Chat
                 </button>
@@ -72,26 +102,30 @@
         <main class="chat-main">
             <div class="chat-header">
                 <h1>Council Chat</h1>
-                <p class="chat-subtitle">Multiple models. One answer.</p>
+                <p class="chat-subtitle">Multiple models. One answer. Use /commands for special modes.</p>
             </div>
 
             <div class="chat-container" id="chat-container">
                 <div class="welcome-message" id="welcome-message">
                     <div class="welcome-icon">🤖</div>
                     <h2>Welcome to ChatOS</h2>
-                    <p>Start a conversation with your local AI council. Each model will analyze your message and the best response will be selected.</p>
+                    <p>Start a conversation with your local AI council, or use special commands for advanced features.</p>
                     <div class="welcome-tips">
                         <div class="tip">
-                            <span class="tip-icon">💬</span>
-                            <span>Use <strong>Normal</strong> mode for general chat</span>
+                            <span class="tip-icon">🔬</span>
+                            <span><strong>/research</strong> - Deep research with web context</span>
                         </div>
                         <div class="tip">
-                            <span class="tip-icon">⌨️</span>
-                            <span>Use <strong>Code</strong> mode for programming help</span>
+                            <span class="tip-icon">🧠</span>
+                            <span><strong>/deepthinking</strong> - Extended chain-of-thought</span>
                         </div>
                         <div class="tip">
-                            <span class="tip-icon">📚</span>
-                            <span>Enable <strong>RAG</strong> to include document context</span>
+                            <span class="tip-icon">🐝</span>
+                            <span><strong>/swarm</strong> - Multi-agent coding collaboration</span>
+                        </div>
+                        <div class="tip">
+                            <span class="tip-icon">💻</span>
+                            <span><strong>Sandbox</strong> - Full coding environment</span>
                         </div>
                     </div>
                 </div>
@@ -102,7 +136,7 @@
                     <div class="input-wrapper">
                         <textarea 
                             id="message-input" 
-                            placeholder="Type your message... (Shift+Enter for new line)"
+                            placeholder="Type your message or /command... (Shift+Enter for new line)"
                             rows="1"
                             autofocus
                         ></textarea>
@@ -110,6 +144,7 @@
                             <span class="send-icon">➤</span>
                         </button>
                     </div>
+                    <div class="input-hints" id="input-hints"></div>
                 </form>
             </div>
         </main>
@@ -122,6 +157,7 @@
         
         let isLoading = false;
         let councilInfo = null;
+        let commandSuggestions = [];
 
         // =============================================================================
         // Initialization
@@ -131,8 +167,6 @@
             loadCouncilInfo();
             checkHealth();
             setupTextarea();
-            
-            // Periodic health check
             setInterval(checkHealth, 30000);
         });
 
@@ -170,15 +204,13 @@
             }
         }
 
-        async function sendMessage(message, mode, useRag) {
+        async function sendMessage(message, useRag) {
             const response = await fetch('/api/chat', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: message,
-                    mode: mode,
+                    mode: 'normal',
                     use_rag: useRag,
                 }),
             });
@@ -217,6 +249,17 @@
             return icons[behavior] || '🤖';
         }
 
+        function getModeIcon(mode) {
+            const icons = {
+                'research': '🔬',
+                'deepthinking': '🧠',
+                'swarm': '🐝',
+                'code': '⌨️',
+                'normal': '💬',
+            };
+            return icons[mode] || '💬';
+        }
+
         function updateStrategyDisplay(strategy) {
             const display = document.getElementById('strategy-display');
             const strategies = {
@@ -234,19 +277,18 @@
 
         function hideWelcomeMessage() {
             const welcome = document.getElementById('welcome-message');
-            if (welcome) {
-                welcome.style.display = 'none';
-            }
+            if (welcome) welcome.style.display = 'none';
         }
 
         function appendUserMessage(text) {
             hideWelcomeMessage();
             const container = document.getElementById('chat-container');
+            const isCommand = text.startsWith('/');
             const messageEl = document.createElement('div');
             messageEl.className = 'message user-message';
             messageEl.innerHTML = `
                 <div class="message-content">
-                    <div class="message-text">${escapeHtml(text)}</div>
+                    <div class="message-text ${isCommand ? 'command-text' : ''}">${escapeHtml(text)}</div>
                 </div>
                 <div class="message-avatar user-avatar">You</div>
             `;
@@ -259,10 +301,10 @@
             const messageEl = document.createElement('div');
             messageEl.className = 'message assistant-message';
             
-            // Format the main answer
             const formattedAnswer = formatResponse(data.answer);
+            const modeIcon = getModeIcon(data.mode || 'normal');
+            const modeBadge = data.command ? `<span class="mode-badge">${modeIcon} /${data.command}</span>` : '';
             
-            // Build responses list for expansion
             const responsesHtml = data.responses.map(r => `
                 <div class="model-response ${r.model === data.chosen_model ? 'chosen' : ''}">
                     <div class="model-response-header">
@@ -274,10 +316,11 @@
             `).join('');
 
             messageEl.innerHTML = `
-                <div class="message-avatar assistant-avatar">${getModelIcon(getModelBehavior(data.chosen_model))}</div>
+                <div class="message-avatar assistant-avatar">${modeIcon}</div>
                 <div class="message-content">
                     <div class="message-meta">
                         <span class="chosen-model">${data.chosen_model}</span>
+                        ${modeBadge}
                         <span class="meta-separator">•</span>
                         <span class="memory-summary">${data.memory_summary || ''}</span>
                     </div>
@@ -287,32 +330,37 @@
                             <span>Show all ${data.responses.length} responses</span>
                             <span class="expand-icon">▼</span>
                         </summary>
-                        <div class="responses-list">
-                            ${responsesHtml}
-                        </div>
+                        <div class="responses-list">${responsesHtml}</div>
                     </details>
                 </div>
             `;
             container.appendChild(messageEl);
-            
-            // Highlight the chosen model in sidebar
             highlightChosenModel(data.chosen_model);
             scrollToBottom();
         }
 
-        function appendLoadingMessage() {
+        function appendLoadingMessage(mode = 'normal') {
             const container = document.getElementById('chat-container');
             const loadingEl = document.createElement('div');
             loadingEl.className = 'message assistant-message loading-message';
             loadingEl.id = 'loading-message';
+            
+            const modeText = {
+                'research': 'Researching...',
+                'deepthinking': 'Thinking deeply...',
+                'swarm': 'Swarm collaborating...',
+                'code': 'Generating code...',
+                'normal': 'Council is deliberating...',
+            }[mode] || 'Processing...';
+            
             loadingEl.innerHTML = `
-                <div class="message-avatar assistant-avatar">⏳</div>
+                <div class="message-avatar assistant-avatar">${getModeIcon(mode)}</div>
                 <div class="message-content">
                     <div class="loading-indicator">
                         <span class="loading-dot"></span>
                         <span class="loading-dot"></span>
                         <span class="loading-dot"></span>
-                        <span class="loading-text">Council is deliberating...</span>
+                        <span class="loading-text">${modeText}</span>
                     </div>
                 </div>
             `;
@@ -322,9 +370,7 @@
 
         function removeLoadingMessage() {
             const loading = document.getElementById('loading-message');
-            if (loading) {
-                loading.remove();
-            }
+            if (loading) loading.remove();
         }
 
         function appendErrorMessage(error) {
@@ -342,22 +388,17 @@
         }
 
         function highlightChosenModel(modelName) {
-            // Remove previous highlight
-            document.querySelectorAll('.model-item').forEach(el => {
-                el.classList.remove('chosen');
-            });
-            
-            // Add highlight to chosen model
+            document.querySelectorAll('.model-item').forEach(el => el.classList.remove('chosen'));
             const chosenEl = document.querySelector(`.model-item[data-model="${modelName}"]`);
-            if (chosenEl) {
-                chosenEl.classList.add('chosen');
-            }
+            if (chosenEl) chosenEl.classList.add('chosen');
         }
 
-        function getModelBehavior(modelName) {
-            if (!councilInfo) return 'thoughtful';
-            const model = councilInfo.models.find(m => m.name === modelName);
-            return model ? model.behavior : 'thoughtful';
+        function highlightCommand(command) {
+            document.querySelectorAll('.command-item').forEach(el => el.classList.remove('active'));
+            if (command) {
+                const cmdEl = document.querySelector(`.command-item[data-command="${command}"]`);
+                if (cmdEl) cmdEl.classList.add('active');
+            }
         }
 
         // =============================================================================
@@ -366,29 +407,33 @@
         
         async function handleSubmit(event) {
             event.preventDefault();
-            
             if (isLoading) return;
             
             const input = document.getElementById('message-input');
             const message = input.value.trim();
-            
             if (!message) return;
             
-            const mode = document.getElementById('mode-select').value;
             const useRag = document.getElementById('use-rag').checked;
             
-            // Clear input and show user message
+            // Detect mode from message
+            let mode = 'normal';
+            if (message.startsWith('/research')) mode = 'research';
+            else if (message.startsWith('/deepthinking')) mode = 'deepthinking';
+            else if (message.startsWith('/swarm')) mode = 'swarm';
+            else if (message.startsWith('/code')) mode = 'code';
+            
             input.value = '';
             resetTextareaHeight();
+            hideInputHints();
             appendUserMessage(message);
+            highlightCommand(mode !== 'normal' ? mode : null);
             
-            // Show loading state
             isLoading = true;
             updateSendButton(true);
-            appendLoadingMessage();
+            appendLoadingMessage(mode);
             
             try {
-                const data = await sendMessage(message, mode, useRag);
+                const data = await sendMessage(message, useRag);
                 removeLoadingMessage();
                 appendAssistantMessage(data);
             } catch (error) {
@@ -397,7 +442,15 @@
             } finally {
                 isLoading = false;
                 updateSendButton(false);
+                highlightCommand(null);
             }
+        }
+
+        function insertCommand(command) {
+            const input = document.getElementById('message-input');
+            input.value = `/${command} `;
+            input.focus();
+            showInputHints(command);
         }
 
         function clearChat() {
@@ -409,11 +462,7 @@
                     <p>Start a conversation with your local AI council.</p>
                 </div>
             `;
-            
-            // Clear model highlight
-            document.querySelectorAll('.model-item').forEach(el => {
-                el.classList.remove('chosen');
-            });
+            document.querySelectorAll('.model-item').forEach(el => el.classList.remove('chosen'));
         }
 
         // =============================================================================
@@ -423,24 +472,52 @@
         function setupTextarea() {
             const textarea = document.getElementById('message-input');
             
-            // Auto-resize
             textarea.addEventListener('input', () => {
                 textarea.style.height = 'auto';
                 textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+                
+                // Check for command hints
+                const value = textarea.value;
+                if (value.startsWith('/')) {
+                    const cmd = value.slice(1).split(' ')[0];
+                    showInputHints(cmd);
+                } else {
+                    hideInputHints();
+                }
             });
             
-            // Handle Enter key
             textarea.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     document.getElementById('chat-form').dispatchEvent(new Event('submit'));
                 }
-                
                 if (e.key === 'Escape') {
                     textarea.value = '';
                     resetTextareaHeight();
+                    hideInputHints();
                 }
             });
+        }
+
+        function showInputHints(command) {
+            const hints = document.getElementById('input-hints');
+            const hintText = {
+                'research': '🔬 Research: Add your query to search the web for context',
+                'deepthinking': '🧠 Deep Thinking: Add a problem to analyze with extended reasoning',
+                'swarm': '🐝 Swarm: Describe a coding task for multi-agent collaboration',
+                'code': '⌨️ Code: Add your coding request',
+            }[command];
+            
+            if (hintText) {
+                hints.textContent = hintText;
+                hints.style.display = 'block';
+            } else {
+                hints.style.display = 'none';
+            }
+        }
+
+        function hideInputHints() {
+            document.getElementById('input-hints').style.display = 'none';
         }
 
         function resetTextareaHeight() {
@@ -471,16 +548,31 @@
         }
 
         function formatResponse(text) {
-            // Basic code block detection and formatting
             let formatted = escapeHtml(text);
             
-            // Convert code blocks (```...```)
+            // Convert markdown headers
+            formatted = formatted.replace(/^### (.+)$/gm, '<h4>$1</h4>');
+            formatted = formatted.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+            formatted = formatted.replace(/^# (.+)$/gm, '<h2>$1</h2>');
+            
+            // Convert bold
+            formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            
+            // Convert code blocks
             formatted = formatted.replace(/```(\w*)\n?([\s\S]*?)```/g, (match, lang, code) => {
                 return `<pre class="code-block"><code class="language-${lang || 'plaintext'}">${code.trim()}</code></pre>`;
             });
             
-            // Convert inline code (`...`)
+            // Convert inline code
             formatted = formatted.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+            
+            // Convert bullet points
+            formatted = formatted.replace(/^- (.+)$/gm, '<li>$1</li>');
+            formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+            
+            // Convert checkboxes
+            formatted = formatted.replace(/\[x\]/g, '✅');
+            formatted = formatted.replace(/\[ \]/g, '⬜');
             
             // Convert line breaks
             formatted = formatted.replace(/\n/g, '<br>');
@@ -490,4 +582,3 @@
     </script>
 </body>
 </html>
-

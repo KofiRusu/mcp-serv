@@ -1,21 +1,23 @@
 """
 chat.py - Orchestrates the conversation between user and multiple models.
 
-This module implements the "council of bots" pattern:
-1. Load multiple models at startup
-2. For each user message, query all models
-3. Use a voting/selection strategy to pick the best response
-4. Maintain conversation memory and RAG context
+This module implements the "council of bots" pattern and integrates
+special command modes: /research, /deepthinking, /swarm
 """
 
 import random
 from dataclasses import dataclass
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
-from ChatOS.config import COUNCIL_STRATEGY, DATA_DIR
+from ChatOS.config import COUNCIL_STRATEGY, DATA_DIR, COMMAND_MODES
 from ChatOS.models.loader import load_models
 from ChatOS.utils.memory import ChatMemory, get_memory
 from ChatOS.utils.rag import RagEngine
+
+from .commands import CommandProcessor, ParsedCommand, get_command_processor
+from .research import ResearchEngine, get_research_engine
+from .deepthinking import DeepThinkingEngine, get_deepthinking_engine
+from .swarm import SwarmCoordinator, get_swarm_coordinator
 
 
 # =============================================================================
@@ -53,63 +55,24 @@ class CouncilVoter:
         ]
         
         if not valid_responses:
-            # Fall back to first response even if it's an error
             return responses[0]
         
         if self.strategy == "longest":
             return max(valid_responses, key=lambda x: len(x[1]))
-        
         elif self.strategy == "shortest":
             return min(valid_responses, key=lambda x: len(x[1]))
-        
         elif self.strategy == "random":
             return random.choice(valid_responses)
-        
         elif self.strategy == "first":
             return valid_responses[0]
         
-        # Default fallback
         return valid_responses[0]
-
-    def score_response(self, text: str) -> float:
-        """
-        Calculate a quality score for a response.
-        
-        This is a placeholder for more sophisticated scoring.
-        Could incorporate:
-        - Response length (not too short, not too long)
-        - Coherence metrics
-        - Relevance to query
-        - Grammar/spelling
-        
-        Args:
-            text: The response text to score
-            
-        Returns:
-            A quality score between 0.0 and 1.0
-        """
-        if not text:
-            return 0.0
-        
-        # Simple heuristic: prefer medium-length responses
-        length = len(text)
-        if length < 10:
-            return 0.1
-        elif length < 50:
-            return 0.5
-        elif length < 500:
-            return 1.0
-        elif length < 1000:
-            return 0.8
-        else:
-            return 0.6
 
 
 # =============================================================================
 # Global instances (loaded once at module import)
 # =============================================================================
 
-# Load models once at startup
 _models: Optional[Dict[str, Any]] = None
 _rag: Optional[RagEngine] = None
 _voter: Optional[CouncilVoter] = None
@@ -152,26 +115,27 @@ async def chat_endpoint(
     """
     Execute a chat turn with the model council.
     
-    This is the main entry point for chat interactions. It:
-    1. Retrieves conversation memory and RAG context
-    2. Builds the prompt for all models
-    3. Queries each model in the council
-    4. Uses the voter to select the best response
-    5. Updates conversation memory
-    
-    Args:
-        message: The user's message
-        mode: Chat mode - "normal" or "code"
-        use_rag: Whether to include RAG context
-        session_id: Optional session identifier for memory
-        
-    Returns:
-        Dictionary containing:
-        - answer: The selected response
-        - chosen_model: Name of the model that gave the chosen response
-        - responses: List of all model responses
-        - memory_summary: Brief summary of conversation state
+    This handles both normal chat and special /commands.
     """
+    # Parse for commands
+    processor = get_command_processor()
+    parsed = processor.parse(message)
+    
+    # Handle special commands
+    if parsed.is_command:
+        return await _handle_command(parsed, session_id)
+    
+    # Normal chat flow
+    return await _normal_chat(message, mode, use_rag, session_id)
+
+
+async def _normal_chat(
+    message: str,
+    mode: str,
+    use_rag: bool,
+    session_id: Optional[str],
+) -> Dict[str, Any]:
+    """Handle normal chat messages."""
     models = _get_models()
     rag = _get_rag()
     voter = _get_voter()
@@ -193,10 +157,9 @@ async def chat_endpoint(
     # Vote on the best response
     chosen_name, chosen_answer = voter.vote(responses)
     
-    # Update memory with this turn
+    # Update memory
     memory.add_turn(message, chosen_answer)
     
-    # Format response for API
     return {
         "answer": chosen_answer,
         "chosen_model": chosen_name,
@@ -205,6 +168,135 @@ async def chat_endpoint(
             for name, text in responses
         ],
         "memory_summary": memory.get_summary(),
+        "mode": mode,
+        "command": None,
+    }
+
+
+async def _handle_command(
+    parsed: ParsedCommand,
+    session_id: Optional[str],
+) -> Dict[str, Any]:
+    """Handle special /commands."""
+    memory = get_memory(session_id)
+    
+    if parsed.command == "research":
+        return await _handle_research(parsed, memory)
+    elif parsed.command == "deepthinking":
+        return await _handle_deepthinking(parsed, memory)
+    elif parsed.command == "swarm":
+        return await _handle_swarm(parsed, memory)
+    elif parsed.command == "code":
+        # Code mode uses normal chat with code mode
+        return await _normal_chat(parsed.query, "code", True, session_id)
+    else:
+        return {
+            "answer": f"Unknown command: /{parsed.command}",
+            "chosen_model": "System",
+            "responses": [],
+            "memory_summary": memory.get_summary(),
+            "mode": "normal",
+            "command": parsed.command,
+        }
+
+
+async def _handle_research(
+    parsed: ParsedCommand,
+    memory: ChatMemory,
+) -> Dict[str, Any]:
+    """Handle /research command."""
+    engine = get_research_engine()
+    
+    # Perform research
+    depth = int(parsed.args.get("depth", "1"))
+    context = await engine.research(parsed.query, depth=depth)
+    
+    # Build response
+    answer = f"""## 🔬 Research Results
+
+{context.synthesis}
+
+### Sources ({len(context.sources)} found)
+
+"""
+    for i, source in enumerate(context.sources[:5], 1):
+        answer += f"{i}. **[{source.domain}]** {source.title}\n"
+        answer += f"   {source.snippet[:150]}...\n\n"
+    
+    # Update memory
+    memory.add_turn(f"/research {parsed.query}", answer[:200] + "...")
+    
+    return {
+        "answer": answer,
+        "chosen_model": "Research Engine",
+        "responses": [{
+            "model": "Research Engine",
+            "text": answer,
+        }],
+        "memory_summary": memory.get_summary(),
+        "mode": "research",
+        "command": "research",
+        "research_context": context.to_dict(),
+    }
+
+
+async def _handle_deepthinking(
+    parsed: ParsedCommand,
+    memory: ChatMemory,
+) -> Dict[str, Any]:
+    """Handle /deepthinking command."""
+    engine = get_deepthinking_engine()
+    
+    # Perform deep thinking
+    thought = await engine.think(parsed.query)
+    
+    # Format response
+    answer = engine.format_for_display(thought)
+    
+    # Update memory
+    memory.add_turn(f"/deepthinking {parsed.query}", thought.final_answer[:200] + "...")
+    
+    return {
+        "answer": answer,
+        "chosen_model": "Deep Thinking Engine",
+        "responses": [{
+            "model": f"Phase: {step.phase}",
+            "text": step.content,
+        } for step in thought.thoughts],
+        "memory_summary": memory.get_summary(),
+        "mode": "deepthinking",
+        "command": "deepthinking",
+        "thinking_result": thought.to_dict(),
+    }
+
+
+async def _handle_swarm(
+    parsed: ParsedCommand,
+    memory: ChatMemory,
+) -> Dict[str, Any]:
+    """Handle /swarm command."""
+    coordinator = get_swarm_coordinator()
+    
+    # Execute swarm
+    result = await coordinator.execute(parsed.query)
+    
+    # Format response
+    answer = coordinator.format_result(result)
+    
+    # Update memory
+    memory.add_turn(f"/swarm {parsed.query}", f"Swarm completed with {len(result.responses)} agents")
+    
+    return {
+        "answer": answer,
+        "chosen_model": "Swarm Coordinator",
+        "responses": [{
+            "model": f"{r.agent_name} ({r.agent_role})",
+            "text": r.content,
+        } for r in result.responses],
+        "memory_summary": memory.get_summary(),
+        "mode": "swarm",
+        "command": "swarm",
+        "swarm_result": result.to_dict(),
     }
 
 
@@ -215,19 +307,7 @@ def _build_prompt(
     memory: ChatMemory,
     rag: RagEngine,
 ) -> str:
-    """
-    Build the full prompt including context, memory, and user message.
-    
-    Args:
-        message: The user's current message
-        mode: Chat mode for instruction tuning
-        use_rag: Whether to include RAG context
-        memory: The conversation memory
-        rag: The RAG engine
-        
-    Returns:
-        Formatted prompt string
-    """
+    """Build the full prompt including context, memory, and user message."""
     parts = []
     
     # System instruction based on mode
@@ -260,12 +340,7 @@ def _build_prompt(
 
 
 def get_council_info() -> Dict[str, Any]:
-    """
-    Get information about the current council configuration.
-    
-    Returns:
-        Dictionary with model names, voter strategy, and RAG status
-    """
+    """Get information about the current council configuration."""
     models = _get_models()
     rag = _get_rag()
     voter = _get_voter()
@@ -280,5 +355,10 @@ def get_council_info() -> Dict[str, Any]:
         ],
         "strategy": voter.strategy,
         "rag_documents": len(rag),
+        "available_commands": list(COMMAND_MODES.keys()),
     }
 
+
+def get_available_commands() -> Dict[str, Any]:
+    """Get information about available commands."""
+    return COMMAND_MODES
