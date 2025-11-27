@@ -2,17 +2,7 @@
 
 <div align="center">
 
-⚡ **A PewDiePie-style Local AI Interface**
-
 *Multiple models. One answer. Your machine.*
-
-</div>
-
----
-
-## What is ChatOS?
-
-ChatOS is inspired by [PewDiePie's custom AI setup](https://www.youtube.com/watch?v=...). It demonstrates how to run multiple language models locally and combine their responses using a "**council of bots**" approach.
 
 ### Key Features
 
