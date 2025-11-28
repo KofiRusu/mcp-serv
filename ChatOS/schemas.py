@@ -27,6 +27,7 @@ class ChatRequest(BaseModel):
     session_id: Optional[str] = Field(None, description="Session identifier")
     project_id: Optional[str] = Field(None, description="Project ID for project-specific context")
     attachment_ids: Optional[List[str]] = Field(None, description="IDs of attached files")
+    model_id: Optional[str] = Field(None, description="Specific model ID to use (bypasses council voting)")
 
 
 class ModelResponse(BaseModel):

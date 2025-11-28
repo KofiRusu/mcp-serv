@@ -30,6 +30,8 @@ from ChatOS.controllers.attachments import get_attachment_manager
 from ChatOS.controllers.project_memory import get_project_memory_manager
 from ChatOS.controllers.model_config import get_model_config_manager, ModelConfig, ModelProvider
 from ChatOS.controllers.llm_client import get_llm_client
+from ChatOS.controllers.memory_logger import get_memory_logger, InteractionQuality
+from ChatOS.controllers.auto_trainer import get_auto_trainer, TrainingConfig
 from ChatOS.schemas import (
     ChatRequest,
     ChatResponse,
@@ -178,6 +180,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
             mode=request.mode,
             use_rag=request.use_rag,
             session_id=request.session_id,
+            model_id=request.model_id,
         )
         
         # Store in project memory if applicable
@@ -742,6 +745,146 @@ async def delete_ollama_model(model_name: str):
     if result["success"]:
         return result
     raise HTTPException(status_code=500, detail=result.get("error", "Failed to delete model"))
+
+
+# =============================================================================
+# Memory & Training API
+# =============================================================================
+
+@app.get("/api/memory/stats", tags=["Memory & Training"])
+async def get_memory_stats():
+    """Get current memory logging statistics."""
+    logger = get_memory_logger()
+    return logger.get_session_stats()
+
+
+@app.get("/api/memory/analytics", tags=["Memory & Training"])
+async def get_analytics():
+    """Generate comprehensive analytics report."""
+    logger = get_memory_logger()
+    return logger.generate_analytics_report()
+
+
+@app.post("/api/memory/feedback/{conversation_id}", tags=["Memory & Training"])
+async def submit_feedback(
+    conversation_id: str,
+    thumbs_up: bool,
+    feedback: str = None,
+):
+    """Submit feedback for a conversation."""
+    logger = get_memory_logger()
+    
+    if thumbs_up:
+        logger.thumbs_up(conversation_id)
+    else:
+        logger.thumbs_down(conversation_id, feedback)
+    
+    return {"success": True, "conversation_id": conversation_id}
+
+
+@app.post("/api/memory/rate/{conversation_id}", tags=["Memory & Training"])
+async def rate_conversation(
+    conversation_id: str,
+    quality: str,  # excellent, good, acceptable, poor, failed
+    feedback: str = None,
+):
+    """Rate a conversation's quality for training."""
+    logger = get_memory_logger()
+    
+    try:
+        q = InteractionQuality(quality)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid quality: {quality}")
+    
+    logger.rate_conversation(conversation_id, q, feedback)
+    return {"success": True}
+
+
+@app.post("/api/memory/export", tags=["Memory & Training"])
+async def export_training_data(
+    min_quality: str = "acceptable",
+    start_date: str = None,
+    end_date: str = None,
+):
+    """Export logged conversations as training data."""
+    logger = get_memory_logger()
+    
+    try:
+        q = InteractionQuality(min_quality)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid quality: {min_quality}")
+    
+    stats = logger.export_training_data(
+        min_quality=q,
+        start_date=start_date,
+        end_date=end_date,
+    )
+    return stats
+
+
+@app.get("/api/training/status", tags=["Memory & Training"])
+async def get_training_status():
+    """Get current training system status."""
+    trainer = get_auto_trainer()
+    return trainer.get_training_status()
+
+
+@app.get("/api/training/data-stats", tags=["Memory & Training"])
+async def get_training_data_stats():
+    """Get statistics about available training data."""
+    trainer = get_auto_trainer()
+    return trainer.data_preparer.get_data_stats()
+
+
+@app.post("/api/training/start", tags=["Memory & Training"])
+async def start_training(
+    force: bool = False,
+    epochs: int = None,
+    learning_rate: float = None,
+):
+    """Start a training run to enhance the model."""
+    trainer = get_auto_trainer()
+    
+    # Check readiness
+    if not force:
+        check = trainer.should_train()
+        if not check["should_train"]:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Not ready for training: {check['reason']}"
+            )
+    
+    # Create custom config if params provided
+    config = TrainingConfig()
+    if epochs is not None:
+        config.epochs = epochs
+    if learning_rate is not None:
+        config.learning_rate = learning_rate
+    
+    try:
+        run = trainer.start_training(config=config, force=force)
+        return {
+            "success": True,
+            "run_id": run.run_id,
+            "num_samples": run.num_samples,
+            "status": run.status,
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/training/models", tags=["Memory & Training"])
+async def list_trained_models():
+    """List all trained/enhanced models."""
+    trainer = get_auto_trainer()
+    return {"models": trainer.list_models()}
+
+
+@app.get("/api/training/should-train", tags=["Memory & Training"])
+async def check_should_train():
+    """Check if the system is ready for training."""
+    trainer = get_auto_trainer()
+    return trainer.should_train()
 
 
 # =============================================================================

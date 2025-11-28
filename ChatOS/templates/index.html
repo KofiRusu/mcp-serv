@@ -21,6 +21,8 @@
                 <span class="version">v0.1</span>
             </div>
 
+            <!-- Scrollable Content Area -->
+            <div class="sidebar-content">
             <!-- Command Palette -->
             <div class="sidebar-section">
                 <h3 class="section-title">Commands</h3>
@@ -107,6 +109,7 @@
                     </a>
                 </div>
             </div>
+            </div><!-- End sidebar-content -->
 
             <div class="sidebar-footer">
                 <a href="/projects" class="btn btn-primary btn-small sidebar-btn">
@@ -159,12 +162,23 @@
             </div>
 
             <div class="input-container">
+                <!-- Model selector bar -->
+                <div class="model-selector-bar">
+                    <div class="model-selector-wrapper">
+                        <label for="model-selector" class="model-selector-label">Model:</label>
+                        <select id="model-selector" class="model-selector" onchange="onModelSelect(this)">
+                            <option value="">🏛️ Council (All Models)</option>
+                        </select>
+                    </div>
+                    <span id="model-mode-indicator" class="model-mode-indicator">Council Mode</span>
+                </div>
+                
                 <!-- Attachment preview -->
                 <div id="attachment-preview" class="attachment-preview" style="display: none;">
                     <div id="attachment-list" class="attachment-list"></div>
                 </div>
                 
-                <form id="chat-form" onsubmit="handleSubmit(event)">
+                <form id="chat-form" onsubmit="return handleSubmit(event)" action="javascript:void(0);">
                     <div class="input-wrapper">
                         <button type="button" class="attach-button" onclick="triggerFileUpload()" title="Attach file">
                             📎
@@ -175,7 +189,7 @@
                             rows="1"
                             autofocus
                         ></textarea>
-                        <button type="submit" class="send-button" id="send-button">
+                        <button type="button" class="send-button" id="send-button" onclick="handleSubmit(event)">
                             <span class="send-icon">➤</span>
                         </button>
                     </div>
@@ -200,13 +214,71 @@
         let commandSuggestions = [];
         let attachments = [];  // Current attachments
         let sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
+        let availableModels = [];  // All enabled models (not just council)
+        let selectedModelId = null;  // null = use council, string = use specific model
 
         // =============================================================================
         // Initialization
         // =============================================================================
         
+        // =============================================================================
+        //  Window Size Auto-Detection
+        // =============================================================================
+        
+        const BREAKPOINTS = {
+            compact: 900,
+            medium: 1100,
+            large: 1400,
+            xlarge: 1600
+        };
+        
+        let currentSize = 'large';
+        
+        function detectWindowSize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            // Determine size category
+            let newSize;
+            if (width < BREAKPOINTS.compact) {
+                newSize = 'compact';
+            } else if (width < BREAKPOINTS.medium) {
+                newSize = 'medium';
+            } else if (width < BREAKPOINTS.large) {
+                newSize = 'large';
+            } else {
+                newSize = 'xlarge';
+            }
+            
+            // Update body class for CSS targeting
+            if (newSize !== currentSize) {
+                document.body.classList.remove('size-compact', 'size-medium', 'size-large', 'size-xlarge');
+                document.body.classList.add(`size-${newSize}`);
+                currentSize = newSize;
+                console.log(`Window size: ${width}x${height} (${newSize})`);
+            }
+            
+            return { width, height, size: newSize };
+        }
+        
+        // Debounce for performance
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func(...args), wait);
+            };
+        }
+        
+        // Listen for resize
+        window.addEventListener('resize', debounce(detectWindowSize, 100));
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Initial size detection
+            detectWindowSize();
+            
             loadCouncilInfo();
+            loadAvailableModels();
             checkHealth();
             setupTextarea();
             setInterval(checkHealth, 30000);
@@ -220,10 +292,20 @@
             try {
                 const response = await fetch('/api/council');
                 councilInfo = await response.json();
-                renderModelList(councilInfo.models);
                 updateStrategyDisplay(councilInfo.strategy);
             } catch (error) {
                 console.error('Failed to load council info:', error);
+            }
+        }
+
+        async function loadAvailableModels() {
+            try {
+                const response = await fetch('/api/models?enabled_only=true');
+                availableModels = await response.json();
+                renderModelSelector(availableModels);
+                renderModelList(availableModels);
+            } catch (error) {
+                console.error('Failed to load models:', error);
             }
         }
 
@@ -249,27 +331,49 @@
         async function sendMessage(message, useRag) {
             const attachmentIds = attachments.map(a => a.id);
             
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            // Use AbortController for timeout (5 minutes for complex LLM queries)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
+            
+            try {
+                const requestBody = {
                     message: message,
                     mode: 'normal',
                     use_rag: useRag,
                     session_id: sessionId,
                     attachment_ids: attachmentIds.length > 0 ? attachmentIds : null,
-                }),
-            });
+                };
+                
+                // Add model_id if a specific model is selected
+                if (selectedModelId) {
+                    requestBody.model_id = selectedModelId;
+                }
+                
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody),
+                    signal: controller.signal,
+                });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Clear attachments after sending
+                attachments = [];
+                renderAttachmentPreview();
+
+                return await response.json();
+            } catch (error) {
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    throw new Error('Request timed out. The model is taking too long to respond.');
+                }
+                throw error;
             }
-
-            // Clear attachments after sending
-            attachments = [];
-            renderAttachmentPreview();
-
-            return await response.json();
         }
 
         // =============================================================================
@@ -376,15 +480,87 @@
         
         function renderModelList(models) {
             const container = document.getElementById('model-list');
-            container.innerHTML = models.map(model => `
-                <div class="model-item" data-model="${model.name}">
-                    <span class="model-icon">${getModelIcon(model.behavior)}</span>
+            // Filter to show only real models (not dummy) in the sidebar
+            const realModels = models.filter(m => m.provider !== 'dummy');
+            container.innerHTML = realModels.map(model => `
+                <div class="model-item ${model.is_council_member ? 'council-member' : ''}" 
+                     data-model="${model.name}" 
+                     data-model-id="${model.id}"
+                     onclick="selectModelFromSidebar('${model.id}')">
+                    <span class="model-icon">${getProviderIcon(model.provider)}</span>
                     <div class="model-info">
                         <span class="model-name">${model.name}</span>
-                        <span class="model-behavior">${model.behavior}</span>
+                        <span class="model-behavior">${model.model_id}</span>
                     </div>
+                    ${model.is_council_member ? '<span class="council-badge">👥</span>' : ''}
                 </div>
             `).join('');
+        }
+
+        function renderModelSelector(models) {
+            const selector = document.getElementById('model-selector');
+            if (!selector) return;
+            
+            // Filter to real models only
+            const realModels = models.filter(m => m.provider !== 'dummy');
+            
+            let options = '<option value="">🏛️ Council (All Models)</option>';
+            realModels.forEach(model => {
+                const icon = getProviderIcon(model.provider);
+                options += `<option value="${model.id}">${icon} ${model.name}</option>`;
+            });
+            
+            selector.innerHTML = options;
+        }
+
+        function selectModelFromSidebar(modelId) {
+            selectedModelId = modelId;
+            const selector = document.getElementById('model-selector');
+            if (selector) {
+                selector.value = modelId;
+            }
+            updateModelSelectionUI();
+        }
+
+        function onModelSelect(selectElement) {
+            selectedModelId = selectElement.value || null;
+            updateModelSelectionUI();
+        }
+
+        function updateModelSelectionUI() {
+            // Update sidebar highlighting
+            document.querySelectorAll('.model-item').forEach(el => {
+                el.classList.remove('selected');
+                if (selectedModelId && el.dataset.modelId === selectedModelId) {
+                    el.classList.add('selected');
+                }
+            });
+            
+            // Update the indicator text
+            const indicator = document.getElementById('model-mode-indicator');
+            if (indicator) {
+                if (selectedModelId) {
+                    const model = availableModels.find(m => m.id === selectedModelId);
+                    indicator.textContent = model ? `Using: ${model.name}` : 'Single Model';
+                    indicator.classList.add('single-mode');
+                } else {
+                    indicator.textContent = 'Council Mode';
+                    indicator.classList.remove('single-mode');
+                }
+            }
+        }
+
+        function getProviderIcon(provider) {
+            const icons = {
+                'ollama': '🦙',
+                'openai': '🤖',
+                'anthropic': '🧠',
+                'google': '🔮',
+                'lm_studio': '💻',
+                'groq': '⚡',
+                'dummy': '🎭',
+            };
+            return icons[provider] || '🤖';
         }
 
         function getModelIcon(behavior) {
@@ -449,17 +625,30 @@
             const messageEl = document.createElement('div');
             messageEl.className = 'message assistant-message';
             
-            const formattedAnswer = formatResponse(data.answer);
-            const modeIcon = getModeIcon(data.mode || 'normal');
-            const modeBadge = data.command ? `<span class="mode-badge">${modeIcon} /${data.command}</span>` : '';
+            // Safely extract data with defaults
+            const answer = data?.answer || 'No response received';
+            const chosenModel = data?.chosen_model || 'Unknown';
+            const responses = data?.responses || [];
+            const mode = data?.mode || 'normal';
+            const memorySummary = data?.memory_summary || '';
             
-            const responsesHtml = data.responses.map(r => `
-                <div class="model-response ${r.model === data.chosen_model ? 'chosen' : ''}">
+            // Determine if this was a single model or council response
+            const isSingleModel = responses.length <= 1;
+            const responseModeBadge = isSingleModel 
+                ? '<span class="response-mode-badge single">🎯 Single</span>'
+                : '<span class="response-mode-badge council">🏛️ Council</span>';
+            
+            const formattedAnswer = formatResponse(answer);
+            const modeIcon = isSingleModel ? '🎯' : getModeIcon(mode);
+            const modeBadge = data?.command ? `<span class="mode-badge">${getModeIcon(mode)} /${data.command}</span>` : '';
+            
+            const responsesHtml = responses.map(r => `
+                <div class="model-response ${r.model === chosenModel ? 'chosen' : ''}">
                     <div class="model-response-header">
-                        <span class="model-response-name">${r.model}</span>
-                        ${r.model === data.chosen_model ? '<span class="chosen-badge">✓ Chosen</span>' : ''}
+                        <span class="model-response-name">${escapeHtml(r.model || 'Unknown')}</span>
+                        ${r.model === chosenModel ? '<span class="chosen-badge">✓ Chosen</span>' : ''}
                     </div>
-                    <div class="model-response-text">${escapeHtml(r.text)}</div>
+                    <div class="model-response-text">${escapeHtml(r.text || '')}</div>
                 </div>
             `).join('');
 
@@ -467,23 +656,26 @@
                 <div class="message-avatar assistant-avatar">${modeIcon}</div>
                 <div class="message-content">
                     <div class="message-meta">
-                        <span class="chosen-model">${data.chosen_model}</span>
+                        ${responseModeBadge}
+                        <span class="chosen-model">${escapeHtml(chosenModel)}</span>
                         ${modeBadge}
                         <span class="meta-separator">•</span>
-                        <span class="memory-summary">${data.memory_summary || ''}</span>
+                        <span class="memory-summary">${escapeHtml(memorySummary)}</span>
                     </div>
                     <div class="message-text">${formattedAnswer}</div>
+                    ${responses.length > 1 ? `
                     <details class="responses-details">
                         <summary class="responses-summary">
-                            <span>Show all ${data.responses.length} responses</span>
+                            <span>Show all ${responses.length} council responses</span>
                             <span class="expand-icon">▼</span>
                         </summary>
                         <div class="responses-list">${responsesHtml}</div>
                     </details>
+                    ` : ''}
                 </div>
             `;
             container.appendChild(messageEl);
-            highlightChosenModel(data.chosen_model);
+            highlightChosenModel(chosenModel);
             scrollToBottom();
         }
 
@@ -493,16 +685,36 @@
             loadingEl.className = 'message assistant-message loading-message';
             loadingEl.id = 'loading-message';
             
-            const modeText = {
-                'research': 'Researching...',
-                'deepthinking': 'Thinking deeply...',
-                'swarm': 'Swarm collaborating...',
-                'code': 'Generating code...',
-                'normal': 'Council is deliberating...',
-            }[mode] || 'Processing...';
+            // Determine loading text based on mode AND model selection
+            let modeText;
+            let avatarIcon;
+            
+            if (selectedModelId) {
+                // Single model mode
+                const model = availableModels.find(m => m.id === selectedModelId);
+                const modelName = model ? model.name : 'Model';
+                modeText = {
+                    'research': 'Researching...',
+                    'deepthinking': 'Thinking deeply...',
+                    'swarm': 'Swarm collaborating...',
+                    'code': `${modelName} is coding...`,
+                    'normal': `${modelName} is thinking...`,
+                }[mode] || `${modelName} is processing...`;
+                avatarIcon = '🎯';
+            } else {
+                // Council mode
+                modeText = {
+                    'research': 'Researching...',
+                    'deepthinking': 'Thinking deeply...',
+                    'swarm': 'Swarm collaborating...',
+                    'code': 'Council is generating code...',
+                    'normal': 'Council is deliberating...',
+                }[mode] || 'Processing...';
+                avatarIcon = getModeIcon(mode);
+            }
             
             loadingEl.innerHTML = `
-                <div class="message-avatar assistant-avatar">${getModeIcon(mode)}</div>
+                <div class="message-avatar assistant-avatar">${avatarIcon}</div>
                 <div class="message-content">
                     <div class="loading-indicator">
                         <span class="loading-dot"></span>
@@ -554,14 +766,19 @@
         // =============================================================================
         
         async function handleSubmit(event) {
-            event.preventDefault();
-            if (isLoading) return;
+            // Prevent form submission / page refresh
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            if (isLoading) return false;
             
             const input = document.getElementById('message-input');
             const message = input.value.trim();
-            if (!message) return;
+            if (!message) return false;
             
-            const useRag = document.getElementById('use-rag').checked;
+            const useRag = document.getElementById('use-rag')?.checked ?? true;
             
             // Detect mode from message
             let mode = 'normal';
@@ -585,13 +802,16 @@
                 removeLoadingMessage();
                 appendAssistantMessage(data);
             } catch (error) {
+                console.error('Chat error:', error);
                 removeLoadingMessage();
-                appendErrorMessage(error.message);
+                appendErrorMessage(error.message || 'An error occurred');
             } finally {
                 isLoading = false;
                 updateSendButton(false);
                 highlightCommand(null);
             }
+            
+            return false; // Prevent form submission
         }
 
         function insertCommand(command) {
@@ -637,7 +857,8 @@
             textarea.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    document.getElementById('chat-form').dispatchEvent(new Event('submit'));
+                    e.stopPropagation();
+                    handleSubmit(e);
                 }
                 if (e.key === 'Escape') {
                     textarea.value = '';
