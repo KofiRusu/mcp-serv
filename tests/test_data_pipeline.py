@@ -204,13 +204,13 @@ class TestDatasetStats:
         stats = DatasetStats(
             total_conversations=100,
             filtered_conversations=80,
-            training_examples=72,
-            eval_examples=8,
+            total_examples=72,
             positive_examples=50,
             neutral_examples=30,
-            negative_examples=20,
+            negative_excluded=20,
         )
         
         assert stats.total_conversations == 100
-        assert stats.training_examples + stats.eval_examples == 80
+        assert stats.total_examples == 72
+        assert stats.positive_examples == 50
 
