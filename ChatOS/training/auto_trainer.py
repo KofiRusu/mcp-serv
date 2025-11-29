@@ -69,7 +69,7 @@ def get_training_stats() -> Dict[str, Any]:
             "training_examples": total_count,
             "positive_feedback": positive_count,
             "neutral_unrated": stats.neutral_examples,
-            "negative_excluded": stats.negative_examples,
+            "negative_excluded": stats.negative_excluded,
             "min_samples_required": min_samples,
             "min_quality_ratio": settings.min_quality_ratio,
             "current_quality_ratio": quality_ratio,
@@ -149,7 +149,7 @@ def start_training_job(
     except Exception as e:
         raise TrainingError(f"Failed to generate datasets: {e}")
     
-    if dataset_stats.training_examples < 1:
+    if dataset_stats.total_examples < 1:
         raise TrainingError("No training examples generated")
     
     # Step 2: Create job specification
@@ -160,7 +160,7 @@ def start_training_job(
         model_name=model_name or settings.default_base_model,
         train_path=str(train_path),
         eval_path=str(eval_path),
-        description=description or f"ChatOS training job - {dataset_stats.training_examples} examples",
+        description=description or f"ChatOS training job - {dataset_stats.total_examples} examples",
     )
     
     logger.info(f"Created job spec: {job_spec.id}")

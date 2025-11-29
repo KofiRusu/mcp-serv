@@ -149,7 +149,7 @@ def load_raw_conversations(log_root: Optional[Path] = None) -> List[Conversation
         print(f"Warning: Training data directory does not exist: {log_root}")
         return conversations
     
-    # Load all JSONL files
+    # Load all JSONL files (multi-conversation per file)
     for jsonl_file in sorted(log_root.glob("*.jsonl")):
         try:
             with open(jsonl_file, "r", encoding="utf-8") as f:
@@ -169,6 +169,19 @@ def load_raw_conversations(log_root: Optional[Path] = None) -> List[Conversation
                         print(f"Warning: Error parsing {jsonl_file}:{line_num}: {e}")
         except Exception as e:
             print(f"Warning: Could not read {jsonl_file}: {e}")
+    
+    # Also load individual JSON files (one conversation per file)
+    for json_file in sorted(log_root.glob("*.json")):
+        try:
+            with open(json_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                conv = _parse_conversation(data)
+                if conv:
+                    conversations.append(conv)
+        except json.JSONDecodeError as e:
+            print(f"Warning: Invalid JSON in {json_file}: {e}")
+        except Exception as e:
+            print(f"Warning: Could not read {json_file}: {e}")
     
     print(f"Loaded {len(conversations)} conversations from {log_root}")
     return conversations
@@ -196,14 +209,25 @@ def _parse_conversation(data: Dict[str, Any]) -> Optional[Conversation]:
     if not messages:
         return None
     
+    # Try to get thumbs_up from multiple sources
+    thumbs_up = metadata.get("thumbs_up")
+    if thumbs_up is None:
+        # Check for feedback_score at top level
+        feedback_score = data.get("feedback_score")
+        if feedback_score is not None:
+            thumbs_up = feedback_score > 0
+    
+    # Get conversation_id from multiple sources
+    conv_id = metadata.get("conversation_id") or data.get("id") or "unknown"
+    
     return Conversation(
-        conversation_id=metadata.get("conversation_id", "unknown"),
+        conversation_id=conv_id,
         messages=messages,
-        mode=metadata.get("mode", "normal"),
-        model=metadata.get("model"),
+        mode=metadata.get("mode") or data.get("mode", "normal"),
+        model=metadata.get("model") or data.get("model"),
         quality=metadata.get("quality", "unrated"),
-        thumbs_up=metadata.get("thumbs_up"),
-        timestamp=metadata.get("timestamp"),
+        thumbs_up=thumbs_up,
+        timestamp=metadata.get("timestamp") or data.get("timestamp"),
     )
 
 

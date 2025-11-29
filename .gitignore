@@ -75,3 +75,4 @@ secrets.json
 *.pem
 *.key
 
+unsloth_compiled_cache/

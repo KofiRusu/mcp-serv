@@ -110,7 +110,8 @@ def start_training_process(
         f'source {venv_path}/bin/activate && '
         f'cd {unsloth_dir} && '
         f'CHATOS_JOB_ID={job_spec.id} '
-        f'python train_qlora.py --config {config_path}'
+        f'PYTHONUNBUFFERED=1 '
+        f'python -u train_qlora.py --config {config_path}'
     )
     
     # Open log file for writing
@@ -135,6 +136,7 @@ def start_training_process(
         env={
             **os.environ,
             "CHATOS_JOB_ID": job_spec.id,
+            "PYTHONUNBUFFERED": "1",
         },
     )
     
