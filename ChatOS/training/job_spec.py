@@ -27,6 +27,14 @@ class TrainingJobSpec:
     id: str = field(default_factory=lambda: f"job_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}")
     description: Optional[str] = None
     
+    # Preset and model info
+    preset_name: str = "BALANCED"
+    model_key: str = "qwen2.5-7b-instruct"  # Key in MODEL_CONFIGS
+    
+    # Dataset versioning
+    dataset_version: int = 0
+    dataset_sample_count: int = 0
+    
     # Model configuration
     base_model_name: str = "unsloth/Qwen2.5-7B-Instruct-bnb-4bit"
     max_seq_length: int = 2048
@@ -100,6 +108,65 @@ class TrainingJobSpec:
                 spec.chat_template = "llama-3"
             else:
                 spec.chat_template = "chatml"
+        
+        if train_path:
+            spec.dataset_train_path = str(Path(train_path).resolve())
+        if eval_path:
+            spec.dataset_eval_path = str(Path(eval_path).resolve())
+        
+        return spec
+    
+    @classmethod
+    def from_preset(
+        cls,
+        preset_name: str = "BALANCED",
+        model_key: str = "qwen2.5-7b-instruct",
+        train_path: Optional[str] = None,
+        eval_path: Optional[str] = None,
+        dataset_version: int = 0,
+        dataset_sample_count: int = 0,
+        description: Optional[str] = None,
+    ) -> "TrainingJobSpec":
+        """
+        Create a TrainingJobSpec from a preset and model configuration.
+        
+        Args:
+            preset_name: Name of the preset (FAST, BALANCED, QUALITY)
+            model_key: Model key from MODEL_CONFIGS
+            train_path: Path to training dataset
+            eval_path: Path to evaluation dataset
+            dataset_version: Dataset version number
+            dataset_sample_count: Number of samples in dataset
+            description: Optional job description
+        
+        Returns:
+            TrainingJobSpec configured from preset
+        """
+        from ChatOS.training.presets import get_preset, get_model_config
+        
+        preset = get_preset(preset_name)
+        model_config = get_model_config(model_key)
+        
+        spec = cls(
+            description=description,
+            preset_name=preset_name,
+            model_key=model_key,
+            dataset_version=dataset_version,
+            dataset_sample_count=dataset_sample_count,
+            base_model_name=model_config.unsloth_name,
+            chat_template=model_config.chat_template,
+            # From preset
+            num_epochs=preset.epochs,
+            learning_rate=preset.learning_rate,
+            per_device_batch_size=preset.batch_size,
+            gradient_accumulation_steps=preset.gradient_accumulation_steps,
+            warmup_ratio=preset.warmup_ratio,
+            weight_decay=preset.weight_decay,
+            lora_r=preset.lora_r,
+            lora_alpha=preset.lora_alpha,
+            eval_steps=preset.eval_steps,
+            save_steps=preset.save_steps,
+        )
         
         if train_path:
             spec.dataset_train_path = str(Path(train_path).resolve())

@@ -51,6 +51,7 @@ def create_job(
     pid: int,
     config_path: Path,
     log_path: Path,
+    dataset_stats: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Create a new job record.
@@ -60,6 +61,7 @@ def create_job(
         pid: Process ID of the training process
         config_path: Path to the config YAML file
         log_path: Path to the log file
+        dataset_stats: Optional dataset statistics
     
     Returns:
         The created job record
@@ -74,6 +76,7 @@ def create_job(
         "log_path": str(log_path),
         "output_dir": job_spec.output_dir,
         "base_model_name": job_spec.base_model_name,
+        "model_key": job_spec.model_key,
         "dataset_train_path": job_spec.dataset_train_path,
         "dataset_eval_path": job_spec.dataset_eval_path,
         "description": job_spec.description,
@@ -82,6 +85,11 @@ def create_job(
         "finished_at": None,
         "latest_metrics": None,
         "error_snippet": None,
+        # New versioning and preset fields
+        "preset_name": job_spec.preset_name,
+        "dataset_version": job_spec.dataset_version,
+        "dataset_sample_count": job_spec.dataset_sample_count,
+        "dataset_stats": dataset_stats,
         "hyperparameters": {
             "learning_rate": job_spec.learning_rate,
             "num_epochs": job_spec.num_epochs,
@@ -90,7 +98,11 @@ def create_job(
             "gradient_accumulation_steps": job_spec.gradient_accumulation_steps,
             "lora_r": job_spec.lora_r,
             "lora_alpha": job_spec.lora_alpha,
+            "warmup_ratio": job_spec.warmup_ratio,
+            "weight_decay": job_spec.weight_decay,
         },
+        # Export info (filled in after training)
+        "export_info": None,
     }
     
     _save_job(job)

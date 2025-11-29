@@ -23,9 +23,13 @@ router = APIRouter(prefix="/api/training/unsloth", tags=["Training (Unsloth)"])
 
 class StartTrainingRequest(BaseModel):
     """Request to start a new training job."""
-    model_name: Optional[str] = Field(
+    preset: Optional[str] = Field(
         None,
-        description="Base model to fine-tune (default: Qwen2.5-7B-Instruct)"
+        description="Training preset: FAST, BALANCED, or QUALITY (default: BALANCED)"
+    )
+    model: Optional[str] = Field(
+        None,
+        description="Model to fine-tune: qwen2.5-7b-instruct, qwen2.5-coder-7b, mistral-7b-instruct"
     )
     description: Optional[str] = Field(
         None,
@@ -82,6 +86,56 @@ async def get_training_stats():
     
     from ChatOS.training.auto_trainer import get_training_stats
     return get_training_stats()
+
+
+@router.get("/presets")
+async def get_presets():
+    """
+    Get available training presets.
+    
+    Returns:
+        Dict of preset configurations
+    """
+    from ChatOS.training.presets import list_presets, DEFAULT_PRESET
+    
+    return {
+        "presets": list_presets(),
+        "default": DEFAULT_PRESET,
+    }
+
+
+@router.get("/models")
+async def get_available_models():
+    """
+    Get available models for fine-tuning.
+    
+    Returns:
+        Dict of model configurations
+    """
+    from ChatOS.training.presets import list_models, DEFAULT_MODEL
+    
+    return {
+        "models": list_models(),
+        "default": DEFAULT_MODEL,
+    }
+
+
+@router.get("/dataset-versions")
+async def get_dataset_versions():
+    """
+    Get all available dataset versions.
+    
+    Returns:
+        List of dataset versions with paths and stats
+    """
+    _check_training_enabled()
+    
+    from ChatOS.training.data_pipeline import list_dataset_versions, get_current_dataset_version
+    
+    return {
+        "versions": list_dataset_versions(),
+        "current_version": get_current_dataset_version(),
+    }
 
 
 @router.get("/jobs")
@@ -166,13 +220,23 @@ async def get_training_job(job_id: str, include_metrics_history: bool = False):
 @router.post("/start")
 async def start_training(request: StartTrainingRequest):
     """
-    Start a new Unsloth training job.
+    Start a new Unsloth training job with preset configuration.
     
     This will:
-    1. Generate fresh training/eval datasets from ChatOS logs
-    2. Create a job specification
+    1. Generate fresh versioned training/eval datasets from ChatOS logs
+    2. Create a job specification from preset
     3. Spawn the Unsloth training process on Kali GPU
     4. Return the job ID for monitoring
+    
+    Presets:
+    - FAST: Quick iteration (1 epoch, low LR)
+    - BALANCED: Good balance (2 epochs, medium LR)  [default]
+    - QUALITY: Best results (3 epochs, low LR)
+    
+    Models:
+    - qwen2.5-7b-instruct (default)
+    - qwen2.5-coder-7b
+    - mistral-7b-instruct
     
     Returns:
         Job ID and initial job record
@@ -183,7 +247,8 @@ async def start_training(request: StartTrainingRequest):
     
     try:
         job_id, job = start_training_job(
-            model_name=request.model_name,
+            preset_name=request.preset,
+            model_key=request.model,
             description=request.description,
             min_score=request.min_score,
             force=request.force,
@@ -195,7 +260,11 @@ async def start_training(request: StartTrainingRequest):
             "job": {
                 "id": job["id"],
                 "status": job["status"],
+                "preset_name": job.get("preset_name"),
+                "model_key": job.get("model_key"),
                 "base_model_name": job["base_model_name"],
+                "dataset_version": job.get("dataset_version"),
+                "dataset_sample_count": job.get("dataset_sample_count"),
                 "created_at": job["created_at"],
             }
         }
@@ -412,4 +481,53 @@ async def export_model(request: ExportRequest):
         raise HTTPException(status_code=500, detail="Export timed out")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Export error: {e}")
+
+
+@router.post("/export-for-chatos/{job_id}")
+async def export_for_chatos(job_id: str):
+    """
+    Export a completed training job for use in ChatOS.
+    
+    This prepares the model adapter for local inference by:
+    1. Copying adapter files to ~/ChatOS-Memory/models/{job_id}/
+    2. Creating model_info.json with full metadata
+    3. Generating a Modelfile template for Ollama
+    
+    Args:
+        job_id: ID of the completed training job
+    
+    Returns:
+        Export status with paths and display name
+    """
+    _check_training_enabled()
+    
+    from ChatOS.inference.model_loader import export_model_for_ollama
+    
+    try:
+        result = export_model_for_ollama(job_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Export error: {e}")
+
+
+@router.get("/fine-tuned-models")
+async def list_fine_tuned_models():
+    """
+    List all fine-tuned models available in ChatOS.
+    
+    Scans ~/ChatOS-Memory/models/ for exported model adapters.
+    
+    Returns:
+        List of fine-tuned model info
+    """
+    from ChatOS.inference.model_loader import get_fine_tuned_models
+    
+    models = get_fine_tuned_models()
+    
+    return {
+        "models": models,
+        "total": len(models),
+    }
 

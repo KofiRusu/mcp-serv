@@ -123,6 +123,122 @@ class DatasetStats:
     negative_excluded: int = 0
     by_mode: Dict[str, int] = field(default_factory=dict)
     by_model: Dict[str, int] = field(default_factory=dict)
+    # Versioning fields
+    version: int = 0
+    train_path: Optional[str] = None
+    eval_path: Optional[str] = None
+    train_count: int = 0
+    eval_count: int = 0
+    created_at: Optional[str] = None
+
+
+# =============================================================================
+# Dataset Versioning
+# =============================================================================
+
+def _get_version_file() -> Path:
+    """Get path to version tracking file."""
+    return settings.unsloth_datasets_dir / ".version"
+
+
+def get_current_dataset_version() -> int:
+    """
+    Get the current dataset version number.
+    
+    Returns:
+        Current version number (0 if no datasets exist)
+    """
+    version_file = _get_version_file()
+    if version_file.exists():
+        try:
+            return int(version_file.read_text().strip())
+        except (ValueError, IOError):
+            pass
+    return 0
+
+
+def get_next_dataset_version() -> int:
+    """
+    Get the next dataset version number.
+    
+    Returns:
+        Next version number
+    """
+    return get_current_dataset_version() + 1
+
+
+def _increment_version(version: int) -> None:
+    """Save the new version number."""
+    version_file = _get_version_file()
+    version_file.parent.mkdir(parents=True, exist_ok=True)
+    version_file.write_text(str(version))
+
+
+def get_versioned_dataset_dir(version: int) -> Path:
+    """
+    Get the directory for a specific dataset version.
+    
+    Args:
+        version: Dataset version number
+    
+    Returns:
+        Path to the versioned dataset directory
+    """
+    return settings.unsloth_datasets_dir / f"datasets_v{version}"
+
+
+def list_dataset_versions() -> List[Dict[str, Any]]:
+    """
+    List all available dataset versions.
+    
+    Returns:
+        List of version info dicts with paths and stats
+    """
+    datasets_dir = settings.unsloth_datasets_dir
+    versions = []
+    
+    for path in datasets_dir.glob("datasets_v*"):
+        if path.is_dir():
+            try:
+                version = int(path.name.replace("datasets_v", ""))
+                train_file = path / "chatos_train.jsonl"
+                eval_file = path / "chatos_eval.jsonl"
+                stats_file = path / "stats.json"
+                
+                info = {
+                    "version": version,
+                    "path": str(path),
+                    "train_path": str(train_file) if train_file.exists() else None,
+                    "eval_path": str(eval_file) if eval_file.exists() else None,
+                    "train_count": _count_jsonl_lines(train_file),
+                    "eval_count": _count_jsonl_lines(eval_file),
+                }
+                
+                # Load stats if available
+                if stats_file.exists():
+                    try:
+                        with open(stats_file) as f:
+                            info["stats"] = json.load(f)
+                    except (json.JSONDecodeError, IOError):
+                        pass
+                
+                versions.append(info)
+            except ValueError:
+                continue
+    
+    versions.sort(key=lambda v: v["version"], reverse=True)
+    return versions
+
+
+def _count_jsonl_lines(path: Path) -> int:
+    """Count lines in a JSONL file."""
+    if not path.exists():
+        return 0
+    try:
+        with open(path) as f:
+            return sum(1 for line in f if line.strip())
+    except IOError:
+        return 0
 
 
 # =============================================================================
@@ -374,6 +490,28 @@ def split_train_eval(
     return train, eval_set
 
 
+def _save_dataset_stats(stats: DatasetStats, path: Path) -> None:
+    """Save dataset statistics to a JSON file."""
+    stats_dict = {
+        "version": stats.version,
+        "created_at": stats.created_at,
+        "total_conversations": stats.total_conversations,
+        "filtered_conversations": stats.filtered_conversations,
+        "total_examples": stats.total_examples,
+        "train_count": stats.train_count,
+        "eval_count": stats.eval_count,
+        "positive_examples": stats.positive_examples,
+        "neutral_examples": stats.neutral_examples,
+        "negative_excluded": stats.negative_excluded,
+        "by_mode": stats.by_mode,
+        "by_model": stats.by_model,
+        "train_path": stats.train_path,
+        "eval_path": stats.eval_path,
+    }
+    with open(path, "w") as f:
+        json.dump(stats_dict, f, indent=2)
+
+
 def generate_training_dataset(
     min_score: int = 0,
     include_unrated: bool = True,
@@ -381,6 +519,7 @@ def generate_training_dataset(
     output_dir: Optional[Path] = None,
     train_filename: str = "chatos_train.jsonl",
     eval_filename: str = "chatos_eval.jsonl",
+    use_versioning: bool = True,
 ) -> DatasetStats:
     """
     Generate complete training dataset from ChatOS logs.
@@ -394,14 +533,22 @@ def generate_training_dataset(
         output_dir: Output directory (defaults to Unsloth datasets dir)
         train_filename: Name of training file
         eval_filename: Name of evaluation file
+        use_versioning: If True, create versioned dataset directory
     
     Returns:
         DatasetStats with generation statistics
     """
-    if output_dir is None:
-        output_dir = settings.unsloth_datasets_dir
+    # Determine version and output directory
+    if use_versioning:
+        version = get_next_dataset_version()
+        output_dir = get_versioned_dataset_dir(version)
+    else:
+        version = 0
+        if output_dir is None:
+            output_dir = settings.unsloth_datasets_dir
     
     output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
     
     # Load conversations
     conversations = load_raw_conversations()
@@ -428,7 +575,23 @@ def generate_training_dataset(
     if eval_examples:
         to_unsloth_jsonl(eval_examples, eval_path)
     
-    print(f"\nDataset generation complete:")
+    # Update stats with versioning info
+    stats.version = version
+    stats.train_path = str(train_path)
+    stats.eval_path = str(eval_path)
+    stats.train_count = len(train_examples)
+    stats.eval_count = len(eval_examples)
+    stats.created_at = datetime.now().isoformat()
+    
+    # Save stats to version directory
+    stats_path = output_dir / "stats.json"
+    _save_dataset_stats(stats, stats_path)
+    
+    # Update version tracker if using versioning
+    if use_versioning:
+        _increment_version(version)
+    
+    print(f"\nDataset generation complete (v{version}):")
     print(f"  Total conversations: {stats.total_conversations}")
     print(f"  Filtered: {stats.filtered_conversations}")
     print(f"  Training examples: {len(train_examples)}")

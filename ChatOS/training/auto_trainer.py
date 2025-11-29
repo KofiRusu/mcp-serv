@@ -15,6 +15,7 @@ from ChatOS.training.data_pipeline import (
     generate_training_dataset,
     load_raw_conversations,
     filter_for_training,
+    DatasetStats,
 )
 from ChatOS.training.job_spec import TrainingJobSpec
 from ChatOS.training.job_store import (
@@ -25,6 +26,14 @@ from ChatOS.training.job_store import (
     STATUS_RUNNING,
 )
 from ChatOS.training.unsloth_runner import write_temp_config, start_training_process
+from ChatOS.training.presets import (
+    get_preset,
+    get_model_config,
+    list_presets,
+    list_models,
+    DEFAULT_PRESET,
+    DEFAULT_MODEL,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -88,24 +97,26 @@ def get_training_stats() -> Dict[str, Any]:
 
 
 def start_training_job(
-    model_name: Optional[str] = None,
+    preset_name: Optional[str] = None,
+    model_key: Optional[str] = None,
     description: Optional[str] = None,
     min_score: int = 0,
     force: bool = False,
 ) -> Tuple[str, Dict[str, Any]]:
     """
-    Start a new training job.
+    Start a new training job with preset configuration.
     
     This function:
     1. Checks if training is enabled and ready
-    2. Generates fresh training/eval datasets
-    3. Creates a job specification
+    2. Generates fresh versioned training/eval datasets
+    3. Creates a job specification from preset
     4. Writes a config file
     5. Spawns the Unsloth training process
-    6. Saves the job record
+    6. Saves the job record with full metadata
     
     Args:
-        model_name: Base model to fine-tune (default from settings)
+        preset_name: Training preset (FAST, BALANCED, QUALITY). Default: BALANCED
+        model_key: Model to fine-tune (qwen2.5-7b-instruct, mistral-7b-instruct, etc.)
         description: Optional job description
         min_score: Minimum feedback score for training examples
         force: Skip readiness checks
@@ -116,6 +127,17 @@ def start_training_job(
     Raises:
         TrainingError: If training cannot be started
     """
+    # Use defaults if not specified
+    preset_name = preset_name or DEFAULT_PRESET
+    model_key = model_key or DEFAULT_MODEL
+    
+    # Validate preset and model
+    try:
+        preset = get_preset(preset_name)
+        model_config = get_model_config(model_key)
+    except ValueError as e:
+        raise TrainingError(str(e))
+    
     # Check if training is enabled
     if not settings.enable_training_features:
         raise TrainingError("Training features are disabled in settings")
@@ -138,13 +160,14 @@ def start_training_job(
                 f"Quality ratio: {stats.get('current_quality_ratio', 0):.2f}"
             )
     
-    # Step 1: Generate fresh datasets
+    # Step 1: Generate fresh versioned datasets
     logger.info("Generating training datasets...")
     try:
         dataset_stats = generate_training_dataset(
             min_score=min_score,
             include_unrated=True,
             eval_ratio=0.1,
+            use_versioning=True,
         )
     except Exception as e:
         raise TrainingError(f"Failed to generate datasets: {e}")
@@ -152,18 +175,18 @@ def start_training_job(
     if dataset_stats.total_examples < 1:
         raise TrainingError("No training examples generated")
     
-    # Step 2: Create job specification
-    train_path = settings.unsloth_datasets_dir / "chatos_train.jsonl"
-    eval_path = settings.unsloth_datasets_dir / "chatos_eval.jsonl"
-    
-    job_spec = TrainingJobSpec.from_defaults(
-        model_name=model_name or settings.default_base_model,
-        train_path=str(train_path),
-        eval_path=str(eval_path),
-        description=description or f"ChatOS training job - {dataset_stats.total_examples} examples",
+    # Step 2: Create job specification from preset
+    job_spec = TrainingJobSpec.from_preset(
+        preset_name=preset_name,
+        model_key=model_key,
+        train_path=dataset_stats.train_path,
+        eval_path=dataset_stats.eval_path,
+        dataset_version=dataset_stats.version,
+        dataset_sample_count=dataset_stats.train_count,
+        description=description or f"ChatOS {preset_name} training - v{dataset_stats.version} - {dataset_stats.train_count} samples",
     )
     
-    logger.info(f"Created job spec: {job_spec.id}")
+    logger.info(f"Created job spec: {job_spec.id} (preset={preset_name}, model={model_key}, dataset_v{dataset_stats.version})")
     
     # Step 3: Write temporary config
     try:
@@ -182,17 +205,39 @@ def start_training_job(
     
     logger.info(f"Started training process with PID: {pid}")
     
-    # Step 5: Save job record
+    # Step 5: Save job record with full dataset stats
+    dataset_stats_dict = {
+        "version": dataset_stats.version,
+        "train_count": dataset_stats.train_count,
+        "eval_count": dataset_stats.eval_count,
+        "total_conversations": dataset_stats.total_conversations,
+        "positive_examples": dataset_stats.positive_examples,
+        "neutral_examples": dataset_stats.neutral_examples,
+        "negative_excluded": dataset_stats.negative_excluded,
+        "created_at": dataset_stats.created_at,
+    }
+    
     job = create_job(
         job_spec=job_spec,
         pid=pid,
         config_path=config_path,
         log_path=log_path,
+        dataset_stats=dataset_stats_dict,
     )
     
     logger.info(f"Training job created: {job['id']}")
     
     return job["id"], job
+
+
+def get_available_presets() -> Dict[str, Any]:
+    """Get all available training presets."""
+    return list_presets()
+
+
+def get_available_models() -> Dict[str, Any]:
+    """Get all available models for fine-tuning."""
+    return list_models()
 
 
 def can_start_training() -> Tuple[bool, str]:
