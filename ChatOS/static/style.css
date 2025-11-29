@@ -1348,3 +1348,135 @@ details[open] .expand-icon {
 .window-size-indicator {
     display: none !important;
 }
+
+/* =============================================================================
+   Feedback Buttons
+   ============================================================================= */
+
+.message-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+}
+
+.feedback-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.feedback-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    opacity: 0.6;
+}
+
+.feedback-btn:hover {
+    opacity: 1;
+    border-color: var(--accent-primary);
+    transform: scale(1.1);
+}
+
+.feedback-btn.active {
+    opacity: 1;
+    background: var(--bg-elevated);
+}
+
+.feedback-btn.thumbs-up.active {
+    border-color: var(--success);
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.feedback-btn.thumbs-down.active {
+    border-color: var(--error);
+    background: rgba(255, 68, 68, 0.1);
+}
+
+/* =============================================================================
+   Toast Notifications
+   ============================================================================= */
+
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 1px solid var(--accent-primary);
+    box-shadow: var(--shadow-md), 0 0 20px rgba(0, 212, 255, 0.2);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 10000;
+    font-size: 14px;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* =============================================================================
+   Training Dashboard Link
+   ============================================================================= */
+
+.training-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    margin-top: 8px;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(255, 0, 170, 0.1) 100%);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 8px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.training-link:hover {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(255, 0, 170, 0.2) 100%);
+    border-color: var(--accent-primary);
+    transform: translateX(4px);
+}
+
+.training-link .icon {
+    font-size: 16px;
+}
+
+.training-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: auto;
+}
+
+.training-status-dot.idle {
+    background: var(--text-muted);
+}
+
+.training-status-dot.ready {
+    background: var(--success);
+    animation: pulse 2s infinite;
+}
+
+.training-status-dot.training {
+    background: var(--warning);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}

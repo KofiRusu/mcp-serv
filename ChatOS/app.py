@@ -70,6 +70,7 @@ from ChatOS.schemas import (
     ApiKeyRequest,
     OllamaModelRequest,
 )
+from ChatOS.api.routes_training import router as training_router
 
 # =============================================================================
 # App Configuration
@@ -94,6 +95,9 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
+# Include API routers
+app.include_router(training_router)
+
 
 # =============================================================================
 # HTML Routes
@@ -117,6 +121,12 @@ async def projects_page(request: Request) -> HTMLResponse:
 @app.get("/settings", response_class=HTMLResponse, include_in_schema=False)
 async def settings_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "settings.html")
+
+
+@app.get("/training", response_class=HTMLResponse, include_in_schema=False)
+async def training_page(request: Request) -> HTMLResponse:
+    """Training Lab dashboard for model fine-tuning."""
+    return templates.TemplateResponse(request, "training.html")
 
 
 # =============================================================================

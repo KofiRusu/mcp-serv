@@ -262,28 +262,66 @@ For production use, consider:
 
 ---
 
-## Training & Fine-Tuning Qwen
+## 🧪 Training Lab - Fine-Tune Your Models
 
-ChatOS is designed to work with local Qwen models that you can train and enhance.
+ChatOS includes a full training pipeline for fine-tuning local LLMs using Unsloth and QLoRA.
 
-See **[TRAINING.md](TRAINING.md)** for:
-- Setting up Qwen as your primary model
-- Fine-tuning with LoRA/QLoRA
-- Creating custom training data
-- Converting and deploying fine-tuned models
-- Performance optimization tips
+### Features
 
-Quick example:
+- **👍/👎 Feedback System** - Rate responses directly in chat to build training data
+- **📊 Training Dashboard** - Monitor training jobs with real-time loss metrics
+- **🚀 One-Click Training** - Start QLoRA fine-tuning from the UI
+- **📦 Export to Ollama** - Convert trained models to GGUF format
+
+### How to Enable Training
+
+1. **Collect Training Data**
+   - Chat normally with ChatOS
+   - Rate responses with 👍 (good) or 👎 (needs improvement)
+   - Data is automatically logged for training
+
+2. **Open Training Lab**
+   - Click "🧪 Training Lab" in the sidebar
+   - Or navigate to `http://localhost:8000/training`
+
+3. **Start Training**
+   - View stats: total conversations, positive feedback, training readiness
+   - Click "Start Training" when you have enough data (50+ samples recommended)
+   - Monitor progress with live loss metrics
+
+4. **Export and Use**
+   - Once training completes, click "Export to Ollama"
+   - Import the model: `ollama create my-finetuned -f Modelfile`
+   - Select your new model in the chat dropdown
+
+### Training Requirements
+
+- **GPU**: NVIDIA GPU with 8GB+ VRAM (for QLoRA)
+- **Environment**: `~/unsloth_env` virtual environment with Unsloth installed
+- **Setup Script**: Run `cd ~/unsloth/local_kali_pipelines && bash env_setup_kali.sh`
+
+### Quick Commands
+
 ```bash
-# Create custom Qwen variant
-cat > Modelfile << 'EOF'
-FROM qwen2.5
-SYSTEM "You are a helpful AI assistant in the ChatOS council."
-PARAMETER temperature 0.7
-EOF
+# Generate training dataset manually
+cd /home/kr/ChatOS-0.1
+python -m ChatOS.training.data_pipeline --min_score 0 --eval_ratio 0.1
 
-ollama create my-chatos-qwen -f Modelfile
+# Check training setup
+cd ~/unsloth/local_kali_pipelines
+python check_setup.py
+
+# Dry run training
+python train_qlora.py --config configs/chatos_qlora.yaml --dry_run
 ```
+
+### Workflow: From Chat to Fine-Tuned Model
+
+```
+Chat → Give Feedback → Collect Data → Start Training → Monitor → Export → Use New Model
+```
+
+See **[TRAINING.md](TRAINING.md)** for detailed setup and configuration.
 
 ---
 

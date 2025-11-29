@@ -112,6 +112,11 @@
             </div><!-- End sidebar-content -->
 
             <div class="sidebar-footer">
+                <a href="/training" class="training-link" id="training-link">
+                    <span class="icon">🧪</span>
+                    <span>Training Lab</span>
+                    <span class="training-status-dot idle" id="training-status-dot"></span>
+                </a>
                 <a href="/projects" class="btn btn-primary btn-small sidebar-btn">
                     📦 Projects
                 </a>
@@ -631,6 +636,10 @@
             const responses = data?.responses || [];
             const mode = data?.mode || 'normal';
             const memorySummary = data?.memory_summary || '';
+            const conversationId = data?.conversation_id || '';
+            
+            // Store conversation ID for feedback
+            messageEl.dataset.conversationId = conversationId;
             
             // Determine if this was a single model or council response
             const isSingleModel = responses.length <= 1;
@@ -651,6 +660,18 @@
                     <div class="model-response-text">${escapeHtml(r.text || '')}</div>
                 </div>
             `).join('');
+            
+            // Feedback buttons HTML
+            const feedbackHtml = conversationId ? `
+                <div class="feedback-buttons" data-conversation-id="${escapeHtml(conversationId)}">
+                    <button class="feedback-btn thumbs-up" onclick="sendFeedback('${escapeHtml(conversationId)}', true)" title="Good response">
+                        👍
+                    </button>
+                    <button class="feedback-btn thumbs-down" onclick="sendFeedback('${escapeHtml(conversationId)}', false)" title="Poor response">
+                        👎
+                    </button>
+                </div>
+            ` : '';
 
             messageEl.innerHTML = `
                 <div class="message-avatar assistant-avatar">${modeIcon}</div>
@@ -672,11 +693,58 @@
                         <div class="responses-list">${responsesHtml}</div>
                     </details>
                     ` : ''}
+                    <div class="message-actions">
+                        ${feedbackHtml}
+                    </div>
                 </div>
             `;
             container.appendChild(messageEl);
             highlightChosenModel(chosenModel);
             scrollToBottom();
+        }
+        
+        // Feedback handling
+        async function sendFeedback(conversationId, thumbsUp) {
+            try {
+                const response = await fetch(`/api/memory/feedback/${conversationId}?thumbs_up=${thumbsUp}`, {
+                    method: 'POST',
+                });
+                
+                if (response.ok) {
+                    // Update button state
+                    const container = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+                    if (container) {
+                        const thumbsUpBtn = container.querySelector('.thumbs-up');
+                        const thumbsDownBtn = container.querySelector('.thumbs-down');
+                        
+                        if (thumbsUp) {
+                            thumbsUpBtn.classList.add('active');
+                            thumbsDownBtn.classList.remove('active');
+                        } else {
+                            thumbsDownBtn.classList.add('active');
+                            thumbsUpBtn.classList.remove('active');
+                        }
+                        
+                        // Show feedback toast
+                        showToast(thumbsUp ? 'Thanks for the feedback! 👍' : 'Feedback recorded. We\'ll improve! 🔄');
+                    }
+                }
+            } catch (error) {
+                console.error('Feedback error:', error);
+            }
+        }
+        
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
         }
 
         function appendLoadingMessage(mode = 'normal') {
