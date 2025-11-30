@@ -101,6 +101,11 @@ COMMAND_MODES = {
         "description": "Code-focused responses with syntax highlighting",
         "icon": "⌨️",
     },
+    "reason": {
+        "name": "PersRM Reasoning Mode",
+        "description": "Structured reasoning via PersRM integration (UI/UX focused)",
+        "icon": "💡",
+    },
 }
 
 

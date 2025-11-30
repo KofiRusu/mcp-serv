@@ -24,6 +24,7 @@ from .swarm import SwarmCoordinator, get_swarm_coordinator
 from .memory_logger import get_memory_logger, InteractionQuality
 from .llm_client import get_model_council, get_llm_client
 from .model_config import get_model_config_manager, ModelProvider
+from .reasoning import handle_reason_command, format_reasoning_response
 
 
 # =============================================================================
@@ -404,6 +405,8 @@ async def _handle_command(
     elif parsed.command == "code":
         # Code mode uses normal chat with code mode
         return await _normal_chat(parsed.query, "code", True, session_id, model_id)
+    elif parsed.command == "reason":
+        return await _handle_reason(parsed, memory)
     else:
         return {
             "answer": f"Unknown command: /{parsed.command}",
@@ -512,6 +515,34 @@ async def _handle_swarm(
         "mode": "swarm",
         "command": "swarm",
         "swarm_result": result.to_dict(),
+    }
+
+
+async def _handle_reason(
+    parsed: ParsedCommand,
+    memory: ChatMemory,
+) -> Dict[str, Any]:
+    """Handle /reason command via PersRM integration."""
+    # Get reasoning from PersRM bridge
+    response = await handle_reason_command(
+        query=parsed.query,
+        memory=memory,
+    )
+    
+    # Format for display
+    answer = format_reasoning_response(response)
+    
+    return {
+        "answer": answer,
+        "chosen_model": f"PersRM ({response.model_used})",
+        "responses": [{
+            "model": response.model_used,
+            "text": response.reasoning,
+        }],
+        "memory_summary": memory.get_summary(),
+        "mode": "reason",
+        "command": "reason",
+        "reasoning_result": response.to_dict(),
     }
 
 

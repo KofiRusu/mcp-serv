@@ -41,6 +41,7 @@ class ModelProvider(str, Enum):
     TOGETHER = "together"
     OPENROUTER = "openrouter"
     LOCAL_API = "local_api"  # Generic local API endpoint
+    PERSRM = "persrm"  # PersRM reasoning engine integration
     DUMMY = "dummy"  # Built-in dummy models
 
 
@@ -130,6 +131,20 @@ PROVIDER_INFO = {
         "type": "local",
         "default_url": "http://localhost:8000",
         "models": [],
+    },
+    ModelProvider.PERSRM: {
+        "name": "PersRM",
+        "description": "PersRM reasoning engine - structured UI/UX reasoning and code generation",
+        "type": "local",
+        "default_url": "http://localhost:3000",
+        "install_url": "https://github.com/KofiRusu/PersRM-V0.2",
+        "models": [
+            "persrm-reasoning",      # Structured reasoning mode
+            "persrm-code",           # Code generation mode
+            "persrm-uiux",           # UI/UX analysis mode
+            "persrm-benchmark",      # Benchmarking mode
+        ],
+        "capabilities": ["reasoning", "code_generation", "ui_analysis", "benchmarking"],
     },
     ModelProvider.DUMMY: {
         "name": "Dummy (Built-in)",

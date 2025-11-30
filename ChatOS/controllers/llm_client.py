@@ -143,6 +143,9 @@ class LLMClient:
                     api_key=self.config_manager.get_api_key(provider)
                 )
             
+            elif provider == ModelProvider.PERSRM:
+                return await self._generate_persrm(model_config, messages, temp, tokens)
+            
             else:
                 return LLMResponse(
                     text="",
@@ -502,6 +505,74 @@ class LLMClient:
                 model=model_config.model_id,
                 provider=ModelProvider.GOOGLE,
                 error=f"Google AI error ({response.status_code}): {response.text}",
+            )
+    
+    # =========================================================================
+    # PersRM Reasoning Engine
+    # =========================================================================
+    
+    async def _generate_persrm(
+        self,
+        model_config: ModelConfig,
+        messages: List[Dict[str, str]],
+        temperature: float,
+        max_tokens: int,
+    ) -> LLMResponse:
+        """Generate response using PersRM reasoning engine."""
+        from ChatOS.plugins.persrm_bridge import PersRMBridge, PersRMConfig
+        
+        # Get the last user message
+        user_message = ""
+        context = ""
+        for msg in messages:
+            if msg["role"] == "user":
+                user_message = msg["content"]
+            elif msg["role"] == "system":
+                context = msg["content"]
+        
+        # Determine which PersRM mode to use based on model_id
+        mode = model_config.model_id
+        
+        try:
+            config = PersRMConfig()
+            bridge = PersRMBridge(config)
+            
+            if mode == "persrm-code":
+                # Use code generation mode
+                result = await bridge.generate_code(
+                    prompt=user_message,
+                    language="typescript",
+                )
+            else:
+                # Use reasoning mode (default)
+                result = await bridge.reason(
+                    prompt=user_message,
+                    context=context if context else None,
+                )
+            
+            await bridge.close()
+            
+            if result.success:
+                return LLMResponse(
+                    text=result.reasoning,
+                    model=f"PersRM ({result.model_used})",
+                    provider=ModelProvider.PERSRM,
+                    finish_reason="stop",
+                )
+            else:
+                return LLMResponse(
+                    text="",
+                    model=model_config.model_id,
+                    provider=ModelProvider.PERSRM,
+                    error=result.error or "PersRM reasoning failed",
+                )
+                
+        except Exception as e:
+            return LLMResponse(
+                text="",
+                model=model_config.model_id,
+                provider=ModelProvider.PERSRM,
+                error=str(e),
             )
     
     # =========================================================================

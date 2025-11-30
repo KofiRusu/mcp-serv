@@ -55,6 +55,13 @@
                             <span class="command-desc">Code generation</span>
                         </div>
                     </div>
+                    <div class="command-item" data-command="reason" onclick="insertCommand('reason')">
+                        <span class="command-icon">💡</span>
+                        <div class="command-info">
+                            <span class="command-name">/reason</span>
+                            <span class="command-desc">PersRM reasoning</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -157,6 +164,10 @@
                         <div class="tip">
                             <span class="tip-icon">🐝</span>
                             <span><strong>/swarm</strong> - Multi-agent coding collaboration</span>
+                        </div>
+                        <div class="tip">
+                            <span class="tip-icon">💡</span>
+                            <span><strong>/reason</strong> - PersRM structured reasoning</span>
                         </div>
                         <div class="tip">
                             <span class="tip-icon">💻</span>
@@ -584,6 +595,7 @@
                 'deepthinking': '🧠',
                 'swarm': '🐝',
                 'code': '⌨️',
+                'reason': '💡',
                 'normal': '💬',
             };
             return icons[mode] || '💬';
@@ -766,6 +778,7 @@
                     'deepthinking': 'Thinking deeply...',
                     'swarm': 'Swarm collaborating...',
                     'code': `${modelName} is coding...`,
+                    'reason': 'PersRM reasoning...',
                     'normal': `${modelName} is thinking...`,
                 }[mode] || `${modelName} is processing...`;
                 avatarIcon = '🎯';
@@ -776,6 +789,7 @@
                     'deepthinking': 'Thinking deeply...',
                     'swarm': 'Swarm collaborating...',
                     'code': 'Council is generating code...',
+                    'reason': 'PersRM reasoning...',
                     'normal': 'Council is deliberating...',
                 }[mode] || 'Processing...';
                 avatarIcon = getModeIcon(mode);
@@ -854,6 +868,7 @@
             else if (message.startsWith('/deepthinking')) mode = 'deepthinking';
             else if (message.startsWith('/swarm')) mode = 'swarm';
             else if (message.startsWith('/code')) mode = 'code';
+            else if (message.startsWith('/reason')) mode = 'reason';
             
             input.value = '';
             resetTextareaHeight();
