@@ -12,12 +12,19 @@ import json
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+import os
+from enum import Enum, EnumMeta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 import httpx
 
 from ChatOS.config import SANDBOX_DIR
+from ChatOS.controllers.cache import (
+    CacheKeys,
+    CacheTTL,
+    cache_key,
+    get_cache,
+)
 
 
 # =============================================================================
@@ -29,7 +36,20 @@ CONFIG_FILE = CONFIG_DIR / "models.json"
 SECRETS_FILE = CONFIG_DIR / ".secrets.json"
 
 
-class ModelProvider(str, Enum):
+ENABLE_PERSRM_PROVIDER = os.getenv("CHATOS_ENABLE_PERSRM", "0").lower() in {"1", "true", "yes", "on"}
+
+
+class FilterableEnumMeta(EnumMeta):
+    """Enum meta that can hide members based on feature flags."""
+    
+    def __iter__(cls):
+        for member in super().__iter__():
+            if not ENABLE_PERSRM_PROVIDER and member.name == "PERSRM":
+                continue
+            yield member
+
+
+class ModelProvider(str, Enum, metaclass=FilterableEnumMeta):
     """Supported model providers."""
     OLLAMA = "ollama"
     LM_STUDIO = "lm_studio"
@@ -40,10 +60,10 @@ class ModelProvider(str, Enum):
     GROQ = "groq"
     TOGETHER = "together"
     OPENROUTER = "openrouter"
+    MINIMAX = "minimax"  # MiniMax AI models (local + API)
     LOCAL_API = "local_api"  # Generic local API endpoint
     PERSRM = "persrm"  # PersRM reasoning engine integration
     DUMMY = "dummy"  # Built-in dummy models
-
 
 # Provider metadata
 PROVIDER_INFO = {
@@ -54,11 +74,13 @@ PROVIDER_INFO = {
         "default_url": "http://localhost:11434",
         "install_url": "https://ollama.ai",
         # Qwen models listed first as primary options
+        # persrm-standalone is added when fine-tuned model is available
         "models": [
             "qwen2.5", "qwen2.5:7b", "qwen2.5:14b", "qwen2.5:32b", "qwen2.5:72b",
             "qwen2.5-coder", "qwen2.5-coder:7b", "qwen2.5-coder:14b", "qwen2.5-coder:32b",
             "qwen2", "qwen2:7b", "qwen2:72b",
-            "llama3.2", "llama3.1", "mistral", "codellama", "deepseek-coder", "phi3", "gemma2"
+            "llama3.2", "llama3.1", "mistral", "codellama", "deepseek-coder", "phi3", "gemma2",
+            "persrm-standalone-mistral",  # Fine-tuned PersRM model (available after training)
         ],
     },
     ModelProvider.LM_STUDIO: {
@@ -124,6 +146,27 @@ PROVIDER_INFO = {
         "default_url": "https://openrouter.ai/api/v1",
         "models": ["anthropic/claude-3.5-sonnet", "openai/gpt-4o", "meta-llama/llama-3.1-70b-instruct"],
         "requires_key": True,
+    },
+    ModelProvider.MINIMAX: {
+        "name": "MiniMax",
+        "description": "MiniMax AI models - M1/M2 reasoning & coding models",
+        "type": "hybrid",  # Supports both local and API
+        "default_url": "https://api.minimax.chat/v1",
+        "install_url": "https://huggingface.co/MiniMaxAI",
+        "models": [
+            # API models
+            "abab6.5s-chat",
+            "abab6.5g-chat", 
+            "abab5.5s-chat",
+            # Local models (via Ollama or vLLM)
+            "MiniMax-M1",
+            "MiniMax-M2",
+            "MiniMax-Text-01",
+            "MiniMax-VL-01",
+        ],
+        "requires_key": True,  # For API access
+        "local_models": ["MiniMax-M1", "MiniMax-M2", "MiniMax-Text-01"],
+        "capabilities": ["reasoning", "coding", "long_context", "128k_tokens"],
     },
     ModelProvider.LOCAL_API: {
         "name": "Custom Local API",
@@ -223,6 +266,25 @@ class ProviderStatus:
     models: List[str] = field(default_factory=list)
     version: Optional[str] = None
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "provider": self.provider.value,
+            "available": self.available,
+            "error": self.error,
+            "models": self.models,
+            "version": self.version,
+        }
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "ProviderStatus":
+        return cls(
+            provider=ModelProvider(data["provider"]),
+            available=data["available"],
+            error=data.get("error"),
+            models=data.get("models", []),
+            version=data.get("version"),
+        )
+
 
 @dataclass
 class GlobalSettings:
@@ -283,6 +345,7 @@ class ModelConfigManager:
         self.models: Dict[str, ModelConfig] = {}
         self.settings = GlobalSettings()
         self.api_keys: Dict[str, str] = {}
+        self._cache = get_cache()
         
         self._load_config()
         self._load_secrets()
@@ -359,37 +422,51 @@ class ModelConfigManager:
     
     async def check_provider_status(self, provider: ModelProvider) -> ProviderStatus:
         """Check if a provider is available and list its models."""
+        cache_key_value = cache_key(CacheKeys.PROVIDER, provider.value)
+        if provider != ModelProvider.DUMMY:
+            cached = await self._cache.get(cache_key_value)
+            if cached is not None:
+                return ProviderStatus.from_dict(cached)
         
         if provider == ModelProvider.DUMMY:
-            return ProviderStatus(
+            status = ProviderStatus(
                 provider=provider,
                 available=True,
                 models=PROVIDER_INFO[provider]["models"],
             )
+        elif provider == ModelProvider.OLLAMA:
+            status = await self._check_ollama()
+        elif provider == ModelProvider.LM_STUDIO:
+            status = await self._check_openai_compatible(
+                provider,
+                PROVIDER_INFO[provider]["default_url"],
+            )
+        elif provider == ModelProvider.LLAMA_CPP:
+            status = await self._check_llamacpp()
+        elif provider in [
+            ModelProvider.OPENAI,
+            ModelProvider.GROQ,
+            ModelProvider.TOGETHER,
+            ModelProvider.OPENROUTER,
+        ]:
+            status = await self._check_api_provider(provider)
+        elif provider == ModelProvider.ANTHROPIC:
+            status = await self._check_anthropic()
+        elif provider == ModelProvider.GOOGLE:
+            status = await self._check_google()
+        elif provider == ModelProvider.MINIMAX:
+            status = await self._check_minimax()
+        else:
+            status = ProviderStatus(provider=provider, available=False, error="Unknown provider")
         
-        if provider == ModelProvider.OLLAMA:
-            return await self._check_ollama()
-        
-        if provider == ModelProvider.LM_STUDIO:
-            return await self._check_openai_compatible(
-                provider, 
-                PROVIDER_INFO[provider]["default_url"]
+        if provider != ModelProvider.DUMMY:
+            await self._cache.set(
+                cache_key_value,
+                status.to_dict(),
+                ttl=CacheTTL.VERY_SHORT,
             )
         
-        if provider == ModelProvider.LLAMA_CPP:
-            return await self._check_llamacpp()
-        
-        if provider in [ModelProvider.OPENAI, ModelProvider.GROQ, 
-                       ModelProvider.TOGETHER, ModelProvider.OPENROUTER]:
-            return await self._check_api_provider(provider)
-        
-        if provider == ModelProvider.ANTHROPIC:
-            return await self._check_anthropic()
-        
-        if provider == ModelProvider.GOOGLE:
-            return await self._check_google()
-        
-        return ProviderStatus(provider=provider, available=False, error="Unknown provider")
+        return status
     
     async def _check_ollama(self) -> ProviderStatus:
         """Check Ollama availability and list models."""
@@ -525,6 +602,157 @@ class ModelConfigManager:
             models=PROVIDER_INFO[ModelProvider.GOOGLE]["models"],
         )
     
+    async def _check_minimax(self) -> ProviderStatus:
+        """Check MiniMax availability (API and local models)."""
+        available_models = []
+        errors = []
+        
+        # Check API availability
+        api_key = self.get_api_key(ModelProvider.MINIMAX)
+        if api_key:
+            available_models.extend([
+                "abab6.5s-chat",
+                "abab6.5g-chat",
+                "abab5.5s-chat",
+            ])
+        else:
+            errors.append("API key not configured for cloud models")
+        
+        # Check local models via Ollama
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                resp = await client.get("http://localhost:11434/api/tags")
+                if resp.status_code == 200:
+                    data = resp.json()
+                    ollama_models = [m["name"].lower() for m in data.get("models", [])]
+                    
+                    # Check for MiniMax models in Ollama
+                    minimax_local = ["minimax-m1", "minimax-m2", "minimax-text-01"]
+                    for model in minimax_local:
+                        if any(model in m for m in ollama_models):
+                            available_models.append(f"MiniMax-{model.split('-')[-1].upper()}")
+        except Exception:
+            pass  # Ollama not running
+        
+        # Check for vLLM/local server
+        try:
+            async with httpx.AsyncClient(timeout=3.0) as client:
+                resp = await client.get("http://localhost:8000/v1/models")
+                if resp.status_code == 200:
+                    data = resp.json()
+                    for model in data.get("data", []):
+                        model_id = model.get("id", "").lower()
+                        if "minimax" in model_id:
+                            available_models.append(model.get("id"))
+        except Exception:
+            pass  # vLLM not running
+        
+        if available_models:
+            return ProviderStatus(
+                provider=ModelProvider.MINIMAX,
+                available=True,
+                models=list(set(available_models)),
+            )
+        
+        return ProviderStatus(
+            provider=ModelProvider.MINIMAX,
+            available=False,
+            error="; ".join(errors) if errors else "No MiniMax models available. Install via Ollama or configure API key.",
+            models=PROVIDER_INFO[ModelProvider.MINIMAX]["models"],
+        )
+    
+    # =========================================================================
+    # MiniMax Model Installation
+    # =========================================================================
+    
+    async def install_minimax_model(self, model_name: str, method: str = "ollama") -> Dict[str, Any]:
+        """
+        Install a MiniMax model locally.
+        
+        Args:
+            model_name: "M1", "M2", or "Text-01"
+            method: "ollama" or "huggingface"
+            
+        Returns:
+            Dict with installation status
+        """
+        model_map = {
+            "M1": {
+                "ollama": "minimax-m1",
+                "huggingface": "MiniMaxAI/MiniMax-M1",
+                "description": "MiniMax-M1: Hybrid-attention reasoning model",
+            },
+            "M2": {
+                "ollama": "minimax-m2",
+                "huggingface": "MiniMaxAI/MiniMax-M2", 
+                "description": "MiniMax-M2: MoE coding & agentic model with 128K context",
+            },
+            "Text-01": {
+                "ollama": "minimax-text-01",
+                "huggingface": "MiniMaxAI/MiniMax-Text-01",
+                "description": "MiniMax-Text-01: Advanced language model",
+            },
+        }
+        
+        if model_name not in model_map:
+            return {"success": False, "error": f"Unknown model: {model_name}. Available: {list(model_map.keys())}"}
+        
+        model_info = model_map[model_name]
+        
+        if method == "ollama":
+            return await self._install_minimax_ollama(model_info["ollama"], model_info["description"])
+        elif method == "huggingface":
+            return await self._install_minimax_huggingface(model_info["huggingface"], model_info["description"])
+        else:
+            return {"success": False, "error": f"Unknown method: {method}. Use 'ollama' or 'huggingface'"}
+    
+    async def _install_minimax_ollama(self, model_name: str, description: str) -> Dict[str, Any]:
+        """Install MiniMax model via Ollama."""
+        try:
+            # Check if Ollama is running
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                resp = await client.get("http://localhost:11434/api/version")
+                if resp.status_code != 200:
+                    return {"success": False, "error": "Ollama is not running. Start it with: ollama serve"}
+            
+            # Pull the model
+            async with httpx.AsyncClient(timeout=600.0) as client:  # 10 min timeout for large models
+                resp = await client.post(
+                    "http://localhost:11434/api/pull",
+                    json={"name": model_name},
+                )
+                
+                if resp.status_code == 200:
+                    return {
+                        "success": True,
+                        "message": f"Successfully installed {model_name}",
+                        "description": description,
+                        "usage": f"Select 'MiniMax' provider and model '{model_name}' in ChatOS",
+                    }
+                else:
+                    return {"success": False, "error": f"Failed to pull model: {resp.text}"}
+                    
+        except httpx.TimeoutException:
+            return {"success": False, "error": "Installation timed out. Model may still be downloading in background."}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    async def _install_minimax_huggingface(self, model_name: str, description: str) -> Dict[str, Any]:
+        """Provide instructions for HuggingFace installation."""
+        return {
+            "success": True,
+            "message": "HuggingFace installation instructions",
+            "description": description,
+            "steps": [
+                f"1. Install dependencies: pip install transformers torch",
+                f"2. Clone model: git lfs install && git clone https://huggingface.co/{model_name}",
+                f"3. Or use transformers: from transformers import AutoModelForCausalLM, AutoTokenizer",
+                f"4. Load: model = AutoModelForCausalLM.from_pretrained('{model_name}')",
+                f"5. For vLLM: python -m vllm.entrypoints.openai.api_server --model {model_name}",
+            ],
+            "vllm_command": f"python -m vllm.entrypoints.openai.api_server --model {model_name} --port 8000",
+        }
+    
     # =========================================================================
     # Ollama Model Management
     # =========================================================================
@@ -642,8 +870,24 @@ class ModelConfigManager:
             models = [m for m in models if m.is_council_member]
         
         if self.settings.use_local_only:
-            local_types = {"local", "builtin"}
-            models = [m for m in models if PROVIDER_INFO.get(m.provider, {}).get("type") in local_types]
+            def is_local_or_builtin(model: ModelConfig) -> bool:
+                provider_meta = PROVIDER_INFO.get(model.provider, {})
+                provider_type = provider_meta.get("type")
+                
+                if provider_type in {"local", "builtin"}:
+                    return True
+                
+                if provider_type == "hybrid":
+                    # Allow hybrid providers that point to localhost endpoints
+                    if model.base_url and model.base_url.startswith(("http://localhost", "http://127.0.0.1")):
+                        return True
+                    # Or whose model id matches known local variants
+                    local_names = provider_meta.get("local_models", [])
+                    if local_names and model.model_id in local_names:
+                        return True
+                return False
+            
+            models = [m for m in models if is_local_or_builtin(m)]
         
         return models
     
@@ -669,6 +913,82 @@ class ModelConfigManager:
     def get_settings(self) -> GlobalSettings:
         """Get global settings."""
         return self.settings
+    
+    # =========================================================================
+    # PersRM Standalone Model Integration
+    # =========================================================================
+    
+    async def detect_persrm_standalone(self) -> Optional[ModelConfig]:
+        """
+        Detect if the PersRM Standalone model is available in Ollama.
+        
+        Returns:
+            ModelConfig if found, None otherwise
+        """
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                response = await client.get("http://localhost:11434/api/tags")
+                if response.status_code == 200:
+                    data = response.json()
+                    models = [m.get("name", "") for m in data.get("models", [])]
+                    
+                    # Check for persrm-standalone model
+                    for model_name in models:
+                        if "persrm-standalone" in model_name.lower():
+                            return await self.register_persrm_standalone(model_name)
+        except Exception:
+            pass
+        return None
+    
+    async def register_persrm_standalone(self, model_name: str = "persrm-standalone-mistral") -> ModelConfig:
+        """
+        Register the PersRM Standalone model as a ChatOS model.
+        
+        Args:
+            model_name: Name of the model in Ollama
+        
+        Returns:
+            ModelConfig for the registered model
+        """
+        model_id = f"persrm-standalone-{model_name.split(':')[0]}"
+        
+        # Check if already registered
+        existing = self.get_model(model_id)
+        if existing:
+            return existing
+        
+        # Create config for PersRM Standalone
+        config = ModelConfig(
+            id=model_id,
+            name="PersRM Standalone (Mistral)",
+            provider=ModelProvider.OLLAMA,
+            model_id=model_name,
+            enabled=True,
+            is_council_member=True,
+            base_url="http://localhost:11434",
+            temperature=0.7,
+            max_tokens=4096,
+            context_length=8192,
+            custom_params={
+                "is_persrm_standalone": True,
+                "reasoning_format": "think_answer",
+                "specialization": "ui_ux_reasoning",
+            }
+        )
+        
+        return self.add_model(config)
+    
+    def get_persrm_standalone_model(self) -> Optional[ModelConfig]:
+        """
+        Get the PersRM Standalone model if registered.
+        
+        Returns:
+            ModelConfig if found, None otherwise
+        """
+        for model in self.models.values():
+            if model.custom_params.get("is_persrm_standalone"):
+                return model
+        return None
     
     # =========================================================================
     # Provider Info
@@ -714,4 +1034,3 @@ def get_model_config_manager() -> ModelConfigManager:
     if _config_manager is None:
         _config_manager = ModelConfigManager()
     return _config_manager
-

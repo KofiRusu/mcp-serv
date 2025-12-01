@@ -77,6 +77,10 @@ class ConversationLog:
     rag_enabled: bool = False
     rag_context: Optional[str] = None
     
+    # Project association
+    project_id: Optional[str] = None
+    project_name: Optional[str] = None
+    
     # Model info
     models_used: List[str] = field(default_factory=list)
     chosen_model: Optional[str] = None
@@ -114,6 +118,8 @@ class ConversationLog:
             "mode": self.mode,
             "rag_enabled": self.rag_enabled,
             "rag_context": self.rag_context,
+            "project_id": self.project_id,
+            "project_name": self.project_name,
             "models_used": self.models_used,
             "chosen_model": self.chosen_model,
             "council_votes": self.council_votes,
@@ -234,6 +240,8 @@ class MemoryLogger:
         self,
         mode: str = "normal",
         rag_enabled: bool = False,
+        project_id: Optional[str] = None,
+        project_name: Optional[str] = None,
     ) -> str:
         """Start a new conversation and return its ID."""
         conv_id = self._generate_conversation_id()
@@ -244,10 +252,21 @@ class MemoryLogger:
             started_at=datetime.now().isoformat(),
             mode=mode,
             rag_enabled=rag_enabled,
+            project_id=project_id,
+            project_name=project_name,
         )
         
         self.session_stats.total_conversations += 1
         self.session_stats.modes_usage[mode] = self.session_stats.modes_usage.get(mode, 0) + 1
+        
+        # If project specified, add to project's chat list
+        if project_id:
+            try:
+                from ChatOS.projects import get_ai_project_store
+                store = get_ai_project_store()
+                store.add_chat_to_project(project_id, conv_id)
+            except Exception:
+                pass  # Don't fail if project store unavailable
         
         return conv_id
     
