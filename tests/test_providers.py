@@ -382,9 +382,10 @@ class TestProviderInfo:
 
     def test_all_providers_have_type(self):
         """Every provider should have a type."""
+        allowed_types = {"local", "api", "builtin", "hybrid"}
         for provider, info in PROVIDER_INFO.items():
             assert "type" in info
-            assert info["type"] in ["local", "api", "builtin"]
+            assert info["type"] in allowed_types
 
     def test_api_providers_require_key(self):
         """API providers should indicate key requirement."""
@@ -457,4 +458,3 @@ class TestLocalProviderPriority:
         
         api_model = [m for m in all_models if m.id == "api-test"]
         assert len(api_model) == 1
-

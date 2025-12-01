@@ -61,7 +61,8 @@ class TestModelProvider:
         """Should have all expected providers."""
         expected = [
             "ollama", "lm_studio", "llama_cpp", "openai", "anthropic",
-            "google", "groq", "together", "openrouter", "local_api", "dummy"
+            "google", "groq", "together", "openrouter", "local_api",
+            "minimax", "dummy"
         ]
         actual = [p.value for p in ModelProvider]
         assert sorted(actual) == sorted(expected)
@@ -566,4 +567,3 @@ class TestSingleton:
         with patch("ChatOS.controllers.model_config._config_manager", None):
             manager = get_model_config_manager()
             assert isinstance(manager, ModelConfigManager)
-
