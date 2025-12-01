@@ -11,20 +11,56 @@
     <style>
         /* Training Dashboard Specific Styles */
         .training-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             background: var(--bg-primary);
             color: var(--text-primary);
+            overflow: hidden;
+        }
+        
+        /* Custom Scrollbar */
+        .training-content::-webkit-scrollbar,
+        .panel-body::-webkit-scrollbar,
+        .jobs-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .training-content::-webkit-scrollbar-track,
+        .panel-body::-webkit-scrollbar-track,
+        .jobs-list::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+        
+        .training-content::-webkit-scrollbar-thumb,
+        .panel-body::-webkit-scrollbar-thumb,
+        .jobs-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        
+        .training-content::-webkit-scrollbar-thumb:hover,
+        .panel-body::-webkit-scrollbar-thumb:hover,
+        .jobs-list::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
         }
         
         .training-header {
+            flex: 0 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 20px 32px;
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border-color);
+            width: 100%;
         }
         
         .training-header h1 {
@@ -50,12 +86,17 @@
         }
         
         .training-content {
-            flex: 1;
+            flex: 1 1 0%;
+            min-height: 0;
             padding: 32px;
             overflow-y: auto;
+            overflow-x: hidden;
             display: grid;
             grid-template-columns: 1fr 1fr;
+            grid-auto-rows: min-content;
             gap: 24px;
+            width: 100%;
+            align-content: start;
         }
         
         .panel {
@@ -63,6 +104,9 @@
             border-radius: 12px;
             border: 1px solid var(--border-color);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 100%;
         }
         
         .panel-header {
@@ -72,6 +116,7 @@
             padding: 16px 20px;
             border-bottom: 1px solid var(--border-color);
             background: var(--bg-tertiary);
+            flex-shrink: 0;
         }
         
         .panel-title {
@@ -84,6 +129,9 @@
         
         .panel-body {
             padding: 20px;
+            overflow-y: auto;
+            flex: 1 1 auto;
+            min-height: 0;
         }
         
         /* Stats Panel */
@@ -169,6 +217,12 @@
         /* Jobs Panel */
         .jobs-panel {
             grid-column: span 2;
+            max-height: 400px;
+        }
+        
+        .jobs-panel .panel-body {
+            max-height: 320px;
+            overflow-y: auto;
         }
         
         .jobs-list {
@@ -332,6 +386,12 @@
         /* Job Details Panel */
         .details-panel {
             grid-column: span 2;
+            max-height: 450px;
+        }
+        
+        .details-panel .panel-body {
+            max-height: 380px;
+            overflow-y: auto;
         }
         
         .details-placeholder {
@@ -463,9 +523,90 @@
             opacity: 0.5;
         }
         
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 32px;
+        }
+        
+        .tab-btn {
+            padding: 16px 24px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+        
+        .tab-btn.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+        }
+        
+        .tab-btn .tab-badge {
+            background: var(--accent-primary);
+            color: #000;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: grid;
+        }
+        
+        /* PersRM specific */
+        .persrm-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .job-type-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .job-type-badge.chatos {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-primary);
+        }
+        
+        .job-type-badge.persrm {
+            background: rgba(238, 90, 36, 0.2);
+            color: #ee5a24;
+        }
+        
         /* Responsive */
         @media (max-width: 1200px) {
-            .training-content {
+            .training-content,
+            .tab-content {
                 grid-template-columns: 1fr;
             }
             
@@ -490,8 +631,21 @@
             </a>
         </header>
         
-        <!-- Content -->
-        <div class="training-content">
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('llm')" id="tab-btn-llm">
+                <span>🤖</span>
+                <span>LLM Training</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('persrm')" id="tab-btn-persrm">
+                <span>🎨</span>
+                <span>PersRM Training</span>
+                <span class="persrm-badge">UI/UX</span>
+            </button>
+        </nav>
+        
+        <!-- LLM Training Tab Content -->
+        <div class="training-content tab-content active" id="tab-llm">
             <!-- Stats Panel -->
             <div class="panel">
                 <div class="panel-header">
@@ -544,9 +698,7 @@
                     <div class="form-group">
                         <label class="form-label">Base Model</label>
                         <select id="model-select" class="form-select">
-                            <option value="">Default (Qwen2.5-7B)</option>
-                            <option value="unsloth/Qwen2.5-7B-Instruct-bnb-4bit">Qwen 2.5 7B (4-bit)</option>
-                            <option value="unsloth/mistral-7b-instruct-v0.3-bnb-4bit">Mistral 7B (4-bit)</option>
+                            <option value="">Loading models...</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -604,6 +756,125 @@
                 </div>
             </div>
         </div>
+        
+        <!-- PersRM Training Tab Content -->
+        <div class="training-content tab-content" id="tab-persrm">
+            <!-- PersRM Stats Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span>📊</span>
+                        PersRM Training Data
+                    </h2>
+                    <button onclick="refreshPersrmStats()" class="btn btn-small">Refresh</button>
+                </div>
+                <div class="panel-body">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Reasoning Examples</div>
+                            <div class="stat-value" id="persrm-stat-reasoning">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Instruction Examples</div>
+                            <div class="stat-value" id="persrm-stat-instruction">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Feedback Examples</div>
+                            <div class="stat-value positive" id="persrm-stat-feedback">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Examples</div>
+                            <div class="stat-value" id="persrm-stat-total">-</div>
+                        </div>
+                        <div class="readiness-card">
+                            <div class="readiness-status">
+                                <div class="readiness-dot not-ready" id="persrm-readiness-dot"></div>
+                                <div class="readiness-text">
+                                    <div id="persrm-readiness-status">Checking...</div>
+                                    <div class="reason" id="persrm-readiness-reason"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PersRM Start Training Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span>🚀</span>
+                        Start PersRM Training
+                    </h2>
+                </div>
+                <div class="panel-body start-panel">
+                    <div class="form-group">
+                        <label class="form-label">Training Preset</label>
+                        <select id="persrm-preset-select" class="form-select">
+                            <option value="">Loading presets...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Base Model</label>
+                        <select id="persrm-model-select" class="form-select">
+                            <option value="">Loading models...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description (optional)</label>
+                        <input type="text" id="persrm-description-input" class="form-input" placeholder="e.g., UI/UX reasoning enhancement">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="persrm-force-checkbox">
+                            Force start (skip readiness checks)
+                        </label>
+                    </div>
+                    <button id="persrm-start-btn" class="btn-start" onclick="startPersrmTraining()">
+                        <span>🚀</span>
+                        Start PersRM Training
+                    </button>
+                </div>
+            </div>
+            
+            <!-- PersRM Jobs List Panel -->
+            <div class="panel jobs-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span>📋</span>
+                        PersRM Training Jobs
+                    </h2>
+                    <span id="persrm-jobs-count">0 jobs</span>
+                </div>
+                <div class="panel-body">
+                    <div class="jobs-list" id="persrm-jobs-list">
+                        <div class="empty-state">
+                            <div class="icon">📭</div>
+                            <div>No PersRM training jobs yet</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PersRM Job Details Panel -->
+            <div class="panel details-panel" id="persrm-details-panel" style="display: none;">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span>📝</span>
+                        PersRM Job Details
+                    </h2>
+                    <span class="job-id" id="persrm-detail-job-id">-</span>
+                </div>
+                <div class="panel-body">
+                    <div class="details-content" id="persrm-details-content">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="action-buttons" id="persrm-action-buttons">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -612,17 +883,148 @@
         let jobs = [];
         let selectedJobId = null;
         let pollInterval = null;
+        let activeTab = 'llm';
+        
+        // PersRM State
+        let persrmStats = null;
+        let persrmJobs = [];
+        let selectedPersrmJobId = null;
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             refreshStats();
             refreshJobs();
+            refreshPersrmStats();
+            refreshPersrmJobs();
+            // Load dropdowns
+            loadLlmModels();
+            loadPersrmPresets();
+            loadPersrmModels();
             // Poll for updates every 5 seconds
             pollInterval = setInterval(() => {
+                if (activeTab === 'llm') {
                 refreshStats();
                 refreshJobs();
+                } else {
+                    refreshPersrmStats();
+                    refreshPersrmJobs();
+                }
             }, 5000);
         });
+        
+        // Load LLM models from API
+        async function loadLlmModels() {
+            try {
+                const response = await fetch('/api/training/unsloth/models');
+                if (response.ok) {
+                    const data = await response.json();
+                    const select = document.getElementById('model-select');
+                    select.innerHTML = `<option value="">Default (${data.default})</option>`;
+                    
+                    for (const [key, config] of Object.entries(data.models)) {
+                        select.innerHTML += `<option value="${key}">${config.display_name} - ${config.vram_requirement}</option>`;
+                    }
+                }
+                
+                // Also load fine-tuned models
+                const ftResponse = await fetch('/api/training/unsloth/fine-tuned-models');
+                if (ftResponse.ok) {
+                    const ftData = await ftResponse.json();
+                    const select = document.getElementById('model-select');
+                    
+                    if (ftData.models && ftData.models.length > 0) {
+                        select.innerHTML += `<option disabled>── Fine-tuned Models ──</option>`;
+                        for (const model of ftData.models) {
+                            select.innerHTML += `<option value="${model.job_id}">${model.display_name || model.job_id}</option>`;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading LLM models:', error);
+                // Fallback to defaults
+                const select = document.getElementById('model-select');
+                select.innerHTML = `
+                    <option value="">Default (Qwen2.5-7B)</option>
+                    <option value="qwen2.5-7b-instruct">Qwen 2.5 7B Instruct</option>
+                    <option value="qwen2.5-coder-7b">Qwen 2.5 Coder 7B</option>
+                    <option value="mistral-7b-instruct">Mistral 7B Instruct</option>
+                `;
+            }
+        }
+        
+        // Tab switching
+        function switchTab(tab) {
+            activeTab = tab;
+            
+            // Update tab buttons
+            document.getElementById('tab-btn-llm').classList.toggle('active', tab === 'llm');
+            document.getElementById('tab-btn-persrm').classList.toggle('active', tab === 'persrm');
+            
+            // Update tab content
+            document.getElementById('tab-llm').classList.toggle('active', tab === 'llm');
+            document.getElementById('tab-persrm').classList.toggle('active', tab === 'persrm');
+            
+            // Refresh data for active tab
+            if (tab === 'llm') {
+                refreshStats();
+                refreshJobs();
+            } else {
+                refreshPersrmStats();
+                refreshPersrmJobs();
+                loadPersrmPresets();
+                loadPersrmModels();
+            }
+        }
+        
+        // Load PersRM presets from API
+        async function loadPersrmPresets() {
+            try {
+                const response = await fetch('/api/training/persrm/presets');
+                if (response.ok) {
+                    const data = await response.json();
+                    const select = document.getElementById('persrm-preset-select');
+                    select.innerHTML = `<option value="">Default (${data.default})</option>`;
+                    
+                    for (const [name, config] of Object.entries(data.presets)) {
+                        select.innerHTML += `<option value="${name}">${name} - ${config.description}</option>`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading PersRM presets:', error);
+            }
+        }
+        
+        // Load PersRM models from API
+        async function loadPersrmModels() {
+            try {
+                const response = await fetch('/api/training/persrm/models');
+                if (response.ok) {
+                    const data = await response.json();
+                    const select = document.getElementById('persrm-model-select');
+                    select.innerHTML = `<option value="">Default (${data.default})</option>`;
+                    
+                    for (const [key, config] of Object.entries(data.models)) {
+                        select.innerHTML += `<option value="${key}">${config.display_name} - ${config.vram_requirement}</option>`;
+                    }
+                }
+                
+                // Also load fine-tuned models
+                const ftResponse = await fetch('/api/training/unsloth/fine-tuned-models');
+                if (ftResponse.ok) {
+                    const ftData = await ftResponse.json();
+                    const select = document.getElementById('persrm-model-select');
+                    
+                    if (ftData.models && ftData.models.length > 0) {
+                        select.innerHTML += `<option disabled>── Fine-tuned Models ──</option>`;
+                        for (const model of ftData.models) {
+                            select.innerHTML += `<option value="${model.job_id}">${model.display_name || model.job_id}</option>`;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading PersRM models:', error);
+            }
+        }
         
         // Fetch training stats
         async function refreshStats() {
@@ -656,9 +1058,18 @@
             } else {
                 readyDot.className = 'readiness-dot not-ready';
                 readyStatus.textContent = 'Not Ready';
+                // Show reason based on stats
                 const examples = stats.training_examples || 0;
                 const required = stats.min_samples_required || 50;
-                readyReason.textContent = `${examples}/${required} samples collected`;
+                const qualityRatio = stats.current_quality_ratio || 0;
+                const minQuality = stats.min_quality_ratio || 0.7;
+                if (examples < required) {
+                    readyReason.textContent = `${examples}/${required} samples collected`;
+                } else if (qualityRatio < minQuality) {
+                    readyReason.textContent = `Quality ratio: ${(qualityRatio * 100).toFixed(1)}% (need ${(minQuality * 100).toFixed(0)}%) - use Force Start`;
+                } else {
+                    readyReason.textContent = `${examples}/${required} samples collected`;
+                }
                 startBtn.disabled = !document.getElementById('force-checkbox').checked;
             }
         }
@@ -969,6 +1380,350 @@
             if (e.target.checked || (currentStats && currentStats.ready_to_train)) {
                 startBtn.disabled = false;
             } else if (currentStats && !currentStats.ready_to_train) {
+                startBtn.disabled = true;
+            }
+        });
+        
+        // ========================================
+        // PersRM Functions
+        // ========================================
+        
+        // Fetch PersRM training stats
+        async function refreshPersrmStats() {
+            try {
+                const response = await fetch('/api/training/persrm/stats');
+                if (response.ok) {
+                    persrmStats = await response.json();
+                    updatePersrmStatsUI(persrmStats);
+                }
+            } catch (error) {
+                console.error('Error fetching PersRM stats:', error);
+            }
+        }
+        
+        function updatePersrmStatsUI(stats) {
+            document.getElementById('persrm-stat-reasoning').textContent = stats.reasoning_examples || 0;
+            document.getElementById('persrm-stat-instruction').textContent = stats.instruction_examples || 0;
+            document.getElementById('persrm-stat-feedback').textContent = stats.feedback_examples || 0;
+            document.getElementById('persrm-stat-total').textContent = stats.total_examples || 0;
+            
+            const readyDot = document.getElementById('persrm-readiness-dot');
+            const readyStatus = document.getElementById('persrm-readiness-status');
+            const readyReason = document.getElementById('persrm-readiness-reason');
+            const startBtn = document.getElementById('persrm-start-btn');
+            
+            if (stats.ready_to_train) {
+                readyDot.className = 'readiness-dot ready';
+                readyStatus.textContent = 'Ready to Train';
+                readyReason.textContent = `${stats.total_examples} examples available`;
+                startBtn.disabled = false;
+            } else {
+                readyDot.className = 'readiness-dot not-ready';
+                readyStatus.textContent = 'Not Ready';
+                const examples = stats.total_examples || 0;
+                const required = stats.min_samples_required || 10;
+                readyReason.textContent = `${examples}/${required} examples needed`;
+                startBtn.disabled = !document.getElementById('persrm-force-checkbox').checked;
+            }
+        }
+        
+        // Fetch PersRM jobs
+        async function refreshPersrmJobs() {
+            try {
+                const response = await fetch('/api/training/persrm/jobs?limit=20');
+                if (response.ok) {
+                    const data = await response.json();
+                    persrmJobs = data.jobs || [];
+                    updatePersrmJobsUI();
+                }
+            } catch (error) {
+                console.error('Error fetching PersRM jobs:', error);
+            }
+        }
+        
+        function updatePersrmJobsUI() {
+            const container = document.getElementById('persrm-jobs-list');
+            const countEl = document.getElementById('persrm-jobs-count');
+            
+            countEl.textContent = `${persrmJobs.length} jobs`;
+            
+            if (persrmJobs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <div>No PersRM training jobs yet</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = persrmJobs.map(job => {
+                const loss = job.latest_metrics?.train_loss;
+                const lossStr = loss != null ? loss.toFixed(4) : '-';
+                const time = new Date(job.created_at).toLocaleString();
+                
+                return `
+                    <div class="job-card ${job.id === selectedPersrmJobId ? 'selected' : ''}" 
+                         onclick="selectPersrmJob('${job.id}')">
+                        <div class="job-info">
+                            <div class="job-id">${escapeHtml(job.id)}<span class="job-type-badge persrm">PersRM</span></div>
+                            <div class="job-model">${escapeHtml(job.base_model_name.split('/').pop())}</div>
+                            <div class="job-time">${time}</div>
+                        </div>
+                        <div class="job-meta">
+                            <div class="job-metrics">
+                                <div class="job-loss">${lossStr}</div>
+                                <div class="job-loss-label">loss</div>
+                            </div>
+                            <div class="job-status ${job.status}">${job.status}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Update selected job details if needed
+            if (selectedPersrmJobId) {
+                const job = persrmJobs.find(j => j.id === selectedPersrmJobId);
+                if (job) {
+                    showPersrmJobDetails(job);
+                }
+            }
+        }
+        
+        async function selectPersrmJob(jobId) {
+            selectedPersrmJobId = jobId;
+            updatePersrmJobsUI();
+            
+            // Fetch full job details
+            try {
+                const response = await fetch(`/api/training/persrm/jobs/${jobId}?include_metrics_history=true`);
+                if (response.ok) {
+                    const job = await response.json();
+                    showPersrmJobDetails(job);
+                }
+            } catch (error) {
+                console.error('Error fetching PersRM job details:', error);
+            }
+        }
+        
+        function showPersrmJobDetails(job) {
+            const panel = document.getElementById('persrm-details-panel');
+            const content = document.getElementById('persrm-details-content');
+            const actions = document.getElementById('persrm-action-buttons');
+            
+            panel.style.display = 'block';
+            document.getElementById('persrm-detail-job-id').textContent = job.id;
+            
+            const metrics = job.latest_metrics || {};
+            const summary = job.metrics_summary || {};
+            
+            content.innerHTML = `
+                <div class="detail-section">
+                    <h4>Configuration</h4>
+                    <div class="detail-item">
+                        <span class="detail-label">Type</span>
+                        <span class="detail-value">PersRM (UI/UX Reasoning)</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Model</span>
+                        <span class="detail-value">${escapeHtml(job.base_model_name.split('/').pop())}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value">${job.status}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Started</span>
+                        <span class="detail-value">${job.started_at ? new Date(job.started_at).toLocaleString() : '-'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Finished</span>
+                        <span class="detail-value">${job.finished_at ? new Date(job.finished_at).toLocaleString() : '-'}</span>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h4>Metrics</h4>
+                    <div class="detail-item">
+                        <span class="detail-label">Current Step</span>
+                        <span class="detail-value">${metrics.step || '-'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Train Loss</span>
+                        <span class="detail-value">${metrics.train_loss != null ? metrics.train_loss.toFixed(4) : '-'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Eval Loss</span>
+                        <span class="detail-value">${metrics.eval_loss != null ? metrics.eval_loss.toFixed(4) : '-'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Min Train Loss</span>
+                        <span class="detail-value">${summary.min_train_loss != null ? summary.min_train_loss.toFixed(4) : '-'}</span>
+                    </div>
+                </div>
+                ${job.error_snippet ? `
+                <div class="detail-section" style="grid-column: span 2;">
+                    <h4>Error</h4>
+                    <div class="log-viewer" style="color: var(--error);">${escapeHtml(job.error_snippet)}</div>
+                </div>
+                ` : ''}
+            `;
+            
+            // Action buttons based on status
+            let actionsHtml = '';
+            if (job.status === 'running') {
+                actionsHtml = `
+                    <button class="btn-action btn-stop" onclick="stopPersrmJob('${job.id}')">
+                        ⏹ Stop Training
+                    </button>
+                    <button class="btn-action btn-logs" onclick="viewPersrmLogs('${job.id}')">
+                        📜 View Logs
+                    </button>
+                `;
+            } else if (job.status === 'completed') {
+                actionsHtml = `
+                    <button class="btn-action btn-export" onclick="exportPersrmModel('${job.id}')">
+                        📦 Export to Ollama
+                    </button>
+                    <button class="btn-action btn-logs" onclick="viewPersrmLogs('${job.id}')">
+                        📜 View Logs
+                    </button>
+                `;
+            } else {
+                actionsHtml = `
+                    <button class="btn-action btn-logs" onclick="viewPersrmLogs('${job.id}')">
+                        📜 View Logs
+                    </button>
+                `;
+            }
+            actions.innerHTML = actionsHtml;
+        }
+        
+        // Start PersRM training
+        async function startPersrmTraining() {
+            const presetSelect = document.getElementById('persrm-preset-select');
+            const modelSelect = document.getElementById('persrm-model-select');
+            const descriptionInput = document.getElementById('persrm-description-input');
+            const forceCheckbox = document.getElementById('persrm-force-checkbox');
+            const startBtn = document.getElementById('persrm-start-btn');
+            
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<span>⏳</span> Starting...';
+            
+            try {
+                const response = await fetch('/api/training/persrm/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        preset: presetSelect.value || null,
+                        model: modelSelect.value || null,
+                        description: descriptionInput.value || null,
+                        force: forceCheckbox.checked,
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    alert(`PersRM Training started! Job ID: ${data.job_id}`);
+                    selectedPersrmJobId = data.job_id;
+                    refreshPersrmJobs();
+                } else {
+                    alert(`Failed to start PersRM training: ${data.detail || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error starting PersRM training:', error);
+                alert('Error starting PersRM training: ' + error.message);
+            } finally {
+                startBtn.disabled = false;
+                startBtn.innerHTML = '<span>🚀</span> Start PersRM Training';
+            }
+        }
+        
+        // Stop PersRM job
+        async function stopPersrmJob(jobId) {
+            if (!confirm('Are you sure you want to stop this PersRM training job?')) return;
+            
+            try {
+                const response = await fetch(`/api/training/persrm/stop/${jobId}`, {
+                    method: 'POST',
+                });
+                
+                if (response.ok) {
+                    alert('Stop signal sent');
+                    refreshPersrmJobs();
+                } else {
+                    const data = await response.json();
+                    alert(`Failed to stop job: ${data.detail || 'Unknown error'}`);
+                }
+            } catch (error) {
+                alert('Error stopping job: ' + error.message);
+            }
+        }
+        
+        // Export PersRM model
+        async function exportPersrmModel(jobId) {
+            if (!confirm('Export this PersRM model for use in ChatOS/Ollama?')) return;
+            
+            try {
+                const response = await fetch(`/api/training/persrm/export-for-chatos/${jobId}`, {
+                    method: 'POST',
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(`Export completed!\nModel ready for use.`);
+                } else {
+                    alert(`Export failed: ${data.detail || 'Unknown error'}`);
+                }
+            } catch (error) {
+                alert('Error exporting model: ' + error.message);
+            }
+        }
+        
+        // View PersRM logs
+        async function viewPersrmLogs(jobId) {
+            try {
+                const response = await fetch(`/api/training/persrm/jobs/${jobId}/logs?lines=100`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const logs = data.lines.join('\n') || 'No logs available';
+                    
+                    const logWindow = window.open('', 'PersRM Training Logs', 'width=800,height=600');
+                    logWindow.document.write(`
+                        <html>
+                        <head>
+                            <title>PersRM Training Logs - ${jobId}</title>
+                            <style>
+                                body { 
+                                    background: #0a0a0f; 
+                                    color: #a0a0b0; 
+                                    font-family: 'JetBrains Mono', monospace;
+                                    font-size: 12px;
+                                    padding: 20px;
+                                    line-height: 1.6;
+                                }
+                                pre { white-space: pre-wrap; word-wrap: break-word; }
+                            </style>
+                        </head>
+                        <body>
+                            <h3 style="color: #ee5a24;">PersRM Training Logs: ${jobId}</h3>
+                            <pre>${escapeHtml(logs)}</pre>
+                        </body>
+                        </html>
+                    `);
+                }
+            } catch (error) {
+                alert('Error fetching logs: ' + error.message);
+            }
+        }
+        
+        // Enable PersRM start button when force is checked
+        document.getElementById('persrm-force-checkbox').addEventListener('change', (e) => {
+            const startBtn = document.getElementById('persrm-start-btn');
+            if (e.target.checked || (persrmStats && persrmStats.ready_to_train)) {
+                startBtn.disabled = false;
+            } else if (persrmStats && !persrmStats.ready_to_train) {
                 startBtn.disabled = true;
             }
         });

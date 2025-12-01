@@ -421,18 +421,36 @@
             
             input.value = '';
             appendAssistantUserMessage(message);
+            appendAssistantResponse('⏳ Thinking...');
             
             try {
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message, mode: 'code' }),
+                    body: JSON.stringify({ 
+                        message, 
+                        mode: 'code',
+                        model_id: 'dummy-atlas'  // Use fast dummy model for sandbox assistant
+                    }),
                 });
                 
                 const data = await response.json();
-                appendAssistantResponse(data.answer);
+                // Replace the "Thinking..." message with actual response
+                const chat = document.getElementById('assistant-chat');
+                const lastMsg = chat.lastElementChild;
+                if (lastMsg && lastMsg.textContent === '⏳ Thinking...') {
+                    lastMsg.innerHTML = formatCode(data.answer);
+                } else {
+                    appendAssistantResponse(data.answer);
+                }
             } catch (error) {
-                appendAssistantResponse('Error: ' + error.message);
+                const chat = document.getElementById('assistant-chat');
+                const lastMsg = chat.lastElementChild;
+                if (lastMsg && lastMsg.textContent === '⏳ Thinking...') {
+                    lastMsg.innerHTML = 'Error: ' + error.message;
+                } else {
+                    appendAssistantResponse('Error: ' + error.message);
+                }
             }
         }
 
@@ -594,12 +612,42 @@
         /* Sandbox-specific styles */
         .sandbox-app {
             display: grid;
-            grid-template-columns: 250px 1fr 300px;
+            grid-template-columns: minmax(200px, 250px) 1fr minmax(250px, 300px);
             height: 100vh;
+            overflow: hidden;
         }
 
         .file-explorer {
             border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .file-explorer .sidebar-header {
+            flex-shrink: 0;
+        }
+
+        .file-explorer .sidebar-section {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .file-explorer .sidebar-section:first-of-type {
+            flex: 2;
+        }
+
+        .file-explorer .sidebar-section:last-of-type {
+            flex: 1;
+        }
+
+        .file-explorer .sidebar-footer {
+            flex-shrink: 0;
+            margin-top: auto;
         }
 
         .section-header {
@@ -607,6 +655,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
+            flex-shrink: 0;
         }
 
         .file-actions {
@@ -633,8 +682,10 @@
         }
 
         .file-tree {
-            max-height: 300px;
+            flex: 1;
+            min-height: 0;
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .file-item {
@@ -667,6 +718,10 @@
             font-size: 13px;
         }
 
+        .search-box {
+            flex-shrink: 0;
+        }
+
         .search-box input {
             width: 100%;
             padding: 8px 12px;
@@ -675,12 +730,15 @@
             border-radius: 6px;
             color: var(--text-primary);
             font-size: 13px;
+            box-sizing: border-box;
         }
 
         .search-results {
             margin-top: 8px;
-            max-height: 200px;
+            flex: 1;
+            min-height: 0;
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .search-result {
@@ -908,10 +966,46 @@
 
         @media (max-width: 1200px) {
             .sandbox-app {
-                grid-template-columns: 220px 1fr;
+                grid-template-columns: 200px 1fr;
             }
             .assistant-panel {
                 display: none;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sandbox-app {
+                grid-template-columns: 180px 1fr;
+            }
+            .file-explorer .sidebar-section {
+                padding: 8px;
+            }
+            .section-title {
+                font-size: 11px;
+            }
+            .file-item {
+                font-size: 12px;
+                padding: 4px 6px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sandbox-app {
+                grid-template-columns: 1fr;
+            }
+            .file-explorer {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 250px;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 100;
+                background: var(--bg-secondary);
+            }
+            .file-explorer.open {
+                transform: translateX(0);
             }
         }
     </style>
