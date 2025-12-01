@@ -13,8 +13,46 @@ python-multipart>=0.0.6
 # Templates
 jinja2>=3.1.2
 
-# HTTP client (for future API integrations)
-httpx>=0.26.0
+# HTTP client (for API integrations)
+httpx[http2]>=0.26.0  # HTTP/2 support for better multiplexing
+
+# =============================================================================
+# Performance Optimizations
+# =============================================================================
+
+# Caching (optional Redis support)
+cachetools>=5.3.0
+# redis>=5.0.0  # Uncomment for distributed caching
+
+# Async file I/O
+aiofiles>=23.0.0
+
+# Fast hashing (for attachments)
+xxhash>=3.4.0
+
+# =============================================================================
+# RAG Enhancement (Embeddings)
+# =============================================================================
+
+# For sentence embeddings - HIGHLY RECOMMENDED for better RAG:
+sentence-transformers>=2.2.0
+
+# For fast vector search:
+faiss-cpu>=1.7.4
+
+# =============================================================================
+# Learning Loop Database
+# =============================================================================
+
+# Database ORM
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9  # PostgreSQL driver
+
+# HuggingFace datasets
+datasets>=2.16.0
+
+# Web scraping
+beautifulsoup4>=4.12.0
 
 # =============================================================================
 # Optional: Real LLM Backend Support (uncomment as needed)
@@ -23,14 +61,14 @@ httpx>=0.26.0
 # For Ollama integration:
 # ollama>=0.1.6
 
-# For sentence embeddings (RAG enhancement):
-# sentence-transformers>=2.2.0
-
-# For vector search:
-# faiss-cpu>=1.7.4
-
 # For HuggingFace models:
 # transformers>=4.37.0
+
+# =============================================================================
+# Training Pipeline (Unsloth)
+# =============================================================================
+
+pyyaml>=6.0
 
 # =============================================================================
 # Development & Testing

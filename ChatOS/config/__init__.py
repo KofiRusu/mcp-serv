@@ -39,6 +39,15 @@ if _config_module_path.exists():
     STATIC_DIR = _legacy_config.STATIC_DIR
     SWARM_AGENTS = _legacy_config.SWARM_AGENTS
     TEMPLATES_DIR = _legacy_config.TEMPLATES_DIR
+    
+    # VSCode Sandbox configuration
+    SANDBOX_PROJECT_ROOTS = _legacy_config.SANDBOX_PROJECT_ROOTS
+    CODE_SERVER_PORT = _legacy_config.CODE_SERVER_PORT
+    CODE_SERVER_HOST = _legacy_config.CODE_SERVER_HOST
+    CODE_SERVER_AUTH = _legacy_config.CODE_SERVER_AUTH
+    SANDBOX_ALLOWED_COMMANDS = _legacy_config.SANDBOX_ALLOWED_COMMANDS
+    SANDBOX_COMMAND_TIMEOUT = _legacy_config.SANDBOX_COMMAND_TIMEOUT
+    SANDBOX_MAX_OUTPUT_SIZE = _legacy_config.SANDBOX_MAX_OUTPUT_SIZE
 
 __all__ = [
     "settings",
@@ -67,4 +76,12 @@ __all__ = [
     "STATIC_DIR",
     "SWARM_AGENTS",
     "TEMPLATES_DIR",
+    # VSCode Sandbox
+    "SANDBOX_PROJECT_ROOTS",
+    "CODE_SERVER_PORT",
+    "CODE_SERVER_HOST",
+    "CODE_SERVER_AUTH",
+    "SANDBOX_ALLOWED_COMMANDS",
+    "SANDBOX_COMMAND_TIMEOUT",
+    "SANDBOX_MAX_OUTPUT_SIZE",
 ]

@@ -71,7 +71,8 @@ class Settings:
         return self.unsloth_pipelines_dir / "outputs"
     
     # Virtual environment for Unsloth training
-    unsloth_venv_path: Path = field(default_factory=lambda: Path.home() / "unsloth_env")
+    # Can be a virtualenv path (~/unsloth_env) or conda env name (unsloth_py311)
+    unsloth_venv_path: Path = field(default_factory=lambda: Path.home() / "miniforge3" / "envs" / "unsloth_py311")
     
     # ==========================================================================
     # Training Configuration
@@ -101,6 +102,20 @@ class Settings:
     
     # Enable feedback collection
     enable_feedback: bool = True
+    
+    # ==========================================================================
+    # Learning Loop Database
+    # ==========================================================================
+    
+    # PostgreSQL connection
+    database_url: str = "postgresql://chatos:chatos@localhost:5432/chatos_learning"
+    
+    # SQLite fallback for development
+    use_sqlite_fallback: bool = False
+    
+    @property
+    def sqlite_path(self) -> Path:
+        return self.memory_dir / "learning_loop.db"
     
     # ==========================================================================
     # Ollama Configuration

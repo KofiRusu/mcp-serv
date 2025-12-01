@@ -25,9 +25,11 @@ class ChatRequest(BaseModel):
     mode: str = Field(default="normal", description="Chat mode")
     use_rag: bool = Field(default=True, description="Include RAG context")
     session_id: Optional[str] = Field(None, description="Session identifier")
-    project_id: Optional[str] = Field(None, description="Project ID for project-specific context")
+    project_id: Optional[str] = Field(None, description="Coding project ID for project-specific context")
+    ai_project_id: Optional[str] = Field(None, description="AI project ID for system prompt/model presets")
     attachment_ids: Optional[List[str]] = Field(None, description="IDs of attached files")
     model_id: Optional[str] = Field(None, description="Specific model ID to use (bypasses council voting)")
+    stream: bool = Field(default=False, description="Stream the response for real-time tokens")
 
 
 class ModelResponse(BaseModel):
@@ -47,6 +49,8 @@ class ChatResponse(BaseModel):
     research_context: Optional[Dict[str, Any]] = None
     thinking_result: Optional[Dict[str, Any]] = None
     swarm_result: Optional[Dict[str, Any]] = None
+    ai_project_id: Optional[str] = None
+    ai_project_name: Optional[str] = None
 
 
 # =============================================================================
@@ -258,6 +262,90 @@ class ProjectContextResponse(BaseModel):
     active_tasks: List[str] = []
     file_history: List[Dict[str, Any]] = []
     notes: List[str] = []
+
+
+# =============================================================================
+# AI Projects (Chat Settings Presets)
+# =============================================================================
+
+class AIProjectCreateRequest(BaseModel):
+    """Request to create a new AI project."""
+    name: str = Field(..., min_length=1, max_length=100, description="Project name")
+    description: Optional[str] = Field(None, max_length=500, description="Project description")
+    color: str = Field(default="#2B26FE", description="Theme color (hex)")
+    icon: str = Field(default="📁", max_length=10, description="Emoji icon")
+    system_prompt: str = Field(default="", max_length=10000, description="System prompt (Markdown)")
+    default_model_id: Optional[str] = Field(None, description="Default model ID")
+    default_temperature: float = Field(default=0.7, ge=0.0, le=2.0, description="Default temperature")
+    training_enabled: bool = Field(default=True, description="Enable training data collection")
+    rag_enabled: bool = Field(default=True, description="Enable RAG context")
+    code_mode: bool = Field(default=False, description="Enable code mode by default")
+
+
+class AIProjectUpdateRequest(BaseModel):
+    """Request to update an AI project."""
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
+    color: Optional[str] = None
+    icon: Optional[str] = Field(None, max_length=10)
+    system_prompt: Optional[str] = Field(None, max_length=10000)
+    default_model_id: Optional[str] = None
+    default_temperature: Optional[float] = Field(None, ge=0.0, le=2.0)
+    training_enabled: Optional[bool] = None
+    rag_enabled: Optional[bool] = None
+    code_mode: Optional[bool] = None
+
+
+class AIProjectResponse(BaseModel):
+    """Full AI project response."""
+    id: str
+    name: str
+    slug: str
+    description: Optional[str]
+    color: str
+    icon: str
+    system_prompt: str
+    default_model_id: Optional[str]
+    default_temperature: float
+    training_enabled: bool
+    rag_enabled: bool
+    code_mode: bool
+    created_at: str
+    updated_at: str
+
+
+class AIProjectListResponse(BaseModel):
+    """List of AI projects."""
+    projects: List[AIProjectResponse]
+    total: int
+
+
+class AIProjectTemplateResponse(BaseModel):
+    """AI project template info."""
+    key: str
+    name: str
+    icon: str
+    color: str
+    description: Optional[str] = None
+
+
+class AIProjectTemplateListResponse(BaseModel):
+    """List of available AI project templates."""
+    templates: List[AIProjectTemplateResponse]
+
+
+class AIProjectNewChatRequest(BaseModel):
+    """Request to create a new chat bound to an AI project."""
+    session_id: Optional[str] = Field(None, description="Optional session ID (auto-generated if not provided)")
+
+
+class AIProjectNewChatResponse(BaseModel):
+    """Response for new chat creation."""
+    chat_id: str
+    session_id: str
+    project_id: str
+    project_name: str
+    system_snapshot: Dict[str, Any]
 
 
 # =============================================================================
