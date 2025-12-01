@@ -12,18 +12,26 @@ Features:
 Run with: uvicorn ChatOS.app:app --reload
 """
 
+import asyncio
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import List
 
 from fastapi import FastAPI, HTTPException, Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from ChatOS import __version__
 from ChatOS.config import STATIC_DIR, TEMPLATES_DIR, COMMAND_MODES
-from ChatOS.controllers.chat import chat_endpoint, get_council_info, get_available_commands
+from ChatOS.controllers.chat import (
+    chat_endpoint,
+    get_council_info,
+    get_available_commands,
+    stream_chat_response,
+)
 from ChatOS.controllers.sandbox import get_sandbox, CodeEdit
 from ChatOS.controllers.projects import get_project_manager
 from ChatOS.controllers.attachments import get_attachment_manager
@@ -71,6 +79,52 @@ from ChatOS.schemas import (
     OllamaModelRequest,
 )
 from ChatOS.api.routes_training import router as training_router
+from ChatOS.api.routes_persrm_training import router as persrm_training_router
+from ChatOS.api.routes_ai_projects import router as ai_projects_router
+from ChatOS.api.routes_chat_history import router as history_router
+from ChatOS.api.routes_learning_loop import router as learning_loop_router
+from ChatOS.api.routes_terminal import router as terminal_router
+from ChatOS.api.routes_vscode import router as vscode_router
+from ChatOS.api.routes_agi import router as agi_router
+from ChatOS.api.routes_persrm_integration import router as persrm_integration_router
+
+# =============================================================================
+# Lifecycle Management
+# =============================================================================
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Application lifespan manager for startup/shutdown events.
+    
+    Handles:
+    - Resource initialization on startup
+    - Graceful cleanup on shutdown (HTTP clients, caches, etc.)
+    """
+    # Startup
+    import logging
+    logging.info("ChatOS starting up...")
+    yield
+    
+    # Shutdown - cleanup resources
+    logging.info("ChatOS shutting down, cleaning up resources...")
+    
+    # Close LLM client connections
+    try:
+        from ChatOS.controllers.llm_client import cleanup_llm_client
+        await cleanup_llm_client()
+    except Exception as e:
+        logging.warning(f"Error cleaning up LLM client: {e}")
+    
+    # Close cache connections
+    try:
+        from ChatOS.controllers.cache import close_cache
+        await close_cache()
+    except Exception as e:
+        logging.warning(f"Error closing cache: {e}")
+    
+    logging.info("ChatOS shutdown complete")
+
 
 # =============================================================================
 # App Configuration
@@ -82,7 +136,12 @@ app = FastAPI(
     version=__version__,
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
+
+# GZip compression for responses (improves transfer speed)
+# Only compress responses larger than 1KB
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.add_middleware(
     CORSMiddleware,
@@ -90,6 +149,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    max_age=3600,  # Cache preflight requests for 1 hour
 )
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
@@ -97,36 +157,66 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 # Include API routers
 app.include_router(training_router)
+app.include_router(persrm_training_router)
+app.include_router(ai_projects_router)
+app.include_router(history_router)
+app.include_router(learning_loop_router)
+app.include_router(terminal_router)
+app.include_router(vscode_router)
+app.include_router(agi_router)
+app.include_router(persrm_integration_router)
 
 
 # =============================================================================
-# HTML Routes
+# HTML Routes - Serve Jinja2 Templates
 # =============================================================================
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def index(request: Request) -> HTMLResponse:
+    """Main ChatOS chat interface."""
     return templates.TemplateResponse(request, "index.html")
 
 
 @app.get("/sandbox", response_class=HTMLResponse, include_in_schema=False)
 async def sandbox_page(request: Request) -> HTMLResponse:
+    """Coding sandbox with Monaco editor."""
     return templates.TemplateResponse(request, "sandbox.html")
 
 
 @app.get("/projects", response_class=HTMLResponse, include_in_schema=False)
 async def projects_page(request: Request) -> HTMLResponse:
+    """Project management page."""
     return templates.TemplateResponse(request, "projects.html")
 
 
 @app.get("/settings", response_class=HTMLResponse, include_in_schema=False)
 async def settings_page(request: Request) -> HTMLResponse:
+    """Settings and configuration."""
     return templates.TemplateResponse(request, "settings.html")
 
 
 @app.get("/training", response_class=HTMLResponse, include_in_schema=False)
 async def training_page(request: Request) -> HTMLResponse:
-    """Training Lab dashboard for model fine-tuning."""
+    """Training Lab for model fine-tuning."""
     return templates.TemplateResponse(request, "training.html")
+
+
+@app.get("/ai-projects", response_class=HTMLResponse, include_in_schema=False)
+async def ai_projects_page(request: Request) -> HTMLResponse:
+    """AI Projects for system prompt presets."""
+    return templates.TemplateResponse(request, "ai_projects.html")
+
+
+@app.get("/history", response_class=HTMLResponse, include_in_schema=False)
+async def history_page(request: Request) -> HTMLResponse:
+    """Chat history page."""
+    return templates.TemplateResponse(request, "history.html")
+
+
+@app.get("/agi", response_class=HTMLResponse, include_in_schema=False)
+async def agi_page(request: Request) -> HTMLResponse:
+    """AGI Core dashboard."""
+    return templates.TemplateResponse(request, "agi.html")
 
 
 # =============================================================================
@@ -144,6 +234,30 @@ async def health() -> HealthResponse:
     )
 
 
+@app.get("/api/cache/stats", tags=["System"])
+async def cache_stats():
+    """Get cache statistics for monitoring performance."""
+    from ChatOS.controllers.cache import get_cache_stats
+    from ChatOS.controllers.llm_client import get_response_cache_stats
+    
+    return {
+        "unified_cache": get_cache_stats(),
+        "llm_response_cache": get_response_cache_stats(),
+    }
+
+
+@app.post("/api/cache/clear", tags=["System"])
+async def clear_cache():
+    """Clear all caches. Use with caution."""
+    from ChatOS.controllers.cache import get_cache
+    from ChatOS.controllers.llm_client import clear_response_cache
+    
+    unified = await get_cache().clear()
+    clear_response_cache()
+    
+    return {"cleared": True, "unified_cache_entries": unified}
+
+
 @app.get("/api/council", response_model=CouncilInfoResponse, tags=["System"])
 async def council_info() -> CouncilInfoResponse:
     info = get_council_info()
@@ -157,17 +271,21 @@ async def list_commands() -> List[CommandInfo]:
 
 
 @app.post("/api/chat", response_model=ChatResponse, tags=["Chat"])
-async def chat(request: ChatRequest) -> ChatResponse:
+async def chat(request: ChatRequest):
     """Send a message to the council with optional project context and attachments."""
     try:
         # Build context from attachments
         attachment_context = ""
         if request.attachment_ids:
             att_mgr = get_attachment_manager()
-            for att_id in request.attachment_ids:
-                content = att_mgr.get_full_content(att_id)
-                if content:
-                    attachment_context += content + "\n\n"
+            tasks = [
+                att_mgr.get_full_content(att_id)
+                for att_id in request.attachment_ids
+            ]
+            for content in await asyncio.gather(*tasks, return_exceptions=True):
+                if isinstance(content, Exception) or not content:
+                    continue
+                attachment_context += content + "\n\n"
         
         # Build context from project memory
         project_context = ""
@@ -185,12 +303,26 @@ async def chat(request: ChatRequest) -> ChatResponse:
         if attachment_context:
             full_message = f"{attachment_context}\nUser query: {request.message}"
         
+        if request.stream:
+            stream_iter = await stream_chat_response(
+                message=full_message,
+                mode=request.mode,
+                use_rag=request.use_rag,
+                session_id=request.session_id,
+                model_id=request.model_id,
+                ai_project_id=request.ai_project_id,
+                project_id=request.project_id,
+                attachment_ids=request.attachment_ids,
+            )
+            return StreamingResponse(stream_iter, media_type="text/event-stream")
+        
         result = await chat_endpoint(
             message=full_message,
             mode=request.mode,
             use_rag=request.use_rag,
             session_id=request.session_id,
             model_id=request.model_id,
+            ai_project_id=request.ai_project_id,
         )
         
         # Store in project memory if applicable
@@ -266,6 +398,57 @@ async def search_files(request: SearchRequest):
     sandbox = get_sandbox()
     matches = sandbox.search_in_files(request.pattern, request.path, request.file_pattern)
     return SearchResponse(pattern=request.pattern, matches=[SearchResult(**m) for m in matches], total_matches=len(matches))
+
+
+@app.post("/api/sandbox/directory", tags=["Sandbox"])
+async def create_sandbox_directory(path: str):
+    """Create a directory in the sandbox."""
+    sandbox = get_sandbox()
+    try:
+        sandbox.create_directory(path)
+        return {"status": "success", "path": path}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/sandbox/import/directory", tags=["Sandbox"])
+async def import_directory(source_path: str, target_name: str = None):
+    """Import a directory from the local filesystem into the sandbox."""
+    sandbox = get_sandbox()
+    try:
+        result = sandbox.import_directory(source_path, target_name)
+        return {"status": "success", **result}
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except FileExistsError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/sandbox/import/file", tags=["Sandbox"])
+async def import_file(source_path: str, target_path: str = None):
+    """Import a single file from the local filesystem into the sandbox."""
+    sandbox = get_sandbox()
+    try:
+        result = sandbox.import_file(source_path, target_path)
+        return {"status": "success", **result}
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/sandbox/upload", tags=["Sandbox"])
+async def upload_to_sandbox(file: UploadFile = File(...), target_dir: str = Form("")):
+    """Upload a file to the sandbox."""
+    sandbox = get_sandbox()
+    try:
+        content = await file.read()
+        result = sandbox.import_from_upload(file.filename, content, target_dir)
+        return {"status": "success", **result}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 # =============================================================================
@@ -446,7 +629,7 @@ async def list_attachments(session_id: str):
 async def get_attachment_content(session_id: str, attachment_id: str):
     """Get attachment content."""
     mgr = get_attachment_manager()
-    content = mgr.read_attachment_text(attachment_id)
+    content = await mgr.read_attachment_text(attachment_id)
     if content is None:
         raise HTTPException(status_code=404, detail="Attachment not found or not readable")
     return {"content": content}
@@ -456,7 +639,7 @@ async def get_attachment_content(session_id: str, attachment_id: str):
 async def delete_attachment(session_id: str, attachment_id: str):
     """Delete an attachment."""
     mgr = get_attachment_manager()
-    if mgr.delete_attachment(attachment_id):
+    if await mgr.delete_attachment(attachment_id):
         return {"success": True}
     raise HTTPException(status_code=404, detail="Attachment not found")
 
@@ -755,6 +938,48 @@ async def delete_ollama_model(model_name: str):
     if result["success"]:
         return result
     raise HTTPException(status_code=500, detail=result.get("error", "Failed to delete model"))
+
+
+# =============================================================================
+# MiniMax Model Management
+# =============================================================================
+
+@app.post("/api/minimax/install/{model_name}", tags=["MiniMax"])
+async def install_minimax_model(model_name: str, method: str = "ollama"):
+    """
+    Install a MiniMax model locally.
+    
+    Args:
+        model_name: "M1", "M2", or "Text-01"
+        method: "ollama" or "huggingface"
+    """
+    mgr = get_model_config_manager()
+    result = await mgr.install_minimax_model(model_name, method)
+    if result["success"]:
+        return result
+    raise HTTPException(status_code=500, detail=result.get("error", "Failed to install model"))
+
+
+@app.get("/api/minimax/status", tags=["MiniMax"])
+async def get_minimax_status():
+    """Get MiniMax provider status and available models."""
+    from ChatOS.controllers.model_config import ModelProvider
+    mgr = get_model_config_manager()
+    status = await mgr.check_provider_status(ModelProvider.MINIMAX)
+    return {
+        "available": status.available,
+        "models": status.models,
+        "error": status.error,
+        "api_key_configured": mgr.has_api_key(ModelProvider.MINIMAX),
+        "supported_models": {
+            "api": ["abab6.5s-chat", "abab6.5g-chat", "abab5.5s-chat"],
+            "local": ["MiniMax-M1", "MiniMax-M2", "MiniMax-Text-01"],
+        },
+        "installation": {
+            "M1": "POST /api/minimax/install/M1 - Hybrid-attention reasoning model",
+            "M2": "POST /api/minimax/install/M2 - MoE coding model with 128K context",
+        }
+    }
 
 
 # =============================================================================
