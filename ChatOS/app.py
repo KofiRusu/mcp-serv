@@ -1,5 +1,5 @@
 """
-ChatOS - A PewDiePie-style Local AI Interface
+ChatOS - A Local AI Interface
 
 Features:
 - Multi-model council with voting/selection
@@ -87,6 +87,11 @@ from ChatOS.api.routes_terminal import router as terminal_router
 from ChatOS.api.routes_vscode import router as vscode_router
 from ChatOS.api.routes_agi import router as agi_router
 from ChatOS.api.routes_persrm_integration import router as persrm_integration_router
+from ChatOS.api.routes_notes import router as notes_router
+from ChatOS.api.routes_notes_db import router as notes_db_router
+from ChatOS.api.routes_transcripts import router as transcripts_router
+from ChatOS.api.routes_search import router as search_router
+from ChatOS.api.routes_uploads import router as uploads_router
 
 # =============================================================================
 # Lifecycle Management
@@ -132,7 +137,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="ChatOS",
-    description="A PewDiePie-style local AI interface with council-of-bots, project management, and coding sandbox",
+    description="A local AI interface with council-of-bots, project management, and coding sandbox",
     version=__version__,
     docs_url="/docs",
     redoc_url="/redoc",
@@ -165,6 +170,13 @@ app.include_router(terminal_router)
 app.include_router(vscode_router)
 app.include_router(agi_router)
 app.include_router(persrm_integration_router)
+# Note: notes_db_router must be registered BEFORE notes_router
+# because notes_router has /{note_id} which would match "db" otherwise
+app.include_router(notes_db_router)
+app.include_router(transcripts_router)
+app.include_router(search_router)
+app.include_router(uploads_router)
+app.include_router(notes_router)
 
 
 # =============================================================================
@@ -304,7 +316,8 @@ async def chat(request: ChatRequest):
             full_message = f"{attachment_context}\nUser query: {request.message}"
         
         if request.stream:
-            stream_iter = await stream_chat_response(
+            # stream_chat_response is an async generator, don't await it
+            stream_iter = stream_chat_response(
                 message=full_message,
                 mode=request.mode,
                 use_rag=request.use_rag,

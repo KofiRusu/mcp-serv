@@ -114,8 +114,8 @@ curl -X POST http://localhost:8000/api/models \
 
 | Model | Response |
 |-------|----------|
-| Base (qwen2.5:7b) | "ChatOS is an AI platform that allows running multiple language models locally and combines their outputs, similar to PewDiePie's setup, enabling a more robust conversational experience." |
-| FT-Qwen25-V1-QUALITY | "ChatOS is an AI platform that enables running multiple language models locally, combining their outputs to enhance conversational robustness, similar to PewDiePie's setup." |
+| Base (qwen2.5:7b) | "ChatOS is an AI platform that allows running multiple language models locally and combines their outputs using a council-of-bots architecture, enabling a more robust conversational experience." |
+| FT-Qwen25-V1-QUALITY | "ChatOS is an AI platform that enables running multiple language models locally, combining their outputs to enhance conversational robustness using a council-of-bots approach." |
 
 **Observation:** Similar responses, FT model slightly more concise.
 

@@ -345,7 +345,6 @@ MIT License - feel free to use and modify.
 
 ## Acknowledgments
 
-- Inspired by PewDiePie's ChatOS demo
 - Built with [FastAPI](https://fastapi.tiangolo.com/)
 - UI fonts: [Outfit](https://fonts.google.com/specimen/Outfit) & [JetBrains Mono](https://www.jetbrains.com/lp/mono/)
 

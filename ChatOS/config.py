@@ -5,8 +5,9 @@ This module centralizes all configurable parameters so they can be
 easily adjusted without modifying core logic.
 """
 
+import os
 from pathlib import Path
-from typing import Literal
+from typing import List, Literal
 
 # =============================================================================
 # Path Configuration
@@ -191,3 +192,47 @@ SANDBOX_ALLOWED_EXTENSIONS = [
 
 # Maximum file size in sandbox (bytes)
 SANDBOX_MAX_FILE_SIZE: int = 1024 * 1024  # 1MB
+
+
+# =============================================================================
+# VSCode Sandbox Configuration
+# =============================================================================
+
+# Project roots for VSCode sandbox (colon-separated paths via env var)
+# These are the directories that can be opened in the VSCode sandbox
+_project_roots_env = os.environ.get(
+    "SANDBOX_PROJECT_ROOTS",
+    str(Path.home() / "ChatOS-Sandbox")
+)
+SANDBOX_PROJECT_ROOTS: List[str] = [
+    str(Path(p.strip()).expanduser().resolve())
+    for p in _project_roots_env.split(":")
+    if p.strip()
+]
+
+# code-server configuration
+CODE_SERVER_PORT: int = int(os.environ.get("CODE_SERVER_PORT", "8443"))
+CODE_SERVER_HOST: str = os.environ.get("CODE_SERVER_HOST", "127.0.0.1")
+CODE_SERVER_AUTH: str = os.environ.get("CODE_SERVER_AUTH", "none")
+
+# Command allowlist for sandbox execution
+# Only these commands can be executed via the /api/sandbox/run endpoint
+SANDBOX_ALLOWED_COMMANDS: List[str] = [
+    # Python
+    "python", "python3", "pip", "pip3", "pytest", "mypy", "black", "ruff",
+    # Node.js
+    "node", "npm", "npx", "pnpm", "yarn", "bun",
+    # Shell basics
+    "bash", "sh", "cat", "ls", "pwd", "echo", "grep", "find", "head", "tail",
+    "mkdir", "touch", "cp", "mv", "rm", "wc", "sort", "uniq", "diff",
+    # Git
+    "git",
+    # Build tools
+    "make", "cmake",
+]
+
+# Command execution timeout (seconds)
+SANDBOX_COMMAND_TIMEOUT: int = int(os.environ.get("SANDBOX_COMMAND_TIMEOUT", "60"))
+
+# Maximum output size for command execution (bytes)
+SANDBOX_MAX_OUTPUT_SIZE: int = int(os.environ.get("SANDBOX_MAX_OUTPUT_SIZE", str(1024 * 1024)))

@@ -53,11 +53,14 @@ const nextConfig: NextConfig = {
   },
   
   // Reduce bundle size by not including server-only code in client
-  modularizeImports: {
-    'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{member}}',
-    },
-  },
+  // NOTE: modularizeImports for lucide-react removed because it conflicts with
+  // the kebab-case naming in the lucide-react package. The optimizePackageImports
+  // experimental feature handles this correctly instead.
+  // modularizeImports: {
+  //   'lucide-react': {
+  //     transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
+  //   },
+  // },
 };
 
 export default nextConfig;

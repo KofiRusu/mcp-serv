@@ -619,8 +619,8 @@
                             <span class="chat-list-section-toggle">▼</span>
                             <span>Today</span>
                             <span class="chat-list-section-count" id="count-today">0</span>
-                        </div>
-                    </div>
+                </div>
+                </div>
                     <div class="chat-list-section-content" id="chat-list-today"></div>
                 </div>
                 <div class="chat-list-section" id="section-week">
@@ -1924,6 +1924,7 @@
         
         function renderModelList(models) {
             const container = document.getElementById('model-list');
+            if (!container) return; // Element may not exist in current view
             // Filter to show only real models (not dummy) in the sidebar
             const realModels = models.filter(m => m.provider !== 'dummy');
             container.innerHTML = realModels.map(model => `
@@ -2031,6 +2032,7 @@
 
         function updateStrategyDisplay(strategy) {
             const display = document.getElementById('strategy-display');
+            if (!display) return; // Element may not exist in current view
             const strategies = {
                 'longest': { icon: '📏', text: 'Longest wins' },
                 'shortest': { icon: '✂️', text: 'Shortest wins' },

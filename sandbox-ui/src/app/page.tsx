@@ -15,16 +15,27 @@ import {
   Loader2,
   Copy,
   Check,
-  Home,
-  Settings,
-  FolderCode,
-  History,
   MessageSquare,
   Menu,
   X,
+  FileText,
+  Mic,
+  Square,
+  RotateCcw,
+  RefreshCw,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { sendChatMessage, getModels, type ChatResponse, type ModelInfo } from "@/lib/api"
+import { 
+  streamChatMessage, 
+  sendChatMessage,
+  getModels, 
+  type ChatResponse, 
+  type ModelInfo,
+  type StreamEvent,
+} from "@/lib/api"
+import { consumePendingChatMessage } from "@/lib/chat-integration"
+import { MarkdownRenderer } from "@/components/chat/markdown-renderer"
+import { TypingIndicator } from "@/components/chat/typing-indicator"
 
 interface Message {
   id: string
@@ -32,6 +43,8 @@ interface Message {
   content: string
   model?: string
   isLoading?: boolean
+  isStreaming?: boolean
+  isError?: boolean
   responses?: Array<{ model: string; text: string }>
 }
 
@@ -44,7 +57,9 @@ const COMMANDS = [
 
 const NAV_ITEMS = [
   { href: "/", label: "Chat", icon: MessageSquare },
-  { href: "/editor", label: "Editor", icon: FolderCode },
+  { href: "/notes", label: "Notes", icon: FileText },
+  { href: "/diary", label: "Diary", icon: Mic },
+  { href: "/editor", label: "Editor", icon: Code2 },
   { href: "/sandbox", label: "VSCode", icon: Code2 },
 ]
 
@@ -53,7 +68,7 @@ export default function ChatPage() {
     {
       id: "welcome",
       role: "assistant",
-      content: "Welcome to ChatOS! I'm your AI assistant powered by local LLMs. Try these commands:\n\n• **/code** - Generate code snippets\n• **/swarm** - Multi-agent collaboration\n• **/research** - Deep research mode\n• **/deepthinking** - Extended reasoning\n\nOr just ask me anything!",
+      content: "Welcome to ChatOS! I'm your AI assistant powered by local LLMs. Try these commands:\n\n- **/code** - Generate code snippets\n- **/swarm** - Multi-agent collaboration\n- **/research** - Deep research mode\n- **/deepthinking** - Extended reasoning\n\nOr just ask me anything!",
     },
   ])
   const [input, setInput] = useState("")
@@ -64,6 +79,9 @@ export default function ChatPage() {
   const [sessionId] = useState(() => `chat_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [abortController, setAbortController] = useState<AbortController | null>(null)
+  const [lastUserMessage, setLastUserMessage] = useState<string>("")
+  
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -102,62 +120,157 @@ export default function ChatPage() {
     inputRef.current?.focus()
   }, [])
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return
+  // Check for pending chat messages from other pages (Notes, Diary)
+  useEffect(() => {
+    const pendingMessage = consumePendingChatMessage()
+    if (pendingMessage) {
+      const sourceLabel = {
+        note: '📝 Note',
+        diary: '🎙️ Diary',
+        search: '🔍 Search',
+        other: '📄 Content',
+      }[pendingMessage.source] || '📄 Content'
+      
+      const contextMessage: Message = {
+        id: `context-${Date.now()}`,
+        role: "assistant",
+        content: `**${sourceLabel}${pendingMessage.sourceTitle ? `: ${pendingMessage.sourceTitle}` : ''}**\n\n${pendingMessage.content}\n\n---\n*How can I help you with this?*`,
+      }
+      
+      setMessages((prev) => [...prev, contextMessage])
+      setTimeout(() => inputRef.current?.focus(), 100)
+    }
+  }, [])
+
+  // Handle streaming chat
+  const handleSendStreaming = useCallback(async (messageText: string) => {
+    if (!messageText.trim() || isLoading) return
+
+    const controller = new AbortController()
+    setAbortController(controller)
+    setLastUserMessage(messageText)
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input,
+      content: messageText,
     }
 
-    const loadingMessage: Message = {
-      id: `loading-${Date.now()}`,
+    const streamingMessage: Message = {
+      id: `streaming-${Date.now()}`,
       role: "assistant",
       content: "",
-      isLoading: true,
+      isStreaming: true,
     }
 
-    setMessages((prev) => [...prev, userMessage, loadingMessage])
+    setMessages((prev) => [...prev, userMessage, streamingMessage])
     setInput("")
     setIsLoading(true)
 
-    try {
-      const response = await sendChatMessage({
-        message: input,
-        sessionId,
-        modelId: selectedModel?.id,
-      })
+    let fullContent = ""
+    let modelName = ""
 
-      // Replace loading message with actual response
+    try {
+      await streamChatMessage(
+        {
+          message: messageText,
+          session_id: sessionId,
+          model_id: selectedModel?.id,
+        },
+        (event) => {
+          if (event.type === "metadata") {
+            modelName = event.model
+          } else if (event.type === "token") {
+            fullContent += event.text
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.isStreaming
+                  ? { ...msg, content: fullContent, model: modelName }
+                  : msg
+              )
+            )
+          } else if (event.type === "done") {
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.isStreaming
+                  ? {
+                      ...msg,
+                      content: event.answer || fullContent,
+                      model: event.chosen_model || modelName,
+                      isStreaming: false,
+                    }
+                  : msg
+              )
+            )
+          } else if (event.type === "error") {
+            throw new Error(event.message)
+          }
+        },
+        controller.signal
+      )
+
+      // Ensure streaming is marked complete
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.isLoading
-            ? {
-                id: Date.now().toString(),
-                role: "assistant" as const,
-                content: response.answer,
-                model: response.chosen_model,
-                responses: response.responses,
-              }
+          msg.isStreaming
+            ? { ...msg, isStreaming: false, content: fullContent || "No response received." }
             : msg
         )
       )
     } catch (error) {
-      // Replace loading message with error
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.isLoading
-            ? {
-                id: Date.now().toString(),
-                role: "assistant" as const,
-                content: `Error: ${error instanceof Error ? error.message : "Failed to get response"}`,
-              }
-            : msg
+      if ((error as Error).name === "AbortError") {
+        // User cancelled - mark as stopped
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.isStreaming
+              ? { ...msg, isStreaming: false, content: msg.content + "\n\n*[Generation stopped]*" }
+              : msg
+          )
         )
-      )
+      } else {
+        // Replace streaming message with error
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.isStreaming
+              ? {
+                  ...msg,
+                  isStreaming: false,
+                  isError: true,
+                  content: `**Error:** ${error instanceof Error ? error.message : "Failed to get response"}`,
+                }
+              : msg
+          )
+        )
+      }
     } finally {
       setIsLoading(false)
+      setAbortController(null)
+    }
+  }, [isLoading, sessionId, selectedModel])
+
+  const handleSend = async () => {
+    await handleSendStreaming(input)
+  }
+
+  const handleStop = () => {
+    if (abortController) {
+      abortController.abort()
+    }
+  }
+
+  const handleRegenerate = async () => {
+    if (lastUserMessage && !isLoading) {
+      // Remove the last assistant message
+      setMessages((prev) => {
+        const lastUserIdx = prev.findLastIndex((m) => m.role === "user")
+        if (lastUserIdx >= 0) {
+          return prev.slice(0, lastUserIdx + 1)
+        }
+        return prev
+      })
+      
+      // Regenerate
+      await handleSendStreaming(lastUserMessage)
     }
   }
 
@@ -187,6 +300,7 @@ export default function ChatPage() {
         content: "Chat cleared. How can I help you?",
       },
     ])
+    setLastUserMessage("")
   }
 
   return (
@@ -208,7 +322,7 @@ export default function ChatPage() {
 
         {/* Navigation */}
         <nav className="flex-1 p-3 space-y-1">
-                {NAV_ITEMS.map((item) => (
+          {NAV_ITEMS.map((item) => (
             <Link key={item.href} href={item.href}>
               <Button
                 variant="ghost"
@@ -301,6 +415,17 @@ export default function ChatPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {lastUserMessage && !isLoading && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRegenerate}
+                className="h-8 text-xs text-[var(--text-secondary)] gap-1.5"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Regenerate
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -332,32 +457,51 @@ export default function ChatPage() {
                   "rounded-2xl px-4 py-3 max-w-[80%]",
                   message.role === "user"
                     ? "bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white"
-                    : "bg-[var(--bg-secondary)] border border-[var(--border-color)]"
+                    : "bg-[var(--bg-secondary)] border border-[var(--border-color)]",
+                  message.isError && "border-red-500/50"
                 )}
               >
-                {message.isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                {message.isStreaming && !message.content ? (
+                  <div className="flex items-center gap-2 py-1">
+                    <TypingIndicator />
                     <span className="text-sm text-[var(--text-muted)]">Thinking...</span>
                   </div>
                 ) : (
                   <>
-                    <div className="text-sm whitespace-pre-wrap">{message.content}</div>
-                    {message.model && (
-                      <div className="mt-2 pt-2 border-t border-[var(--border-color)] flex items-center justify-between">
+                    {message.role === "assistant" ? (
+                      <MarkdownRenderer 
+                        content={message.content} 
+                        className="text-sm"
+                      />
+                    ) : (
+                      <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+                    )}
+                    
+                    {/* Streaming indicator */}
+                    {message.isStreaming && message.content && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <TypingIndicator />
+                      </div>
+                    )}
+                    
+                    {/* Message footer */}
+                    {message.model && !message.isStreaming && (
+                      <div className="mt-3 pt-2 border-t border-[var(--border-color)] flex items-center justify-between">
                         <span className="text-xs text-[var(--text-muted)]">{message.model}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => copyToClipboard(message.content, message.id)}
-                        >
-                          {copiedId === message.id ? (
-                            <Check className="h-3 w-3 text-green-500" />
-                          ) : (
-                            <Copy className="h-3 w-3" />
-                          )}
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => copyToClipboard(message.content, message.id)}
+                          >
+                            {copiedId === message.id ? (
+                              <Check className="h-3 w-3 text-green-500" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </>
@@ -365,7 +509,7 @@ export default function ChatPage() {
               </div>
               {message.role === "user" && (
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center">
-                  <span className="text-sm font-medium">You</span>
+                  <span className="text-xs font-medium">You</span>
                 </div>
               )}
             </div>
@@ -388,20 +532,25 @@ export default function ChatPage() {
                   className="h-12 bg-[var(--bg-tertiary)] border-[var(--border-color)] pr-12 text-base"
                 />
               </div>
-              <Button
-                onClick={handleSend}
-                disabled={isLoading || !input.trim()}
-                className="h-12 px-6 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
+              {isLoading ? (
+                <Button
+                  onClick={handleStop}
+                  className="h-12 px-6 bg-red-500 hover:bg-red-600"
+                >
+                  <Square className="h-5 w-5" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSend}
+                  disabled={!input.trim()}
+                  className="h-12 px-6 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90"
+                >
                   <Send className="h-5 w-5" />
-                )}
-              </Button>
+                </Button>
+              )}
             </div>
             <p className="mt-2 text-xs text-[var(--text-muted)] text-center">
-              Press Enter to send • Shift+Enter for new line
+              Press Enter to send • {isLoading ? "Click Stop to cancel" : "Shift+Enter for new line"}
             </p>
           </div>
         </div>
@@ -409,4 +558,3 @@ export default function ChatPage() {
     </div>
   )
 }
-

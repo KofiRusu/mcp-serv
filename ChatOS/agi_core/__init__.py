@@ -66,6 +66,12 @@ from .meta.metacognition import MetacognitionEngine, QualityMetrics
 # Training
 from .training.loop import TrainingDataCollector, TrainingExample, export_training_dataset
 
+# Notes
+from .notes.models import Note, ActionItem, NoteType, SourceType, ActionStatus, ActionPriority
+from .notes.store import NoteStore
+from .notes.classifier import NoteClassifier
+from .notes.extractor import ActionItemExtractor
+
 # Orchestrator (main entry point)
 from .orchestrator import AutonomousRunner, RunnerStatus, run_goal
 
@@ -136,6 +142,17 @@ __all__ = [
     "TrainingDataCollector",
     "TrainingExample",
     "export_training_dataset",
+    
+    # Notes
+    "Note",
+    "ActionItem",
+    "NoteType",
+    "SourceType",
+    "ActionStatus",
+    "ActionPriority",
+    "NoteStore",
+    "NoteClassifier",
+    "ActionItemExtractor",
     
     # Orchestrator
     "AutonomousRunner",

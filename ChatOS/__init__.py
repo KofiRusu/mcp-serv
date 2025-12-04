@@ -1,5 +1,5 @@
 """
-ChatOS - A PewDiePie-style Local AI Interface
+ChatOS - A Local AI Interface
 
 This package provides a council-of-bots chat system with:
 - Multiple model orchestration with voting/selection

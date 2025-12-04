@@ -516,3 +516,30 @@ class TrainingRun(Base):
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
 
+
+# =============================================================================
+# Import Notes Models (for create_all to pick them up)
+# =============================================================================
+
+from ChatOS.database.notes_models import NoteDB, TranscriptDB
+
+__all__ = [
+    "Base",
+    "JSONType",
+    "SourceType",
+    "ExampleStatus",
+    "DifficultyLevel",
+    "TaskType",
+    "TaskStatus",
+    "DataSource",
+    "KnowledgeDomain",
+    "TrainingExample",
+    "CoverageAnalysis",
+    "ScrapeTarget",
+    "ScrapeResult",
+    "ActiveLearningTask",
+    "TrainingRun",
+    "NoteDB",
+    "TranscriptDB",
+]
+

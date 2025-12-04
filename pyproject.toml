@@ -1,7 +1,7 @@
 [project]
 name = "ChatOS"
 version = "0.1.0"
-description = "A PewDiePie-style local AI interface with council-of-bots architecture"
+description = "A local AI interface with council-of-bots architecture"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}

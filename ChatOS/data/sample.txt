@@ -6,11 +6,10 @@ RAG engine will include them when constructing prompts.
 
 == About ChatOS ==
 
-ChatOS is inspired by PewDiePie's custom AI setup. It demonstrates how
-to run multiple language models locally and combine their responses
-using a "council of bots" approach. The council queries each model
-independently and then uses a voting/selection strategy to pick the
-best response.
+ChatOS is a local AI interface that demonstrates how to run multiple 
+language models locally and combine their responses using a "council 
+of bots" approach. The council queries each model independently and 
+then uses a voting/selection strategy to pick the best response.
 
 == Features ==
 
