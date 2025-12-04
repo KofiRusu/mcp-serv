@@ -1,0 +1,107 @@
+#!/bin/bash
+# =============================================================================
+# ChatOS Launcher - Cross-platform (Linux & macOS)
+# 
+# Usage: ./chatos or just 'chatos' if added to PATH
+# =============================================================================
+
+set -e
+
+# Detect platform
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    IS_MAC=true
+    CHATOS_DIR="${CHATOS_DIR:-$HOME/ChatOS-v2.0}"
+else
+    IS_MAC=false
+    CHATOS_DIR="${CHATOS_DIR:-$HOME/ChatOS-0.1}"
+fi
+
+# Colors
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${CYAN}"
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║                    🚀 ChatOS Launcher                    ║"
+echo "╚══════════════════════════════════════════════════════════╝"
+echo -e "${NC}"
+
+# Check if ChatOS directory exists
+if [ ! -d "$CHATOS_DIR" ]; then
+    echo -e "${YELLOW}ChatOS not found at $CHATOS_DIR${NC}"
+    echo "Clone it first:"
+    echo "  git clone https://github.com/KofiRusu/ChatOS-v2.0.git $CHATOS_DIR"
+    exit 1
+fi
+
+# Create TradingMemory directories
+mkdir -p ~/TradingMemory/{logs,trades,data}
+
+# Start Backend API
+echo -e "${GREEN}▶ Starting Backend API (port 8000)...${NC}"
+cd "$CHATOS_DIR"
+
+# Check if run.sh exists and is executable
+if [ -x "./run.sh" ]; then
+    ./run.sh &
+else
+    # Fallback: manual startup
+    if [ ! -d ".venv" ]; then
+        echo -e "${YELLOW}Creating virtual environment...${NC}"
+        python3 -m venv .venv
+    fi
+    source .venv/bin/activate
+    pip install -q -r ChatOS/requirements.txt
+    uvicorn ChatOS.app:app --reload --host 127.0.0.1 --port 8000 &
+fi
+
+BACKEND_PID=$!
+echo -e "${GREEN}✓ Backend started (PID: $BACKEND_PID)${NC}"
+
+# Wait for backend to be ready
+echo -e "${CYAN}Waiting for backend...${NC}"
+sleep 3
+
+# Start Next.js UI
+echo -e "${GREEN}▶ Starting Next.js UI (port 3000)...${NC}"
+cd "$CHATOS_DIR/sandbox-ui"
+
+# Check if node_modules exists
+if [ ! -d "node_modules" ]; then
+    echo -e "${YELLOW}Installing dependencies...${NC}"
+    npm install
+fi
+
+npm run dev &
+UI_PID=$!
+echo -e "${GREEN}✓ UI started (PID: $UI_PID)${NC}"
+
+# Print access info
+echo ""
+echo -e "${CYAN}════════════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}✅ ChatOS is running!${NC}"
+echo ""
+echo -e "   ${CYAN}Next.js UI:${NC}  http://localhost:3000"
+echo -e "   ${CYAN}Classic UI:${NC}  http://localhost:8000"
+echo -e "   ${CYAN}API Docs:${NC}    http://localhost:8000/docs"
+echo ""
+echo -e "   Press ${YELLOW}Ctrl+C${NC} to stop all services"
+echo -e "${CYAN}════════════════════════════════════════════════════════════${NC}"
+
+# Trap Ctrl+C to cleanup
+cleanup() {
+    echo ""
+    echo -e "${YELLOW}Shutting down ChatOS...${NC}"
+    kill $BACKEND_PID 2>/dev/null
+    kill $UI_PID 2>/dev/null
+    echo -e "${GREEN}✓ ChatOS stopped${NC}"
+    exit 0
+}
+
+trap cleanup SIGINT SIGTERM
+
+# Wait for processes
+wait
+
