@@ -92,6 +92,7 @@ from ChatOS.api.routes_notes_db import router as notes_db_router
 from ChatOS.api.routes_transcripts import router as transcripts_router
 from ChatOS.api.routes_search import router as search_router
 from ChatOS.api.routes_uploads import router as uploads_router
+from ChatOS.api.routes_training_submission import router as training_submission_router
 
 # =============================================================================
 # Lifecycle Management
@@ -170,6 +171,7 @@ app.include_router(terminal_router)
 app.include_router(vscode_router)
 app.include_router(agi_router)
 app.include_router(persrm_integration_router)
+app.include_router(training_submission_router)
 # Note: notes_db_router must be registered BEFORE notes_router
 # because notes_router has /{note_id} which would match "db" otherwise
 app.include_router(notes_db_router)
