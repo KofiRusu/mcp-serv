@@ -1,0 +1,123 @@
+# =============================================================================
+# ChatOS v1.0 - Docker Compose
+# Works on: Linux (x86_64, arm64) and macOS (Apple Silicon, Intel)
+# =============================================================================
+#
+# Usage:
+#   docker-compose up -d              # Start ChatOS server
+#   docker-compose up -d training     # Start PersRM training
+#   docker-compose down               # Stop all services
+#
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # ===========================================================================
+  # ChatOS Main Application
+  # ===========================================================================
+  chatos:
+    build:
+      context: .
+      target: development
+    container_name: chatos-server
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ChatOS:/app/ChatOS
+      - ./data:/app/data
+      - ./models:/app/models
+      - chatos-logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CHATOS_ENV=development
+      - OLLAMA_HOST=${OLLAMA_HOST:-http://host.docker.internal:11434}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================================================
+  # ChatOS Production
+  # ===========================================================================
+  chatos-prod:
+    build:
+      context: .
+      target: production
+    container_name: chatos-prod
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data:ro
+      - ./models:/app/models:ro
+      - chatos-logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CHATOS_ENV=production
+    restart: always
+    profiles:
+      - production
+
+  # ===========================================================================
+  # PersRM Training (GPU)
+  # ===========================================================================
+  training:
+    build:
+      context: .
+      target: training
+    container_name: chatos-training
+    volumes:
+      - ./ChatOS:/app/ChatOS
+      - ./data:/app/data
+      - ./models:/app/models
+      - training-logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    profiles:
+      - training
+    command: >
+      python -u ChatOS/training/persrm_pytorch_trainer.py
+      --epochs 100
+      --output-dir /app/models/persrm-continuous
+
+  # ===========================================================================
+  # PersRM Training (CPU/MPS for Mac)
+  # ===========================================================================
+  training-cpu:
+    build:
+      context: .
+      target: development
+    container_name: chatos-training-cpu
+    volumes:
+      - ./ChatOS:/app/ChatOS
+      - ./data:/app/data
+      - ./models:/app/models
+      - training-logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTORCH_ENABLE_MPS_FALLBACK=1
+    profiles:
+      - training-cpu
+    command: >
+      python -u ChatOS/training/persrm_pytorch_trainer.py
+      --epochs 100
+      --output-dir /app/models/persrm-continuous
+
+volumes:
+  chatos-logs:
+  training-logs:
+
+networks:
+  default:
+    name: chatos-network
+

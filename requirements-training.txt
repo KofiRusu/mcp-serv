@@ -1,0 +1,33 @@
+# =============================================================================
+# ChatOS v1.0 - PersRM Training Requirements
+# =============================================================================
+
+# PyTorch (installed based on platform - see install.sh)
+# torch>=2.1.0
+
+# Transformers & PEFT
+transformers>=4.37.0
+peft>=0.7.0
+accelerate>=0.25.0
+bitsandbytes>=0.41.0
+
+# Training utilities
+tqdm>=4.66.0
+tensorboard>=2.15.0
+wandb>=0.16.0
+
+# Data processing
+datasets>=2.16.0
+tiktoken>=0.5.0
+
+# Evaluation
+rouge-score>=0.1.2
+sacrebleu>=2.4.0
+
+# Configuration
+pyyaml>=6.0
+omegaconf>=2.3.0
+
+# Logging
+rich>=13.0.0
+

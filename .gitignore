@@ -1,5 +1,5 @@
 # =============================================================================
-# ChatOS .gitignore
+# ChatOS v1.0 - Git Ignore
 # =============================================================================
 
 # Python
@@ -8,28 +8,15 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual environments
 .venv/
 venv/
 ENV/
 env/
-.env
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
 
 # IDE
 .idea/
@@ -37,42 +24,53 @@ env/
 *.swp
 *.swo
 *~
-.project
-.pydevproject
-.settings/
 
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.nox/
+# Environment
+.env
+.env.local
+*.local
 
-# Mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+# Logs
+logs/
+*.log
+nohup.out
 
-# Ruff
-.ruff_cache/
+# Models (large files)
+models/*.safetensors
+models/*.bin
+models/*.gguf
+models/*.pt
+models/*.pth
+!models/.gitkeep
+
+# Training outputs
+models/persrm/run-*/
+models/persrm-continuous/training.log
+
+# Data (keep structure, ignore content)
+data/persrm/*.jsonl
+!data/persrm/.gitkeep
+
+# Node modules (sandbox-ui)
+node_modules/
+.next/
+.nuxt/
+dist/
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-logs/
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
 
-# Local data (keep sample files)
-ChatOS/data/*.db
-ChatOS/data/embeddings/
+# Docker
+.docker/
 
-# Secrets (never commit)
-.env.local
-.env.*.local
-secrets.json
-*.pem
-*.key
+# Temporary
+tmp/
+temp/
+*.tmp
 
-unsloth_compiled_cache/
