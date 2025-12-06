@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useTradingStore, OrderSide, OrderType } from '@/stores/trading-store'
+import { useLivePrices } from '@/hooks/use-live-prices'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -29,6 +30,9 @@ export function OrderTicket() {
     addOrder
   } = useTradingStore()
 
+  // Use live prices for accurate order calculations
+  const { getPrice } = useLivePrices({ refreshInterval: 5000 })
+
   const [side, setSide] = useState<OrderSide>('buy')
   const [orderType, setOrderType] = useState<OrderType>('market')
   const [amount, setAmount] = useState('')
@@ -43,7 +47,9 @@ export function OrderTicket() {
 
   const currentMarket = markets.find(m => m.symbol === currentSymbol)
   const currentAccount = accounts.find(a => a.id === currentAccountId)
-  const currentPrice = currentMarket?.price || 0
+  // Use live price if available, fall back to market price from store
+  const livePrice = getPrice(currentSymbol)
+  const currentPrice = livePrice?.price || currentMarket?.price || 0
 
   // Calculate order details
   const calculations = useMemo(() => {

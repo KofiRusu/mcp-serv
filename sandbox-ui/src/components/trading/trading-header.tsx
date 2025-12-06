@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 import { useTradingStore, Exchange, TradingMode } from '@/stores/trading-store'
 import { useDataRecorder } from '@/hooks/use-data-recorder'
 import { Button } from '@/components/ui/button'
@@ -23,7 +24,9 @@ import {
   Radio,
   RefreshCw,
   Circle,
-  Database
+  Database,
+  Home,
+  MessageSquare
 } from 'lucide-react'
 
 interface TradingHeaderProps {
@@ -118,6 +121,14 @@ export function TradingHeader({ onConnectExchange }: TradingHeaderProps) {
 
   return (
     <header className="h-14 border-b border-gray-800 bg-[#0d0d14] flex items-center px-4 gap-4">
+      {/* Back to Chat */}
+      <Link href="/" className="flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors">
+        <Home className="w-4 h-4" />
+        <span className="text-sm hidden sm:inline">Chat</span>
+      </Link>
+
+      <div className="w-px h-8 bg-gray-700" />
+
       {/* Logo & Title */}
       <div className="flex items-center gap-2">
         <Zap className="w-6 h-6 text-purple-500" />

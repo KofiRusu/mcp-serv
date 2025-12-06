@@ -474,3 +474,212 @@ export async function executeCode(options: {
   }
 }
 
+// =============================================================================
+// VSCode/Code-Server Integration
+// =============================================================================
+
+export interface VSCodeStatus {
+  running: boolean
+  url?: string
+  port?: number
+  workspace?: string
+  error?: string
+}
+
+/**
+ * Get VSCode/code-server status
+ */
+export async function getVSCodeStatus(): Promise<VSCodeStatus> {
+  try {
+    const response = await fetch(`${API_BASE}/api/vscode/status`)
+    if (!response.ok) {
+      return { running: false, error: response.statusText }
+    }
+    return response.json()
+  } catch (error) {
+    // Backend unavailable
+    console.warn("VSCode API unavailable:", error)
+    return { running: false, error: "Backend unavailable" }
+  }
+}
+
+/**
+ * Check if VSCode/code-server is healthy and responding
+ */
+export async function checkVSCodeHealth(): Promise<{ healthy: boolean; latency?: number }> {
+  const start = Date.now()
+  try {
+    const status = await getVSCodeStatus()
+    if (!status.running || !status.url) {
+      return { healthy: false }
+    }
+    
+    // Try to ping the code-server
+    const response = await fetch(`${status.url}/healthz`, {
+      method: "GET",
+      mode: "no-cors",
+    }).catch(() => null)
+    
+    return {
+      healthy: response !== null,
+      latency: Date.now() - start,
+    }
+  } catch {
+    return { healthy: false }
+  }
+}
+
+/**
+ * Start VSCode/code-server
+ */
+export async function startVSCode(workspace?: string): Promise<VSCodeStatus> {
+  try {
+    const response = await fetch(`${API_BASE}/api/vscode/start`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workspace }),
+    })
+    
+    if (!response.ok) {
+      return { running: false, error: `Failed to start: ${response.statusText}` }
+    }
+    
+    return response.json()
+  } catch (error) {
+    return { running: false, error: `Network error: ${error instanceof Error ? error.message : "Unknown"}` }
+  }
+}
+
+/**
+ * Stop VSCode/code-server
+ */
+export async function stopVSCode(): Promise<void> {
+  try {
+    await fetch(`${API_BASE}/api/vscode/stop`, {
+      method: "POST",
+    })
+  } catch (error) {
+    console.warn("Failed to stop VSCode:", error)
+  }
+}
+
+// =============================================================================
+// Projects Management
+// =============================================================================
+
+export interface ProjectInfo {
+  id: string
+  name: string
+  path: string
+  description?: string
+  language?: string
+  created_at: string
+  last_opened?: string
+  is_git?: boolean
+  exists?: boolean
+}
+
+// Default projects to show when backend is unavailable
+const DEFAULT_PROJECTS: ProjectInfo[] = [
+  {
+    id: "chatos",
+    name: "ChatOS",
+    path: "~/ChatOS-v2.0",
+    description: "ChatOS AI Assistant",
+    language: "Python",
+    created_at: new Date().toISOString(),
+    exists: true,
+  },
+  {
+    id: "sandbox-ui",
+    name: "Sandbox UI",
+    path: "~/ChatOS-v2.0/sandbox-ui",
+    description: "Next.js Frontend",
+    language: "TypeScript",
+    created_at: new Date().toISOString(),
+    exists: true,
+  },
+  {
+    id: "home",
+    name: "Home Directory",
+    path: "~",
+    description: "User home directory",
+    created_at: new Date().toISOString(),
+    exists: true,
+  },
+]
+
+/**
+ * Get list of projects
+ */
+export async function getProjects(): Promise<ProjectInfo[]> {
+  try {
+    const response = await fetch(`${API_BASE}/api/projects`)
+    if (!response.ok) {
+      console.warn(`Projects API unavailable: ${response.statusText}`)
+      return DEFAULT_PROJECTS
+    }
+    const projects = await response.json()
+    // If API returns empty, still show defaults
+    return projects.length > 0 ? projects : DEFAULT_PROJECTS
+  } catch (error) {
+    // Backend unavailable - return default projects
+    console.warn("Projects API unavailable:", error)
+    return DEFAULT_PROJECTS
+  }
+}
+
+/**
+ * Create a new project
+ */
+export async function createProject(project: {
+  name: string
+  path?: string
+  description?: string
+  language?: string
+}): Promise<ProjectInfo> {
+  const response = await fetch(`${API_BASE}/api/projects`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(project),
+  })
+  
+  if (!response.ok) {
+    throw new Error(`Failed to create project: ${response.statusText}`)
+  }
+  
+  return response.json()
+}
+
+/**
+ * Delete a project
+ */
+export async function deleteProject(projectId: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/api/projects/${projectId}`, {
+    method: "DELETE",
+  })
+  
+  if (!response.ok) {
+    throw new Error(`Failed to delete project: ${response.statusText}`)
+  }
+}
+
+/**
+ * Open a project in VSCode
+ */
+export async function openProjectInVSCode(projectId: string): Promise<VSCodeStatus> {
+  try {
+    const response = await fetch(`${API_BASE}/api/projects/${projectId}/open`, {
+      method: "POST",
+    })
+    
+    if (!response.ok) {
+      return { running: false, error: `Failed to open project: ${response.statusText}` }
+    }
+    
+    return response.json()
+  } catch (error) {
+    return { running: false, error: `Network error: ${error instanceof Error ? error.message : "Unknown"}` }
+  }
+}
+
