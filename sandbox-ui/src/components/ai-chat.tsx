@@ -50,15 +50,17 @@ export function AiChat({ currentFile, currentFileContent, onApplyCode }: AiChatP
   useEffect(() => {
     getModels(true)
       .then((data) => {
-        // Filter to real models (not dummy)
+        // Include all models (filter dummy only if real models exist)
         const realModels = data.filter((m) => m.provider !== "dummy")
-        setModels(realModels)
-        if (realModels.length > 0) {
-          setSelectedModel(realModels[0])
+        const modelsToUse = realModels.length > 0 ? realModels : data
+        setModels(modelsToUse)
+        // Always select first model by default (council mode is opt-in)
+        if (modelsToUse.length > 0 && !selectedModel) {
+          setSelectedModel(modelsToUse[0])
         }
       })
       .catch(console.error)
-  }, [])
+  }, [selectedModel])
 
   // Scroll to bottom on new messages
   useEffect(() => {
