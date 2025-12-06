@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
     
     // Run or queue
     if (job.status === 'running') {
-      runBacktestSimulation(backtestId, validatedConfig)
+    runBacktestSimulation(backtestId, validatedConfig)
     } else {
       watchJobQueue()
     }

@@ -5,6 +5,7 @@ import { useTradingStore } from '@/stores/trading-store'
 import { useMarketData } from '@/hooks/use-market-data'
 import { Loader2, Wifi, WifiOff, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { IndicatorMenu, useIndicators } from './indicator-menu'
 
 interface TradingChartProps {
   symbol: string
@@ -115,6 +116,14 @@ export function TradingChart({ symbol, timeframe: propTimeframe }: TradingChartP
   const [showVolume, setShowVolume] = useState(true)
   const [showRSI, setShowRSI] = useState(false)
   const [showMACD, setShowMACD] = useState(false)
+  
+  // Indicator menu state
+  const { 
+    indicators, 
+    enabledIndicators,
+    toggleIndicator, 
+    toggleFavorite 
+  } = useIndicators()
 
   // Use prop timeframe if provided, otherwise use internal state
   const activeTimeframe = propTimeframe || timeframe
@@ -601,6 +610,15 @@ export function TradingChart({ symbol, timeframe: propTimeframe }: TradingChartP
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Indicator Menu - Full selection like aggr.trade */}
+          <IndicatorMenu 
+            indicators={indicators}
+            onToggle={toggleIndicator}
+            onFavorite={toggleFavorite}
+          />
+          
+          {/* Quick toggles for common indicators */}
+          <div className="h-4 w-px bg-gray-700 mx-1" />
           <button
             onClick={() => setShowVolume(!showVolume)}
             className={`px-2 py-1 text-xs rounded transition-colors ${

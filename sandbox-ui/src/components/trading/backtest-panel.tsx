@@ -278,12 +278,12 @@ export function BacktestPanel() {
         </div>
         <div className="flex items-center gap-2">
           {viewMode !== 'queue' && (
-            <Button
-              size="sm"
-              variant="ghost"
+          <Button
+            size="sm"
+            variant="ghost"
               onClick={() => setViewMode('queue')}
-              className="text-gray-400 hover:text-white"
-            >
+            className="text-gray-400 hover:text-white"
+          >
               <ChevronLeft className="w-4 h-4 mr-1" />
               Queue
             </Button>
@@ -296,9 +296,9 @@ export function BacktestPanel() {
               className="text-purple-400 hover:text-purple-300"
             >
               <Plus className="w-4 h-4 mr-1" />
-              New Test
-            </Button>
-          )}
+            New Test
+          </Button>
+        )}
         </div>
       </div>
       
@@ -563,22 +563,22 @@ export function BacktestPanel() {
         {/* Error State */}
         {error && (
           <div className="p-3">
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                <div>
-                  <h4 className="font-medium text-red-400">Backtest Failed</h4>
-                  <p className="text-sm text-gray-400 mt-1">{error}</p>
-                </div>
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+              <div>
+                <h4 className="font-medium text-red-400">Backtest Failed</h4>
+                <p className="text-sm text-gray-400 mt-1">{error}</p>
               </div>
-              <Button
+            </div>
+            <Button
                 onClick={goToNewBacktest}
-                variant="outline"
-                size="sm"
-                className="mt-3"
-              >
-                Try Again
-              </Button>
+              variant="outline"
+              size="sm"
+              className="mt-3"
+            >
+              Try Again
+            </Button>
             </div>
           </div>
         )}
