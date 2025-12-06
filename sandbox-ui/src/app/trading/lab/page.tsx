@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTradingStore } from '@/stores/trading-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -28,9 +28,21 @@ import {
   Send,
   CheckCircle,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  Cpu,
+  Loader2,
+  RefreshCw
 } from 'lucide-react'
 import Link from 'next/link'
+
+// LocalStorage key for model persistence
+const MODEL_STORAGE_KEY = 'chatos-selected-model'
+
+interface LocalModel {
+  name: string
+  size: string
+  modified?: string
+}
 
 // Strategy templates
 const strategyTemplates = {
@@ -163,7 +175,7 @@ const mockBacktestResults = {
 }
 
 export default function AlgoLabPage() {
-  const { currentSymbol } = useTradingStore()
+  const { currentSymbol, positions, accounts, currentAccountId, mode } = useTradingStore()
   const [strategies, setStrategies] = useState([
     { id: '1', name: 'Mean Reversion', code: strategyTemplates.meanReversion },
     { id: '2', name: 'Breakout', code: strategyTemplates.breakout },
@@ -177,10 +189,56 @@ export default function AlgoLabPage() {
   const [initialCapital, setInitialCapital] = useState('10000')
   const [isRunning, setIsRunning] = useState(false)
   const [results, setResults] = useState<typeof mockBacktestResults | null>(null)
-  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
+  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; content: string; model?: string }[]>([
     { role: 'assistant', content: 'Welcome to the Lab Assistant! I can help you write, debug, and optimize your trading strategies. What would you like to work on?' }
   ])
   const [chatInput, setChatInput] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  
+  // Model selection state
+  const [availableModels, setAvailableModels] = useState<LocalModel[]>([])
+  const [selectedModel, setSelectedModel] = useState<string>('')
+  const [modelsLoading, setModelsLoading] = useState(true)
+  const [ollamaAvailable, setOllamaAvailable] = useState(false)
+
+  // Get current account balance
+  const currentAccount = accounts.find(a => a.id === currentAccountId)
+  const balance = currentAccount?.balance || 100000
+
+  // Fetch available models on mount
+  useEffect(() => {
+    async function fetchModels() {
+      setModelsLoading(true)
+      try {
+        const response = await fetch('/api/local-models')
+        const data = await response.json()
+        
+        setAvailableModels(data.models || [])
+        setOllamaAvailable(data.ollama_available)
+        
+        // Load persisted model selection
+        const savedModel = localStorage.getItem(MODEL_STORAGE_KEY)
+        if (savedModel && data.models?.some((m: LocalModel) => m.name === savedModel)) {
+          setSelectedModel(savedModel)
+        } else if (data.models?.length > 0) {
+          setSelectedModel(data.models[0].name)
+        }
+      } catch (error) {
+        console.error('Failed to fetch models:', error)
+        setOllamaAvailable(false)
+      } finally {
+        setModelsLoading(false)
+      }
+    }
+    
+    fetchModels()
+  }, [])
+
+  // Persist model selection
+  const handleModelChange = useCallback((model: string) => {
+    setSelectedModel(model)
+    localStorage.setItem(MODEL_STORAGE_KEY, model)
+  }, [])
 
   const runBacktest = async () => {
     setIsRunning(true)
@@ -193,30 +251,74 @@ export default function AlgoLabPage() {
     setIsRunning(false)
   }
 
-  const handleChatSend = () => {
-    if (!chatInput.trim()) return
+  const handleChatSend = async () => {
+    if (!chatInput.trim() || isSending) return
     
-    setChatMessages(prev => [...prev, { role: 'user', content: chatInput }])
-    
-    // Simulate AI response
-    setTimeout(() => {
-      let response = ''
-      const lower = chatInput.toLowerCase()
-      
-      if (lower.includes('rsi') || lower.includes('oversold')) {
-        response = `For RSI-based strategies, I recommend:\n\n1. **RSI Period**: 14 is standard, but try 21 for less noise\n2. **Oversold**: 30 is typical, but 25 can filter more signals\n3. **Overbought**: 70 is standard, try 75 for stronger signals\n\nWould you like me to add RSI divergence detection to your strategy?`
-      } else if (lower.includes('optimize') || lower.includes('improve')) {
-        response = `To optimize your strategy:\n\n1. Add a trend filter (e.g., price > 200 EMA)\n2. Use ATR-based stops instead of fixed %\n3. Add time-of-day filters\n4. Implement position sizing based on volatility\n\nWhich optimization would you like to implement first?`
-      } else if (lower.includes('stop') || lower.includes('loss')) {
-        response = `For stop losses, I suggest:\n\n\`\`\`python\natr = calculate_atr(data, 14)\nstop_loss = entry_price - (atr * 1.5)\n\`\`\`\n\nThis gives you dynamic stops based on market volatility. Want me to add this to your code?`
-      } else {
-        response = `I can help you with:\n\n- Strategy logic and conditions\n- Risk management parameters\n- Code optimization\n- Backtesting setup\n- Debugging errors\n\nWhat specific aspect of your strategy would you like to improve?`
-      }
-      
-      setChatMessages(prev => [...prev, { role: 'assistant', content: response }])
-    }, 1000)
-    
+    const userMessage = chatInput.trim()
     setChatInput('')
+    setChatMessages(prev => [...prev, { role: 'user', content: userMessage }])
+    setIsSending(true)
+    
+    try {
+      // Build conversation history for context
+      const conversationHistory = chatMessages.slice(-6).map(m => ({
+        role: m.role,
+        content: m.content,
+        timestamp: new Date().toISOString(),
+      }))
+
+      // Build trading context
+      const tradingContext = {
+        currentSymbol,
+        positions: positions.map(p => ({
+          symbol: p.symbol,
+          side: p.side,
+          size: p.size,
+          entryPrice: p.entryPrice,
+          pnl: p.pnl,
+        })),
+        balance,
+        mode,
+      }
+
+      const response = await fetch('/api/trading-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(selectedModel ? { 'x-llm-model': selectedModel } : {}),
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          conversationHistory,
+          tradingContext,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.error) {
+        setChatMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: `Error: ${data.error}`,
+          model: 'error'
+        }])
+      } else {
+        setChatMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: data.response,
+          model: data.model
+        }])
+      }
+    } catch (error) {
+      console.error('Chat error:', error)
+      setChatMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Sorry, I encountered an error. Please try again.',
+        model: 'error'
+      }])
+    } finally {
+      setIsSending(false)
+    }
   }
 
   return (
@@ -316,6 +418,38 @@ export default function AlgoLabPage() {
 
             {/* AI Assistant */}
             <TabsContent value="assistant" className="flex-1 flex flex-col mt-0 overflow-hidden">
+              {/* Model Selector */}
+              <div className="px-3 py-2 border-b border-gray-800 bg-gray-900/50">
+                <div className="flex items-center gap-2">
+                  <Cpu className="w-3.5 h-3.5 text-gray-500" />
+                  <Label className="text-xs text-gray-500">Model</Label>
+                  <Select 
+                    value={selectedModel} 
+                    onValueChange={handleModelChange}
+                    disabled={modelsLoading || !ollamaAvailable}
+                  >
+                    <SelectTrigger className="flex-1 h-7 bg-gray-900 border-gray-700 text-xs">
+                      <SelectValue placeholder={modelsLoading ? "Loading..." : "Select model"} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-900 border-gray-700">
+                      {availableModels.map((model) => (
+                        <SelectItem key={model.name} value={model.name} className="text-xs">
+                          <div className="flex items-center gap-2">
+                            <span>{model.name}</span>
+                            <span className="text-gray-500 text-[10px]">{model.size}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {!ollamaAvailable && !modelsLoading && (
+                    <Badge variant="outline" className="text-[10px] text-amber-500 border-amber-500/30">
+                      Offline
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
               <ScrollArea className="flex-1 p-3">
                 <div className="space-y-4">
                   {chatMessages.map((msg, i) => (
@@ -325,15 +459,34 @@ export default function AlgoLabPage() {
                           <Bot className="w-4 h-4" />
                         </div>
                       )}
-                      <div className={`max-w-[85%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${
-                        msg.role === 'user' 
-                          ? 'bg-purple-600 text-white' 
-                          : 'bg-gray-800 text-gray-100'
-                      }`}>
-                        {msg.content}
+                      <div className="flex flex-col max-w-[85%]">
+                        {msg.role === 'assistant' && msg.model && msg.model !== 'error' && (
+                          <span className="text-[10px] text-gray-500 mb-0.5 ml-1">
+                            Model: {msg.model}
+                          </span>
+                        )}
+                        <div className={`rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${
+                          msg.role === 'user' 
+                            ? 'bg-purple-600 text-white' 
+                            : msg.model === 'error'
+                              ? 'bg-red-900/50 text-red-200 border border-red-500/30'
+                              : 'bg-gray-800 text-gray-100'
+                        }`}>
+                          {msg.content}
+                        </div>
                       </div>
                     </div>
                   ))}
+                  {isSending && (
+                    <div className="flex gap-2">
+                      <div className="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      </div>
+                      <div className="bg-gray-800 rounded-lg px-3 py-2 text-sm text-gray-400">
+                        Thinking...
+                      </div>
+                    </div>
+                  )}
                 </div>
               </ScrollArea>
               
@@ -342,12 +495,18 @@ export default function AlgoLabPage() {
                   <Input
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleChatSend()}
+                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleChatSend()}
                     placeholder="Ask about your strategy..."
                     className="flex-1 bg-gray-900 border-gray-700 text-sm"
+                    disabled={isSending}
                   />
-                  <Button size="icon" onClick={handleChatSend} className="bg-purple-600 hover:bg-purple-700">
-                    <Send className="w-4 h-4" />
+                  <Button 
+                    size="icon" 
+                    onClick={handleChatSend} 
+                    className="bg-purple-600 hover:bg-purple-700"
+                    disabled={isSending || !chatInput.trim()}
+                  >
+                    {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   </Button>
                 </div>
               </div>

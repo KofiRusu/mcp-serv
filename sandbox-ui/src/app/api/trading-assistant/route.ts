@@ -251,7 +251,8 @@ function generateLocalResponse(
 async function generateResponse(
   userMessage: string,
   conversationHistory: ConversationMessage[],
-  tradingContext: TradingContext
+  tradingContext: TradingContext,
+  modelOverride?: string
 ): Promise<{ response: string; model: string }> {
   // Check if Ollama is available first
   const ollamaUp = await checkOllamaAvailable()
@@ -286,7 +287,16 @@ ${tradingContext.positions.map(p =>
     { role: 'user', content: userMessage },
   ]
 
-  // Try first available model only (for speed)
+  // If model override specified, try that model first
+  if (modelOverride) {
+    const result = await tryGenerateWithModel(modelOverride, messages)
+    if (result.success && result.response) {
+      return { response: result.response, model: result.model! }
+    }
+    // If override model fails, continue with priority chain
+  }
+
+  // Try models in priority order
   for (const model of MODELS) {
     const result = await tryGenerateWithModel(model, messages)
     if (result.success && result.response) {
@@ -352,6 +362,9 @@ async function recordConversation(
 
 export async function POST(request: NextRequest) {
   try {
+    // Check for model override header
+    const modelOverride = request.headers.get('x-llm-model')
+    
     const body = await request.json()
     const {
       message,
@@ -375,11 +388,12 @@ export async function POST(request: NextRequest) {
       mode: 'paper',
     }
 
-    // Generate response
+    // Generate response (with optional model override)
     const { response, model } = await generateResponse(
       message,
       conversationHistory,
-      context
+      context,
+      modelOverride || undefined
     )
 
     // Record for training (async, don't wait)
