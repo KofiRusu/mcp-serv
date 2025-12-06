@@ -532,12 +532,12 @@ export async function checkVSCodeHealth(): Promise<{ healthy: boolean; latency?:
 /**
  * Start VSCode/code-server
  */
-export async function startVSCode(workspace?: string): Promise<VSCodeStatus> {
+export async function startVSCode(options?: { workspace?: string }): Promise<VSCodeStatus> {
   try {
     const response = await fetch(`${API_BASE}/api/vscode/start`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ workspace }),
+      body: JSON.stringify({ workspace: options?.workspace }),
     })
     
     if (!response.ok) {
@@ -546,7 +546,7 @@ export async function startVSCode(workspace?: string): Promise<VSCodeStatus> {
     
     return response.json()
   } catch (error) {
-    return { running: false, error: `Network error: ${error instanceof Error ? error.message : "Unknown"}` }
+    return { running: false, error: `Backend unavailable. Start the ChatOS server on port 8000.` }
   }
 }
 
