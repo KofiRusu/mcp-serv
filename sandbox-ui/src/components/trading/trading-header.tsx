@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import Link from 'next/link'
 import { useTradingStore, Exchange, TradingMode } from '@/stores/trading-store'
 import { useDataRecorder } from '@/hooks/use-data-recorder'
+import { useTradingData } from '@/hooks/use-trading-data'
 import { Button } from '@/components/ui/button'
 import { 
   Select,
@@ -25,9 +25,11 @@ import {
   RefreshCw,
   Circle,
   Database,
-  Home,
-  MessageSquare
+  AlertTriangle,
+  Loader2,
+  Home
 } from 'lucide-react'
+import Link from 'next/link'
 
 interface TradingHeaderProps {
   onConnectExchange: () => void
@@ -61,6 +63,20 @@ export function TradingHeader({ onConnectExchange }: TradingHeaderProps) {
     toggleRecording,
     symbolsRecording,
   } = useDataRecorder()
+
+  // Get trading data based on current mode (Paper vs Live)
+  const {
+    balance,
+    currency,
+    isLiveMode,
+    isExchangeConnected,
+    exchangeName,
+    loading: dataLoading,
+    error: dataError,
+    connectionStatus,
+    isFallingBackToPaper,
+    retry,
+  } = useTradingData()
 
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
@@ -121,13 +137,10 @@ export function TradingHeader({ onConnectExchange }: TradingHeaderProps) {
 
   return (
     <header className="h-14 border-b border-gray-800 bg-[#0d0d14] flex items-center px-4 gap-4">
-      {/* Back to Chat */}
-      <Link href="/" className="flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors">
-        <Home className="w-4 h-4" />
-        <span className="text-sm hidden sm:inline">Chat</span>
+      {/* Home Button */}
+      <Link href="/" className="p-2 rounded-lg hover:bg-gray-800 transition-colors text-gray-400 hover:text-white" title="Go to Home">
+        <Home className="w-5 h-5" />
       </Link>
-
-      <div className="w-px h-8 bg-gray-700" />
 
       {/* Logo & Title */}
       <div className="flex items-center gap-2">
@@ -137,12 +150,65 @@ export function TradingHeader({ onConnectExchange }: TradingHeaderProps) {
 
       <div className="w-px h-8 bg-gray-700" />
 
+      {/* Balance Display - Shows mode-appropriate balance with connection status */}
+      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${
+        connectionStatus === 'connected'
+          ? 'bg-green-500/10 border-green-500/30' 
+          : connectionStatus === 'error' || connectionStatus === 'fallback'
+            ? 'bg-amber-500/10 border-amber-500/30'
+            : connectionStatus === 'connecting'
+              ? 'bg-blue-500/10 border-blue-500/30'
+              : 'bg-amber-500/10 border-amber-500/30'
+      }`}>
+        {/* Status indicator */}
+        <div className="flex items-center gap-1.5">
+          {connectionStatus === 'connecting' && (
+            <Loader2 className="w-3 h-3 animate-spin text-blue-400" />
+          )}
+          {connectionStatus === 'error' && (
+            <AlertTriangle className="w-3 h-3 text-red-400" />
+          )}
+          {connectionStatus === 'fallback' && (
+            <AlertTriangle className="w-3 h-3 text-amber-400" />
+          )}
+          <span className={`text-xs font-medium ${
+            connectionStatus === 'connected' ? 'text-green-400' 
+              : connectionStatus === 'connecting' ? 'text-blue-400'
+              : connectionStatus === 'error' ? 'text-red-400'
+              : connectionStatus === 'fallback' ? 'text-amber-400'
+              : 'text-amber-400'
+          }`}>
+            {connectionStatus === 'connected' && exchangeName?.toUpperCase()}
+            {connectionStatus === 'connecting' && 'Connecting...'}
+            {connectionStatus === 'error' && 'API Error'}
+            {connectionStatus === 'fallback' && 'Paper Fallback'}
+            {connectionStatus === 'disconnected' && 'Paper Trading'}
+          </span>
+        </div>
+        
+        {/* Balance */}
+        <span className="font-mono font-bold text-white">
+          {dataLoading ? '...' : `$ ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+        </span>
+        
+        {/* Retry button for error states */}
+        {(connectionStatus === 'error' || connectionStatus === 'fallback') && (
+          <button
+            onClick={retry}
+            className="p-1 hover:bg-gray-800 rounded transition-colors"
+            title="Retry connection"
+          >
+            <RefreshCw className="w-3 h-3 text-gray-400 hover:text-white" />
+          </button>
+        )}
+      </div>
+
       {/* Exchange Selector */}
       <Select
         value={currentAccountId || ''}
         onValueChange={setCurrentAccount}
       >
-        <SelectTrigger className="w-48 bg-gray-900 border-gray-700">
+        <SelectTrigger className="w-40 bg-gray-900 border-gray-700">
           <SelectValue placeholder="Select account" />
         </SelectTrigger>
         <SelectContent className="bg-gray-900 border-gray-700">
@@ -150,10 +216,7 @@ export function TradingHeader({ onConnectExchange }: TradingHeaderProps) {
             <SelectItem key={account.id} value={account.id}>
               <div className="flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${account.connected ? 'bg-green-500' : 'bg-gray-500'}`} />
-                <span>{account.name}</span>
-                <span className="text-xs text-gray-500">
-                  ${account.balance.toLocaleString()}
-                </span>
+                <span className="text-sm">{account.name}</span>
               </div>
             </SelectItem>
           ))}

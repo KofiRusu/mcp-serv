@@ -1,12 +1,16 @@
 # =============================================================================
-# ChatOS Trading Scrapers - Docker Compose
-# 24/7 data collection for market data, news, and sentiment
+# ChatOS Trading Scrapers - Docker Compose (Extended)
+# 24/7 data collection for market data, news, sentiment, and derivatives
 # =============================================================================
 #
 # Usage:
 #   docker-compose -f docker-compose.scrapers.yml up -d     # Start all scrapers
 #   docker-compose -f docker-compose.scrapers.yml down      # Stop all scrapers
 #   docker-compose -f docker-compose.scrapers.yml logs -f   # View logs
+#
+# Individual services:
+#   docker-compose -f docker-compose.scrapers.yml up -d aggr-agent
+#   docker-compose -f docker-compose.scrapers.yml up -d coinglass-agent
 #
 # =============================================================================
 
@@ -86,6 +90,77 @@ services:
       timeout: 10s
       retries: 3
 
+  # ===========================================================================
+  # AGGR Agent (L1 Market Microstructure)
+  # Real-time aggregated trades via WebSocket
+  # Similar to aggr.trade functionality
+  # ===========================================================================
+  aggr-agent:
+    build:
+      context: ..
+      dockerfile: scrapers/Dockerfile.scraper
+    container_name: chatos-aggr-agent
+    restart: always
+    volumes:
+      - ../sandbox-ui/data/aggr:/app/data/aggr
+      - scraper-logs:/app/logs
+    environment:
+      - SCRAPER_TYPE=aggr
+      - SYMBOLS=BTCUSDT,ETHUSDT,SOLUSDT
+      - INTERVAL_SECONDS=1
+      - PYTHONUNBUFFERED=1
+    command: python -u aggr_scraper.py
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; exit(0 if os.path.exists('/app/data/aggr') else 1)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================================================
+  # CoinGlass Heatmap Agent (L1 Market Microstructure)
+  # Collects: liquidations, open interest, long/short ratios, heatmaps
+  # ===========================================================================
+  coinglass-agent:
+    build:
+      context: ..
+      dockerfile: scrapers/Dockerfile.scraper
+    container_name: chatos-coinglass-agent
+    restart: always
+    volumes:
+      - ../sandbox-ui/data/coinglass:/app/data/coinglass
+      - scraper-logs:/app/logs
+    environment:
+      - SCRAPER_TYPE=coinglass
+      - SYMBOLS=BTC,ETH,SOL
+      - INTERVAL_SECONDS=60
+      - PYTHONUNBUFFERED=1
+    command: python -u coinglass_scraper.py
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; exit(0 if os.path.exists('/app/data/coinglass') else 1)"]
+      interval: 120s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================================================
+  # Footprint Charts Agent (L1 Market Microstructure) - PLANNED
+  # Collects: volume profile, order flow, footprint candles
+  # Note: Requires additional implementation for bid/ask volume tracking
+  # ===========================================================================
+  # footprint-agent:
+  #   build:
+  #     context: ..
+  #     dockerfile: scrapers/Dockerfile.scraper
+  #   container_name: chatos-footprint-agent
+  #   restart: always
+  #   volumes:
+  #     - ../sandbox-ui/data/footprint:/app/data/footprint
+  #     - scraper-logs:/app/logs
+  #   environment:
+  #     - SCRAPER_TYPE=footprint
+  #     - SYMBOLS=BTCUSDT,ETHUSDT
+  #     - PYTHONUNBUFFERED=1
+  #   command: python -u footprint_scraper.py
+
 volumes:
   scraper-logs:
     name: chatos-scraper-logs
@@ -93,4 +168,3 @@ volumes:
 networks:
   default:
     name: chatos-scrapers-network
-

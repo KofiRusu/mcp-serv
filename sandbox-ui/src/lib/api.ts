@@ -9,6 +9,8 @@ export interface ChatResponse {
   model: string
   response: string
   created: number
+  answer?: string
+  chosen_model?: string
 }
 
 export interface ModelInfo {
@@ -17,15 +19,61 @@ export interface ModelInfo {
   description?: string
   isDefault?: boolean
   provider?: string
-  model_id?: string
-  enabled?: boolean
-  is_council_member?: boolean
 }
 
 export interface StreamEvent {
-  type: 'token' | 'done' | 'error'
+  type: 'token' | 'done' | 'error' | 'metadata'
   content?: string
+  text?: string
   error?: string
+  message?: string
+  model?: string
+  answer?: string
+  chosen_model?: string
+}
+
+export interface VSCodeStatus {
+  running: boolean
+  url?: string
+  port?: number
+  workspace?: string
+  error?: string
+}
+
+export interface ProjectInfo {
+  id: string
+  is_git?: boolean
+  exists?: boolean
+  name: string
+  path: string
+  description?: string
+}
+
+export interface FileTreeResponse {
+  files: { name: string; path: string; type: 'file' | 'directory' }[]
+  root?: FileInfo
+}
+
+export interface FileInfo {
+  name: string
+  path: string
+  type: 'file' | 'directory'
+  is_directory?: boolean
+  size?: number
+  modified?: string
+  children?: FileInfo[]
+}
+
+export interface ExecutionResult {
+  success: boolean
+  output: string
+  stdout?: string
+  stderr?: string
+  error?: string
+  exitCode?: number
+  exit_code?: number
+  duration?: number
+  execution_time?: number
 }
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
@@ -33,20 +81,43 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 /**
  * Send a chat message to the API
  */
+export interface ChatRequest {
+  message: string
+  mode?: string
+  use_rag?: boolean
+  session_id?: string
+  model_id?: string
+  conversation_id?: string
+}
+
 export async function sendChatMessage(
-  message: string,
+  messageOrRequest: string | ChatRequest,
   model?: string,
   conversationId?: string
 ): Promise<ChatResponse> {
   try {
+    let body: Record<string, unknown>
+    if (typeof messageOrRequest === 'string') {
+      body = {
+        message: messageOrRequest,
+        model: model || 'default',
+        conversation_id: conversationId,
+      }
+    } else {
+      body = {
+        message: messageOrRequest.message,
+        model: messageOrRequest.model_id || model || 'default',
+        mode: messageOrRequest.mode,
+        use_rag: messageOrRequest.use_rag,
+        session_id: messageOrRequest.session_id,
+        conversation_id: messageOrRequest.conversation_id || conversationId,
+      }
+    }
+    
     const response = await fetch(`${API_BASE}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message,
-        model: model || 'default',
-        conversation_id: conversationId,
-      }),
+      body: JSON.stringify(body),
     })
     
     if (!response.ok) {
@@ -65,35 +136,49 @@ export async function sendChatMessage(
   }
 }
 
+export interface StreamChatRequest {
+  message: string
+  session_id?: string
+  model_id?: string
+}
+
 /**
- * Stream a chat message from the API
+ * Stream a chat message from the API (callback-based)
  */
-export async function* streamChatMessage(
-  message: string,
-  model?: string,
-  conversationId?: string
-): AsyncGenerator<StreamEvent> {
+export async function streamChatMessage(
+  request: string | StreamChatRequest,
+  callback: (event: StreamEvent) => void,
+  signal?: AbortSignal
+): Promise<void> {
+  const req: StreamChatRequest = typeof request === 'string' 
+    ? { message: request } 
+    : request
+    
   try {
     const response = await fetch(`${API_BASE}/api/chat/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        message,
-        model: model || 'default',
-        conversation_id: conversationId,
+        message: req.message,
+        model: req.model_id || 'default',
+        session_id: req.session_id,
       }),
+      signal,
     })
     
     if (!response.ok) {
-      yield { type: 'error', error: `API error: ${response.status}` }
+      callback({ type: 'error', error: `API error: ${response.status}` })
       return
     }
     
     const reader = response.body?.getReader()
     if (!reader) {
-      yield { type: 'error', error: 'No response body' }
+      callback({ type: 'error', error: 'No response body' })
       return
     }
+    
+    // Send metadata event with model info
+    callback({ type: 'metadata', model: req.model_id || 'default' })
     
     const decoder = new TextDecoder()
     let buffer = ''
@@ -110,380 +195,51 @@ export async function* streamChatMessage(
         if (line.startsWith('data: ')) {
           const data = line.slice(6)
           if (data === '[DONE]') {
-            yield { type: 'done' }
+            callback({ type: 'done' })
           } else {
             try {
               const parsed = JSON.parse(data)
-              yield { type: 'token', content: parsed.content || parsed.text || '' }
+              const text = parsed.content || parsed.text || ''
+              callback({ type: 'token', content: text, text })
             } catch {
-              yield { type: 'token', content: data }
+              callback({ type: 'token', content: data, text: data })
             }
           }
         }
       }
     }
     
-    yield { type: 'done' }
+    callback({ type: 'done' })
   } catch (error) {
     console.error('Stream error:', error)
-    yield { 
+    callback({ 
       type: 'error', 
       error: error instanceof Error ? error.message : 'Stream failed' 
-    }
+    })
   }
 }
 
 /**
  * Get available models from the API
  */
-// Default Ollama models to show when backend is unavailable
-const DEFAULT_MODELS: ModelInfo[] = [
-  {
-    id: "ollama-llama3.2",
-    name: "Llama 3.2",
-    provider: "ollama",
-    model_id: "llama3.2:latest",
-    enabled: true,
-    is_council_member: false,
-    isDefault: true,
-  },
-  {
-    id: "ollama-qwen2.5",
-    name: "Qwen 2.5",
-    provider: "ollama",
-    model_id: "qwen2.5:latest",
-    enabled: true,
-    is_council_member: false,
-  },
-  {
-    id: "ollama-mistral",
-    name: "Mistral",
-    provider: "ollama",
-    model_id: "mistral:latest",
-    enabled: true,
-    is_council_member: false,
-  },
-  {
-    id: "ollama-codellama",
-    name: "CodeLlama",
-    provider: "ollama",
-    model_id: "codellama:latest",
-    enabled: true,
-    is_council_member: false,
-  },
-  {
-    id: "ollama-deepseek-coder",
-    name: "DeepSeek Coder",
-    provider: "ollama",
-    model_id: "deepseek-coder:latest",
-    enabled: true,
-    is_council_member: false,
-  },
-  {
-    id: 'ft-qwen25-v1-quality',
-    name: 'PersRM Quality',
-    description: 'Fine-tuned PersRM model',
-    provider: 'local',
-    enabled: true,
-    is_council_member: false,
-  },
-]
-
-export async function getModels(enabledOnly: boolean = false): Promise<ModelInfo[]> {
+export async function getModels(_includeAll?: boolean): Promise<ModelInfo[]> {
   try {
-    const url = new URL(`${API_BASE}/api/models`)
-    if (enabledOnly) {
-      url.searchParams.set("enabled_only", "true")
-    }
-    
-    const response = await fetch(url.toString())
+    const response = await fetch(`${API_BASE}/api/models`)
     
     if (!response.ok) {
-      console.warn(`Models API unavailable: ${response.statusText}`)
-      return DEFAULT_MODELS
+      throw new Error(`API error: ${response.status}`)
     }
     
-    const models = await response.json()
-    // If API returns empty, still show defaults
-    return models.length > 0 ? models : DEFAULT_MODELS
+    return await response.json()
   } catch (error) {
     console.error('Models API error:', error)
-    // Return default Ollama models if API is unavailable
-    return DEFAULT_MODELS
+    // Return default models if API is unavailable
+    return [
+      { id: 'default', name: 'Default Model', isDefault: true, provider: 'local' },
+      { id: 'ft-qwen25-v1-quality', name: 'PersRM Quality', description: 'Fine-tuned model', provider: 'ollama' },
+      { id: 'mistral:7b', name: 'Mistral 7B', description: 'Base Mistral model', provider: 'ollama' },
+    ]
   }
-}
-
-/**
- * Check API health
- */
-export async function checkHealth(): Promise<{
-  status: string
-  version: string
-  models_loaded: number
-  rag_documents: number
-}> {
-  const response = await fetch(`${API_BASE}/api/health`)
-  if (!response.ok) {
-    throw new Error("API is not healthy")
-  }
-  return response.json()
-}
-
-export interface FileInfo {
-  name: string
-  path: string
-  is_directory: boolean
-  size?: number
-  modified?: string
-  children?: FileInfo[]
-}
-
-export interface ExecutionResult {
-  stdout: string
-  stderr: string
-  exit_code: number
-  execution_time: number
-}
-
-// File icons mapping
-const FILE_ICONS: Record<string, string> = {
-  '.ts': '📘',
-  '.tsx': '⚛️',
-  '.js': '📒',
-  '.jsx': '⚛️',
-  '.json': '📋',
-  '.py': '🐍',
-  '.css': '🎨',
-  '.html': '🌐',
-  '.md': '📝',
-  '.sh': '🖥️',
-  '.yml': '⚙️',
-  '.yaml': '⚙️',
-  'package.json': '📦',
-  'tsconfig.json': '⚙️',
-  'Dockerfile': '🐳',
-  '.gitignore': '🙈',
-  'default': '📄',
-}
-
-/**
- * Get icon for a file based on extension
- */
-export function getFileIcon(filename: string): string {
-  if (FILE_ICONS[filename]) {
-    return FILE_ICONS[filename]
-  }
-  const ext = filename.includes(".") ? `.${filename.split(".").pop()}` : ""
-  return FILE_ICONS[ext] || FILE_ICONS.default
-}
-
-// Language mapping for Monaco editor
-const LANGUAGE_MAP: Record<string, string> = {
-  '.ts': 'typescript',
-  '.tsx': 'typescript',
-  '.js': 'javascript',
-  '.jsx': 'javascript',
-  '.json': 'json',
-  '.py': 'python',
-  '.css': 'css',
-  '.scss': 'scss',
-  '.html': 'html',
-  '.md': 'markdown',
-  '.sh': 'shell',
-  '.bash': 'shell',
-  '.yml': 'yaml',
-  '.yaml': 'yaml',
-  '.sql': 'sql',
-  '.go': 'go',
-  '.rs': 'rust',
-  '.java': 'java',
-  '.c': 'c',
-  '.cpp': 'cpp',
-  '.h': 'c',
-  '.hpp': 'cpp',
-}
-
-/**
- * Get language identifier for Monaco editor
- */
-export function getLanguageFromPath(filepath: string): string {
-  const ext = filepath.includes(".") ? `.${filepath.split(".").pop()}` : ""
-  return LANGUAGE_MAP[ext] || 'plaintext'
-}
-
-/**
- * Get file tree for the sandbox
- */
-export async function getFileTree(path?: string): Promise<FileInfo[]> {
-  const url = new URL(`${API_BASE}/api/sandbox/files`)
-  if (path) {
-    url.searchParams.set("path", path)
-  }
-  
-  try {
-    const response = await fetch(url.toString())
-    if (!response.ok) {
-      console.warn(`File tree API unavailable: ${response.statusText}`)
-      return []
-    }
-    return response.json()
-  } catch (error) {
-    console.warn("File tree API unavailable:", error)
-    return []
-  }
-}
-
-/**
- * Delete a file or directory
- */
-export async function deleteFile(filepath: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/api/sandbox/file`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ path: filepath }),
-  })
-  
-  if (!response.ok) {
-    throw new Error(`Failed to delete file: ${response.statusText}`)
-  }
-}
-
-/**
- * Create a directory
- */
-export async function createDirectory(dirpath: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/api/sandbox/directory`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ path: dirpath }),
-  })
-  
-  if (!response.ok) {
-    throw new Error(`Failed to create directory: ${response.statusText}`)
-  }
-}
-
-/**
- * Upload a file to the sandbox
- */
-export async function uploadFile(file: File, targetPath: string): Promise<FileInfo> {
-  const formData = new FormData()
-  formData.append("file", file)
-  formData.append("path", targetPath)
-  
-  const response = await fetch(`${API_BASE}/api/sandbox/upload`, {
-    method: "POST",
-    body: formData,
-  })
-  
-  if (!response.ok) {
-    throw new Error(`Failed to upload file: ${response.statusText}`)
-  }
-  
-  return response.json()
-}
-
-/**
- * Import a directory from the local filesystem
- */
-export async function importDirectory(sourcePath: string): Promise<FileInfo[]> {
-  const response = await fetch(`${API_BASE}/api/sandbox/import`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ source_path: sourcePath }),
-  })
-  
-  if (!response.ok) {
-    throw new Error(`Failed to import directory: ${response.statusText}`)
-  }
-  
-  return response.json()
-}
-
-/**
- * Read a file's contents
- */
-export async function readFile(filepath: string): Promise<string> {
-  const url = new URL(`${API_BASE}/api/sandbox/file`)
-  url.searchParams.set("path", filepath)
-  
-  try {
-    const response = await fetch(url.toString())
-    if (!response.ok) {
-      console.warn(`Failed to read file: ${response.statusText}`)
-      return ""
-    }
-    const data = await response.json()
-    return data.content
-  } catch (error) {
-    console.warn("File read error:", error)
-    return ""
-  }
-}
-
-/**
- * Write content to a file
- */
-export async function writeFile(filepath: string, content: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/api/sandbox/file`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ path: filepath, content }),
-  })
-  
-  if (!response.ok) {
-    throw new Error(`Failed to write file: ${response.statusText}`)
-  }
-}
-
-/**
- * Execute code in the sandbox
- */
-export async function executeCode(options: {
-  file_path: string
-  timeout?: number
-  args?: string[]
-}): Promise<ExecutionResult> {
-  try {
-    const response = await fetch(`${API_BASE}/api/sandbox/execute`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        path: options.file_path,
-        timeout: options.timeout,
-        args: options.args,
-      }),
-    })
-
-    if (!response.ok) {
-      return {
-        stdout: "",
-        stderr: `API Error: ${response.statusText}`,
-        exit_code: 1,
-        execution_time: 0,
-      }
-    }
-    return response.json()
-  } catch (error) {
-    return {
-      stdout: "",
-      stderr: `Network Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-      exit_code: 1,
-      execution_time: 0,
-    }
-  }
-}
-
-// =============================================================================
-// VSCode/Code-Server Integration
-// =============================================================================
-
-export interface VSCodeStatus {
-  running: boolean
-  url?: string
-  port?: number
-  workspace?: string
-  error?: string
 }
 
 /**
@@ -492,194 +248,454 @@ export interface VSCodeStatus {
 export async function getVSCodeStatus(): Promise<VSCodeStatus> {
   try {
     const response = await fetch(`${API_BASE}/api/vscode/status`)
+    
     if (!response.ok) {
-      return { running: false, error: response.statusText }
+      // API not available or endpoint doesn't exist - return not running
+      return { running: false }
     }
-    return response.json()
-  } catch (error) {
-    // Backend unavailable
-    console.warn("VSCode API unavailable:", error)
-    return { running: false, error: "Backend unavailable" }
+    
+    return await response.json()
+  } catch {
+    // Return not running status if API is unavailable
+    return { running: false }
   }
 }
 
 /**
- * Check if VSCode/code-server is healthy and responding
+ * Check if VSCode/code-server is healthy
  */
-export async function checkVSCodeHealth(): Promise<{ healthy: boolean; latency?: number }> {
-  const start = Date.now()
+export async function checkVSCodeHealth(): Promise<{ healthy: boolean }> {
   try {
     const status = await getVSCodeStatus()
     if (!status.running || !status.url) {
       return { healthy: false }
     }
     
-    // Try to ping the code-server
+    // Try to reach the code-server
     const response = await fetch(`${status.url}/healthz`, {
-      method: "GET",
-      mode: "no-cors",
-    }).catch(() => null)
+      method: 'GET',
+      mode: 'no-cors',
+    })
     
-    return {
-      healthy: response !== null,
-      latency: Date.now() - start,
-    }
-  } catch {
+    return { healthy: true }
+  } catch (error) {
+    console.error('VSCode health check error:', error)
     return { healthy: false }
   }
 }
 
 /**
- * Start VSCode/code-server
+ * Get list of available projects
  */
-export async function startVSCode(options?: { workspace?: string }): Promise<VSCodeStatus> {
+export async function getProjects(): Promise<ProjectInfo[]> {
   try {
+    const response = await fetch(`${API_BASE}/api/projects`)
+    
+    if (!response.ok) {
+      // API not available - return empty list
+      return []
+    }
+    
+    return await response.json()
+  } catch {
+    // Return empty list if API is unavailable
+    return []
+  }
+}
+
+/**
+ * Get file tree for a given path
+ */
+export async function getFileTree(path?: string): Promise<FileTreeResponse> {
+  try {
+    const url = path 
+      ? `${API_BASE}/api/files?path=${encodeURIComponent(path)}`
+      : `${API_BASE}/api/files`
+    const response = await fetch(url)
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('File tree API error:', error)
+    // Return empty file list if API is unavailable
+    return { files: [] }
+  }
+}
+
+/**
+ * Check API health status
+ */
+export async function checkHealth(): Promise<{ status: string }> {
+  try {
+    const response = await fetch(`${API_BASE}/api/health`)
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Health check API error:', error)
+    return { status: 'unavailable' }
+  }
+}
+
+/**
+ * Start VSCode/code-server with a project
+ */
+export async function startVSCode(projectPathOrOptions: string | { workspace: string }): Promise<VSCodeStatus> {
+  try {
+    const path = typeof projectPathOrOptions === 'string' 
+      ? projectPathOrOptions 
+      : projectPathOrOptions.workspace
+      
     const response = await fetch(`${API_BASE}/api/vscode/start`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ workspace: options?.workspace }),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path }),
     })
     
     if (!response.ok) {
-      return { running: false, error: `Failed to start: ${response.statusText}` }
+      throw new Error(`API error: ${response.status}`)
     }
     
-    return response.json()
+    return await response.json()
   } catch (error) {
-    return { running: false, error: `Backend unavailable. Start the ChatOS server on port 8000.` }
+    console.error('Start VSCode API error:', error)
+    return { running: false, error: error instanceof Error ? error.message : 'Failed to start VSCode' }
   }
 }
 
 /**
  * Stop VSCode/code-server
  */
-export async function stopVSCode(): Promise<void> {
+export async function stopVSCode(): Promise<{ success: boolean }> {
   try {
-    await fetch(`${API_BASE}/api/vscode/stop`, {
-      method: "POST",
+    const response = await fetch(`${API_BASE}/api/vscode/stop`, {
+      method: 'POST',
     })
-  } catch (error) {
-    console.warn("Failed to stop VSCode:", error)
-  }
-}
-
-// =============================================================================
-// Projects Management
-// =============================================================================
-
-export interface ProjectInfo {
-  id: string
-  name: string
-  path: string
-  description?: string
-  language?: string
-  created_at: string
-  last_opened?: string
-  is_git?: boolean
-  exists?: boolean
-}
-
-// Default projects to show when backend is unavailable
-const DEFAULT_PROJECTS: ProjectInfo[] = [
-  {
-    id: "chatos",
-    name: "ChatOS",
-    path: "~/ChatOS-v2.0",
-    description: "ChatOS AI Assistant",
-    language: "Python",
-    created_at: new Date().toISOString(),
-    exists: true,
-  },
-  {
-    id: "sandbox-ui",
-    name: "Sandbox UI",
-    path: "~/ChatOS-v2.0/sandbox-ui",
-    description: "Next.js Frontend",
-    language: "TypeScript",
-    created_at: new Date().toISOString(),
-    exists: true,
-  },
-  {
-    id: "home",
-    name: "Home Directory",
-    path: "~",
-    description: "User home directory",
-    created_at: new Date().toISOString(),
-    exists: true,
-  },
-]
-
-/**
- * Get list of projects
- */
-export async function getProjects(): Promise<ProjectInfo[]> {
-  try {
-    const response = await fetch(`${API_BASE}/api/projects`)
+    
     if (!response.ok) {
-      console.warn(`Projects API unavailable: ${response.statusText}`)
-      return DEFAULT_PROJECTS
+      throw new Error(`API error: ${response.status}`)
     }
-    const projects = await response.json()
-    // If API returns empty, still show defaults
-    return projects.length > 0 ? projects : DEFAULT_PROJECTS
+    
+    return await response.json()
   } catch (error) {
-    // Backend unavailable - return default projects
-    console.warn("Projects API unavailable:", error)
-    return DEFAULT_PROJECTS
+    console.error('Stop VSCode API error:', error)
+    return { success: false }
   }
 }
 
 /**
- * Create a new project
+ * Read file contents
  */
-export async function createProject(project: {
-  name: string
+export async function readFile(path: string): Promise<{ content: string }> {
+  try {
+    const response = await fetch(`${API_BASE}/api/files/read?path=${encodeURIComponent(path)}`)
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`)
+    }
+    
+    const data = await response.json()
+    return { content: data.content || '' }
+  } catch (error) {
+    console.error('Read file API error:', error)
+    return { content: '' }
+  }
+}
+
+/**
+ * Write file contents
+ */
+export async function writeFile(path: string, content: string): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE}/api/files/write`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path, content }),
+    })
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Write file API error:', error)
+    return { success: false }
+  }
+}
+
+/**
+ * Delete a file or directory
+ */
+export async function deleteFile(path: string): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE}/api/files/delete`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path }),
+    })
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Delete file API error:', error)
+    return { success: false }
+  }
+}
+
+/**
+ * Create a directory
+ */
+export async function createDirectory(path: string): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE}/api/files/mkdir`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path }),
+    })
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Create directory API error:', error)
+    return { success: false }
+  }
+}
+
+/**
+ * Get file icon based on filename/extension
+ */
+export function getFileIcon(filename: string): string {
+  const ext = filename.split('.').pop()?.toLowerCase() || ''
+  const iconMap: Record<string, string> = {
+    // Code files
+    'js': '📜',
+    'jsx': '⚛️',
+    'ts': '📘',
+    'tsx': '⚛️',
+    'py': '🐍',
+    'rb': '💎',
+    'go': '🐹',
+    'rs': '🦀',
+    'java': '☕',
+    'c': '🔧',
+    'cpp': '🔧',
+    'h': '📋',
+    'cs': '#️⃣',
+    // Web files
+    'html': '🌐',
+    'css': '🎨',
+    'scss': '🎨',
+    'less': '🎨',
+    'svg': '🖼️',
+    // Data files
+    'json': '📋',
+    'yaml': '📋',
+    'yml': '📋',
+    'xml': '📋',
+    'toml': '📋',
+    // Documents
+    'md': '📝',
+    'txt': '📄',
+    'pdf': '📕',
+    'doc': '📘',
+    'docx': '📘',
+    // Config
+    'env': '⚙️',
+    'gitignore': '🚫',
+    'dockerfile': '🐳',
+    // Default
+    'default': '📄',
+  }
+  return iconMap[ext] || iconMap['default']
+}
+
+/**
+ * Import a directory (for project import)
+ */
+export interface ImportResult {
+  success: boolean
   path?: string
-  description?: string
-  language?: string
-}): Promise<ProjectInfo> {
-  const response = await fetch(`${API_BASE}/api/projects`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(project),
-  })
-  
-  if (!response.ok) {
-    throw new Error(`Failed to create project: ${response.statusText}`)
-  }
-  
-  return response.json()
+  target?: string
+  imported_count?: number
+  skipped_count?: number
 }
 
-/**
- * Delete a project
- */
-export async function deleteProject(projectId: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/api/projects/${projectId}`, {
-    method: "DELETE",
-  })
-  
-  if (!response.ok) {
-    throw new Error(`Failed to delete project: ${response.statusText}`)
-  }
-}
-
-/**
- * Open a project in VSCode
- */
-export async function openProjectInVSCode(projectId: string): Promise<VSCodeStatus> {
+export async function importDirectory(sourcePath: string, _targetPath?: string): Promise<ImportResult> {
   try {
-    const response = await fetch(`${API_BASE}/api/projects/${projectId}/open`, {
-      method: "POST",
+    const response = await fetch(`${API_BASE}/api/files/import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: sourcePath }),
     })
     
     if (!response.ok) {
-      return { running: false, error: `Failed to open project: ${response.statusText}` }
+      throw new Error(`API error: ${response.status}`)
     }
     
-    return response.json()
+    return await response.json()
   } catch (error) {
-    return { running: false, error: `Network error: ${error instanceof Error ? error.message : "Unknown"}` }
+    console.error('Import directory API error:', error)
+    return { success: false }
   }
+}
+
+/**
+ * Upload a file
+ */
+export async function uploadFile(pathOrFile: string | File, file?: File): Promise<{ success: boolean }> {
+  try {
+    const formData = new FormData()
+    
+    if (pathOrFile instanceof File) {
+      // Called with just File (use file name as path)
+      formData.append('file', pathOrFile)
+      formData.append('path', pathOrFile.name)
+    } else {
+      // Called with path and file
+      formData.append('file', file!)
+      formData.append('path', pathOrFile)
+    }
+    
+    const response = await fetch(`${API_BASE}/api/files/upload`, {
+      method: 'POST',
+      body: formData,
+    })
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Upload file API error:', error)
+    return { success: false }
+  }
+}
+
+/**
+ * Execute code in a sandbox
+ */
+export async function executeCode(
+  codeOrOptions: string | { file_path: string; code?: string; language?: string },
+  language?: string
+): Promise<ExecutionResult> {
+  try {
+    let body: Record<string, unknown>
+    if (typeof codeOrOptions === 'string') {
+      body = { code: codeOrOptions, language: language || 'python' }
+    } else {
+      body = { 
+        file_path: codeOrOptions.file_path, 
+        code: codeOrOptions.code,
+        language: codeOrOptions.language 
+      }
+    }
+    
+    const response = await fetch(`${API_BASE}/api/execute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Execute code API error:', error)
+    return {
+      success: false,
+      output: '',
+      error: 'Code execution service is unavailable',
+    }
+  }
+}
+
+/**
+ * Get programming language from file path/extension
+ */
+export function getLanguageFromPath(path: string): string {
+  const ext = path.split('.').pop()?.toLowerCase() || ''
+  const langMap: Record<string, string> = {
+    // JavaScript/TypeScript
+    'js': 'javascript',
+    'jsx': 'javascript',
+    'mjs': 'javascript',
+    'cjs': 'javascript',
+    'ts': 'typescript',
+    'tsx': 'typescript',
+    // Python
+    'py': 'python',
+    'pyw': 'python',
+    'pyi': 'python',
+    // Web
+    'html': 'html',
+    'htm': 'html',
+    'css': 'css',
+    'scss': 'scss',
+    'sass': 'sass',
+    'less': 'less',
+    // Data formats
+    'json': 'json',
+    'yaml': 'yaml',
+    'yml': 'yaml',
+    'xml': 'xml',
+    'toml': 'toml',
+    // Markdown
+    'md': 'markdown',
+    'mdx': 'markdown',
+    // Shell
+    'sh': 'shell',
+    'bash': 'shell',
+    'zsh': 'shell',
+    'fish': 'shell',
+    // Other languages
+    'go': 'go',
+    'rs': 'rust',
+    'rb': 'ruby',
+    'php': 'php',
+    'java': 'java',
+    'kt': 'kotlin',
+    'swift': 'swift',
+    'c': 'c',
+    'cpp': 'cpp',
+    'cc': 'cpp',
+    'cxx': 'cpp',
+    'h': 'c',
+    'hpp': 'cpp',
+    'cs': 'csharp',
+    'sql': 'sql',
+    'r': 'r',
+    'lua': 'lua',
+    'pl': 'perl',
+    'ex': 'elixir',
+    'exs': 'elixir',
+    'erl': 'erlang',
+    'hs': 'haskell',
+    'clj': 'clojure',
+    'scala': 'scala',
+    'vue': 'vue',
+    'svelte': 'svelte',
+    // Config files
+    'dockerfile': 'dockerfile',
+    'makefile': 'makefile',
+    'env': 'dotenv',
+    'gitignore': 'gitignore',
+  }
+  return langMap[ext] || 'plaintext'
 }
 

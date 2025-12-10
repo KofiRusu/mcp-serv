@@ -13,7 +13,10 @@ import { BacktestPanel } from './backtest-panel'
 import { DataDashboard } from './data-dashboard'
 import { ValidationDashboard } from './validation-dashboard'
 import { PaperTradingPanel } from './paper-trading-panel'
+import { TradeFlow } from './trade-flow'
 import { useSentimentData, useNewsData } from '@/hooks/use-scraped-data'
+import { useRealtimeWebSocket, ConnectionStatus } from '@/hooks/use-realtime-websocket'
+import { cn } from '@/lib/utils'
 import { 
   Bot, 
   Newspaper, 
@@ -29,8 +32,53 @@ import {
   Database,
   FileCheck,
   Wallet,
-  RefreshCw
+  RefreshCw,
+  Radio,
+  WifiOff,
+  Activity,
+  Clock
 } from 'lucide-react'
+
+// Connection status indicator component
+function ConnectionIndicator({ status, lastUpdate }: { status: ConnectionStatus; lastUpdate: number }) {
+  const [dataAge, setDataAge] = useState(0)
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDataAge(Math.floor((Date.now() - lastUpdate) / 1000))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [lastUpdate])
+  
+  const getStatusConfig = (s: ConnectionStatus) => {
+    switch (s) {
+      case 'connected':
+        return { icon: Radio, color: 'text-green-400', bg: 'bg-green-400', label: 'Live' }
+      case 'connecting':
+        return { icon: RefreshCw, color: 'text-blue-400', bg: 'bg-blue-400', label: 'Connecting' }
+      case 'polling':
+        return { icon: Activity, color: 'text-amber-400', bg: 'bg-amber-400', label: 'Polling' }
+      default:
+        return { icon: WifiOff, color: 'text-gray-500', bg: 'bg-gray-500', label: 'Offline' }
+    }
+  }
+  
+  const config = getStatusConfig(status)
+  const StatusIcon = config.icon
+  
+  return (
+    <div className={cn("flex items-center gap-1.5 text-[10px]", config.color)}>
+      <StatusIcon className={cn("w-3 h-3", status === 'connecting' && "animate-spin")} />
+      <span className="font-medium">{config.label}</span>
+      {dataAge > 0 && status !== 'connecting' && (
+        <span className="text-gray-500 flex items-center gap-0.5">
+          <Clock className="w-2.5 h-2.5" />
+          {dataAge < 60 ? `${dataAge}s` : `${Math.floor(dataAge / 60)}m`}
+        </span>
+      )}
+    </div>
+  )
+}
 
 export function RightPanel() {
   const { rightPanelTab, setRightPanelTab, news: storeNews, currentSymbol } = useTradingStore()
@@ -39,17 +87,33 @@ export function RightPanel() {
   const { sentiment, loading: sentimentLoading } = useSentimentData()
   const { news: scrapedNews, loading: newsLoading } = useNewsData(currentSymbol)
 
-  // Merge store news with scraped news
-  const allNews = scrapedNews.length > 0 ? scrapedNews : storeNews
+  // Real-time WebSocket connection
+  const { 
+    news: realtimeNews, 
+    sentiment: realtimeSentiment, 
+    status: wsStatus, 
+    lastUpdate,
+    refresh 
+  } = useRealtimeWebSocket('all')
+
+  // Merge store news with scraped news and realtime news
+  const allNews = realtimeNews.length > 0 
+    ? realtimeNews 
+    : scrapedNews.length > 0 
+      ? scrapedNews 
+      : storeNews
 
   // Filter news for current symbol
   const filteredNews = allNews.filter(n => 
-    n.symbols.includes(currentSymbol) || n.symbols.length === 0
+    n.symbols?.includes(currentSymbol) || !n.symbols?.length
   )
+  
+  // Use realtime sentiment if available
+  const activeSentiment = realtimeSentiment || sentiment
 
   return (
-    <div className="w-80 border-l border-gray-800 bg-[#0d0d14] flex flex-col">
-      <Tabs value={rightPanelTab} onValueChange={(v) => setRightPanelTab(v as any)} className="flex-1 flex flex-col">
+    <div className="h-full w-full border-l border-gray-800 bg-[#0d0d14] flex flex-col overflow-hidden">
+      <Tabs value={rightPanelTab} onValueChange={(v) => setRightPanelTab(v as any)} className="h-full flex flex-col">
         <TabsList className="w-full justify-start gap-0.5 px-2 pt-2 bg-transparent rounded-none h-auto pb-2 border-b border-gray-800 flex-nowrap overflow-x-auto">
           <TabsTrigger 
             value="assistant"
@@ -117,13 +181,26 @@ export function RightPanel() {
         </TabsList>
 
         {/* AI Assistant Tab */}
-        <TabsContent value="assistant" className="flex-1 mt-0 overflow-hidden">
+        <TabsContent value="assistant" className="flex-1 mt-0 overflow-hidden data-[state=active]:flex data-[state=active]:flex-col">
           <TradingAssistant />
         </TabsContent>
 
         {/* News Tab */}
         <TabsContent value="news" className="flex-1 mt-0 overflow-hidden">
           <div className="flex flex-col h-full">
+            {/* Header with connection status */}
+            <div className="flex items-center justify-between p-3 border-b border-gray-800">
+              <ConnectionIndicator status={wsStatus} lastUpdate={lastUpdate} />
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={refresh}
+                className="h-6 px-2 text-xs text-gray-400 hover:text-white"
+              >
+                <RefreshCw className="w-3 h-3 mr-1" />
+                Refresh
+              </Button>
+            </div>
             <div className="p-3 border-b border-gray-800">
               <Button size="sm" variant="outline" className="w-full text-xs">
                 <Zap className="w-3 h-3 mr-1.5" />
@@ -132,7 +209,11 @@ export function RightPanel() {
             </div>
             <ScrollArea className="flex-1">
               <div className="p-3 space-y-3">
-                {filteredNews.map((item) => (
+                {newsLoading && filteredNews.length === 0 ? (
+                  <div className="flex items-center justify-center py-8">
+                    <RefreshCw className="w-5 h-5 animate-spin text-gray-500" />
+                  </div>
+                ) : filteredNews.map((item) => (
                   <NewsCard key={item.id} item={item} />
                 ))}
                 {filteredNews.length === 0 && (
@@ -150,8 +231,22 @@ export function RightPanel() {
         <TabsContent value="sentiment" className="flex-1 mt-0 overflow-hidden">
           <ScrollArea className="h-full">
             <div className="p-3 space-y-4">
+              {/* Header with connection status */}
+              <div className="flex items-center justify-between">
+                <ConnectionIndicator status={wsStatus} lastUpdate={lastUpdate} />
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  onClick={refresh}
+                  className="h-6 px-2 text-xs text-gray-400 hover:text-white"
+                >
+                  <RefreshCw className="w-3 h-3 mr-1" />
+                  Refresh
+                </Button>
+              </div>
+              
               {/* Loading indicator */}
-              {sentimentLoading && (
+              {sentimentLoading && !activeSentiment && (
                 <div className="flex items-center justify-center py-2">
                   <RefreshCw className="w-4 h-4 animate-spin text-purple-400 mr-2" />
                   <span className="text-xs text-gray-400">Loading live data...</span>
@@ -163,24 +258,24 @@ export function RightPanel() {
                 <h3 className="text-xs font-semibold text-gray-500 uppercase">Market Indices</h3>
                 <IndexCard 
                   name="BTC Dominance" 
-                  value={sentiment ? `${sentiment.btc_dominance.toFixed(1)}%` : '...'} 
+                  value={activeSentiment ? `${(activeSentiment.btc_dominance || 0).toFixed(1)}%` : '...'} 
                   change={0.8} 
                 />
                 <IndexCard 
                   name="Total Market Cap" 
-                  value={sentiment ? `$${sentiment.total_market_cap.toFixed(2)}T` : '...'} 
+                  value={activeSentiment ? `$${(activeSentiment.total_market_cap_t || activeSentiment.total_market_cap || 0).toFixed(2)}T` : '...'} 
                   change={1.2} 
                 />
                 <IndexCard 
                   name="Fear & Greed" 
-                  value={sentiment ? sentiment.fear_greed_index.toString() : '...'} 
-                  label={sentiment?.fear_greed_label || 'Loading'}
-                  labelColor={sentiment?.fear_greed_index > 50 ? "text-green-400" : "text-red-400"}
+                  value={activeSentiment?.fear_greed_index?.toString() || '...'} 
+                  label={activeSentiment?.fear_greed_label || 'Loading'}
+                  labelColor={(activeSentiment?.fear_greed_index ?? 0) > 50 ? "text-green-400" : "text-red-400"}
                 />
                 <IndexCard 
                   name="Funding Rate" 
-                  value={sentiment ? `${(sentiment.funding_rate * 100).toFixed(3)}%` : '...'} 
-                  change={sentiment?.funding_rate ? sentiment.funding_rate * 100 : 0} 
+                  value={activeSentiment ? `${((activeSentiment.funding_rate || 0) * 100).toFixed(3)}%` : '...'} 
+                  change={activeSentiment?.funding_rate ? activeSentiment.funding_rate * 100 : 0} 
                 />
               </div>
 
@@ -190,16 +285,16 @@ export function RightPanel() {
                   {currentSymbol} Sentiment
                 </h3>
                 <SentimentGauge value={
-                  sentiment?.symbols?.[currentSymbol]?.sentiment_score || 50
+                  (activeSentiment as any)?.symbols?.[currentSymbol]?.sentiment_score || 50
                 } />
                 <div className="flex justify-between text-xs text-gray-500 mt-2">
                   <span>Bearish</span>
                   <span>Bullish</span>
                 </div>
-                {sentiment?.symbols?.[currentSymbol] && (
+                {(activeSentiment as any)?.symbols?.[currentSymbol] && (
                   <div className="mt-2 text-xs text-gray-400 text-center">
-                    Score: {sentiment.symbols[currentSymbol].sentiment_score} | 
-                    Mentions: {sentiment.symbols[currentSymbol].social_mentions.toLocaleString()}
+                    Score: {(activeSentiment as any).symbols[currentSymbol].sentiment_score} | 
+                    Mentions: {(activeSentiment as any).symbols[currentSymbol].social_mentions?.toLocaleString() || 'N/A'}
                   </div>
                 )}
               </div>
@@ -210,25 +305,25 @@ export function RightPanel() {
                 <div className="bg-gray-900/50 rounded-lg p-3 space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-400">Twitter Mentions</span>
-                    <span className={`text-sm font-medium ${(sentiment?.social_volume?.twitter || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {sentiment?.social_volume?.twitter !== undefined 
-                        ? `${sentiment.social_volume.twitter >= 0 ? '+' : ''}${sentiment.social_volume.twitter}%`
+                    <span className={`text-sm font-medium ${((activeSentiment as any)?.social_volume?.twitter || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {(activeSentiment as any)?.social_volume?.twitter !== undefined 
+                        ? `${(activeSentiment as any).social_volume.twitter >= 0 ? '+' : ''}${(activeSentiment as any).social_volume.twitter}%`
                         : '...'}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-400">Reddit Posts</span>
-                    <span className={`text-sm font-medium ${(sentiment?.social_volume?.reddit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {sentiment?.social_volume?.reddit !== undefined 
-                        ? `${sentiment.social_volume.reddit >= 0 ? '+' : ''}${sentiment.social_volume.reddit}%`
+                    <span className={`text-sm font-medium ${((activeSentiment as any)?.social_volume?.reddit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {(activeSentiment as any)?.social_volume?.reddit !== undefined 
+                        ? `${(activeSentiment as any).social_volume.reddit >= 0 ? '+' : ''}${(activeSentiment as any).social_volume.reddit}%`
                         : '...'}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-400">Telegram Activity</span>
-                    <span className={`text-sm font-medium ${(sentiment?.social_volume?.telegram || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {sentiment?.social_volume?.telegram !== undefined 
-                        ? `${sentiment.social_volume.telegram >= 0 ? '+' : ''}${sentiment.social_volume.telegram}%`
+                    <span className={`text-sm font-medium ${((activeSentiment as any)?.social_volume?.telegram || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {(activeSentiment as any)?.social_volume?.telegram !== undefined 
+                        ? `${(activeSentiment as any).social_volume.telegram >= 0 ? '+' : ''}${(activeSentiment as any).social_volume.telegram}%`
                         : '...'}
                     </span>
                   </div>
@@ -239,16 +334,16 @@ export function RightPanel() {
               <div className="bg-gray-900/50 rounded-lg p-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-400">Long/Short Ratio</span>
-                  <span className={`text-sm font-medium ${(sentiment?.long_short_ratio || 1) >= 1 ? 'text-green-400' : 'text-red-400'}`}>
-                    {sentiment?.long_short_ratio?.toFixed(2) || '...'}
+                  <span className={`text-sm font-medium ${(activeSentiment?.long_short_ratio || 1) >= 1 ? 'text-green-400' : 'text-red-400'}`}>
+                    {activeSentiment?.long_short_ratio?.toFixed(2) || '...'}
                   </span>
                 </div>
               </div>
 
               {/* Data Source */}
               <div className="text-center text-[10px] text-gray-600">
-                {sentiment?.timestamp && (
-                  <>Last updated: {new Date(sentiment.timestamp).toLocaleTimeString()}</>
+                {activeSentiment?.timestamp && (
+                  <>Last updated: {new Date(activeSentiment.timestamp).toLocaleTimeString()}</>
                 )}
               </div>
             </div>

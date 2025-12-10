@@ -55,8 +55,8 @@ export function ProjectSelector({ onStatusChange, onError }: ProjectSelectorProp
           getVSCodeStatus(),
         ])
         
-        setProjects(projectsData)
-        setStatus(statusData)
+        setProjects(Array.isArray(projectsData) ? projectsData : [])
+        setStatus(statusData || { running: false })
         onStatusChange?.(statusData)
         
         // Set selected project based on current workspace or first project
@@ -160,7 +160,7 @@ export function ProjectSelector({ onStatusChange, onError }: ProjectSelectorProp
             <SelectValue placeholder="Select project..." />
           </SelectTrigger>
           <SelectContent className="bg-[var(--bg-secondary)] border-[var(--border-color)]">
-            {projects.map((project) => (
+            {(projects || []).map((project) => (
               <SelectItem
                 key={project.path}
                 value={project.path}

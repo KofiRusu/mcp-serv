@@ -1,0 +1,144 @@
+[
+  {
+    "id": "f1e11850-1b83-4964-99de-07069719a54d",
+    "name": "A2",
+    "description": "",
+    "type": "scraper",
+    "status": "draft",
+    "deployment_type": "docker",
+    "blocks": [
+      {
+        "id": "block-1765395546076-nezgtx2m7qe",
+        "type": "source",
+        "name": "Binance WebSocket",
+        "config": {
+          "symbol": "BTCUSDT",
+          "stream": "btcusdt@aggTrade"
+        },
+        "position": {
+          "x": 100.0,
+          "y": 100.0
+        },
+        "connections": []
+      },
+      {
+        "id": "block-1765395567293-5j7inrbqi2y",
+        "type": "indicator",
+        "name": "RSI",
+        "config": {
+          "period": 14,
+          "overbought": 70,
+          "oversold": 30
+        },
+        "position": {
+          "x": 436.66668701171875,
+          "y": 36.5
+        },
+        "connections": [
+          "block-1765395546076-nezgtx2m7qe",
+          "block-1765395624818-u6jyp9qeif",
+          "block-1765395700238-48uktcjz387"
+        ]
+      },
+      {
+        "id": "block-1765395591366-bho7jbq1ski",
+        "type": "indicator",
+        "name": "MACD",
+        "config": {
+          "fast": 12,
+          "slow": 26,
+          "signal": 9
+        },
+        "position": {
+          "x": 411.83331298828125,
+          "y": 222.066650390625
+        },
+        "connections": [
+          "block-1765395567293-5j7inrbqi2y",
+          "block-1765395546076-nezgtx2m7qe",
+          "block-1765395624818-u6jyp9qeif",
+          "block-1765395700238-48uktcjz387"
+        ]
+      },
+      {
+        "id": "block-1765395609515-lmc5ou41ysi",
+        "type": "indicator",
+        "name": "Money V1 (Structure)",
+        "config": {
+          "period": 20
+        },
+        "position": {
+          "x": 406.75,
+          "y": 452.75
+        },
+        "connections": [
+          "block-1765395546076-nezgtx2m7qe",
+          "block-1765395624818-u6jyp9qeif",
+          "block-1765395700238-48uktcjz387"
+        ]
+      },
+      {
+        "id": "block-1765395624818-u6jyp9qeif",
+        "type": "stop_loss",
+        "name": "Stop Loss",
+        "config": {
+          "type": "percent",
+          "value": 2
+        },
+        "position": {
+          "x": 748.6666870117188,
+          "y": 201.86666870117188
+        },
+        "connections": []
+      },
+      {
+        "id": "block-1765395700238-48uktcjz387",
+        "type": "take_profit",
+        "name": "Take Profit",
+        "config": {
+          "type": "percent",
+          "value": 4
+        },
+        "position": {
+          "x": 729.75,
+          "y": 386.1499938964844
+        },
+        "connections": []
+      },
+      {
+        "id": "block-1765395762524-zapd3p6tsd9",
+        "type": "entry",
+        "name": "Entry Signal",
+        "config": {
+          "type": "market"
+        },
+        "position": {
+          "x": 1143.9166259765625,
+          "y": 278.9166717529297
+        },
+        "connections": [
+          "block-1765395624818-u6jyp9qeif",
+          "block-1765395700238-48uktcjz387"
+        ]
+      }
+    ],
+    "generated_code": null,
+    "docker_image": null,
+    "container_id": null,
+    "process_id": null,
+    "config": {},
+    "paper_trading": true,
+    "exchange": null,
+    "symbols": [],
+    "schedule_cron": null,
+    "created_at": "2025-12-10T19:43:26.378503",
+    "updated_at": "2025-12-10T20:10:09.951099",
+    "last_run": null,
+    "run_count": 0,
+    "error_message": null,
+    "total_pnl": 0.0,
+    "win_rate": null,
+    "total_trades": 0,
+    "logs": []
+  }
+]

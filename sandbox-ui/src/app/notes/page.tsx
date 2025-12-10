@@ -17,7 +17,9 @@ import {
   ListTodo,
   ArrowLeft,
   Sparkles,
+  Home,
 } from "lucide-react"
+import Link from "next/link"
 import {
   listNotes,
   createNote,
@@ -113,6 +115,13 @@ export default function NotesPage() {
         <div className="p-4 border-b border-[var(--border-color)]">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
+              <Link
+                href="/"
+                className="p-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors"
+                title="Go to Home"
+              >
+                <Home className="h-5 w-5 text-[var(--text-muted)] hover:text-[var(--accent-primary)]" />
+              </Link>
               <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--accent-primary)]/20 to-[var(--accent-secondary)]/20">
                 <Sparkles className="h-5 w-5 text-[var(--accent-primary)]" />
               </div>

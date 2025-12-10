@@ -29,7 +29,7 @@ export function NoteList({ notes, selectedId, onSelect, isLoading }: NoteListPro
     )
   }
 
-  if (notes.length === 0) {
+  if (!notes || notes.length === 0) {
     return (
       <div className="p-4 text-center text-[var(--text-muted)]">
         <p className="text-sm">No notes found</p>
