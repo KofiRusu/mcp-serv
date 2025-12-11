@@ -121,6 +121,29 @@ export default function AutomationBuilderPage() {
     }
   }, [])
 
+  // Function to poll logs for a running automation
+  const startLogPolling = useCallback((automationId: string) => {
+    const pollLogs = async () => {
+      try {
+        const logsRes = await fetch(`http://localhost:8000/api/v1/automations/${automationId}`)
+        if (logsRes.ok) {
+          const data = await logsRes.json()
+          setOutput(data.logs || [])
+          setStatus(data.status)
+          
+          if (data.status === 'running' || data.status === 'testing') {
+            setTimeout(pollLogs, 2000)
+          } else {
+            setIsRunning(false)
+          }
+        }
+      } catch (e) {
+        console.debug('Log polling error:', e)
+      }
+    }
+    pollLogs()
+  }, [])
+
   // Handler for upload diagram button from canvas
   const handleUploadDiagramFromCanvas = useCallback(() => {
     // Switch to AI mode if not already there
@@ -165,6 +188,18 @@ export default function AutomationBuilderPage() {
         setGeneratedCode(data.generated_code)
         setStatus(data.status)
         setPaperTrading(data.paper_trading ?? true)
+        
+        // Load existing logs
+        if (data.logs && data.logs.length > 0) {
+          setOutput(data.logs)
+        }
+        
+        // If automation is running/testing, start polling for logs
+        if (data.status === 'running' || data.status === 'testing') {
+          setIsRunning(true)
+          startLogPolling(id)
+        }
+        
         showActivity('success', `Automation loaded with ${data.blocks?.length || 0} blocks!`)
       } else {
         showActivity('error', 'Automation not found')
@@ -457,26 +492,8 @@ export default function AutomationBuilderPage() {
         showActivity('success', 'Automation started!')
         toast.success('Automation started!')
         
-        // Poll for logs
-        const pollLogs = async () => {
-          try {
-            const logsRes = await fetch(`http://localhost:8000/api/v1/automations/${currentId}`)
-            if (logsRes.ok) {
-              const data = await logsRes.json()
-              setOutput(data.logs || [])
-              setStatus(data.status)
-              
-              if (data.status === 'running' || data.status === 'testing') {
-                setTimeout(pollLogs, 2000)
-              } else {
-                setIsRunning(false)
-              }
-            }
-          } catch (e) {
-            console.debug('Log polling error:', e)
-          }
-        }
-        pollLogs()
+        // Start polling for logs
+        startLogPolling(currentId)
       } else {
         const error = await res.json()
         throw new Error(error.detail || 'Run failed')
@@ -765,17 +782,17 @@ export default function AutomationBuilderPage() {
           />
           
           {/* Bottom Action Bar */}
-          <div className="h-48 border-t border-gray-800 bg-gray-900/30 flex flex-col">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+          <div className="h-56 border-t border-gray-800 bg-gray-900/30 flex flex-col">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 flex-shrink-0">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Output</span>
+                <span className="text-sm font-medium text-white">Output</span>
                 {output.length > 0 && (
                   <Badge variant="secondary" className="text-xs">
                     {output.length} lines
                   </Badge>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 {status === 'running' || status === 'testing' ? (
                   <Button
                     size="sm"
@@ -790,7 +807,7 @@ export default function AutomationBuilderPage() {
                   <Button
                     size="sm"
                     onClick={handleRun}
-                    disabled={!generatedCode || isRunning}
+                    disabled={isRunning}
                     className="gap-2 bg-blue-600 hover:bg-blue-500"
                   >
                     {isRunning ? (
@@ -798,14 +815,14 @@ export default function AutomationBuilderPage() {
                     ) : (
                       <Play className="h-4 w-4" />
                     )}
-                    Test Run
+                    Run
                   </Button>
                 )}
                 
                 <Button
                   size="sm"
                   onClick={handleDeploy}
-                  disabled={!generatedCode || status === 'deployed'}
+                  disabled={status === 'deployed'}
                   className="gap-2 bg-emerald-600 hover:bg-emerald-500"
                 >
                   <Rocket className="h-4 w-4" />
@@ -814,17 +831,50 @@ export default function AutomationBuilderPage() {
               </div>
             </div>
             
-            <ScrollArea className="flex-1 p-3 font-mono text-xs">
+            <ScrollArea className="flex-1 p-3 font-mono text-sm">
               {output.length === 0 ? (
                 <div className="text-gray-500 italic">
                   Output will appear here when you run the automation...
                 </div>
               ) : (
-                output.map((line, i) => (
-                  <div key={i} className="text-gray-300 whitespace-pre-wrap">
-                    {line}
-                  </div>
-                ))
+                output.map((line, i) => {
+                  // Parse and format output for user-friendly display
+                  const isPriceOutput = line.includes('$') && !line.includes('[')
+                  const isError = line.toLowerCase().includes('error')
+                  const isConnected = line.toLowerCase().includes('connected')
+                  
+                  if (isPriceOutput) {
+                    // Price output - show prominently
+                    return (
+                      <div key={i} className="py-1 text-green-400 font-semibold text-base">
+                        📈 {line}
+                      </div>
+                    )
+                  } else if (isError) {
+                    return (
+                      <div key={i} className="py-0.5 text-red-400">
+                        ❌ {line}
+                      </div>
+                    )
+                  } else if (isConnected) {
+                    return (
+                      <div key={i} className="py-0.5 text-blue-400">
+                        ✅ {line}
+                      </div>
+                    )
+                  } else {
+                    // Filter out verbose timestamp logs, show only meaningful output
+                    const cleanLine = line.replace(/\[\d{4}-\d{2}-\d{2}T[\d:.]+\]\s*/g, '')
+                    if (cleanLine.includes('Received') && !cleanLine.includes('$')) {
+                      return null // Skip verbose "Received" logs without price
+                    }
+                    return (
+                      <div key={i} className="py-0.5 text-gray-400 text-xs">
+                        {cleanLine}
+                      </div>
+                    )
+                  }
+                }).filter(Boolean)
               )}
             </ScrollArea>
           </div>

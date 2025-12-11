@@ -87,9 +87,10 @@ class AutomationRunner:
             running = RunningProcess(process, automation_id, temp_file)
             self._running[automation_id] = running
             
-            # Update status
+            # Clear old logs and update status
+            self._store.clear_logs(automation_id)
             self._store.set_status(automation_id, AutomationStatus.TESTING)
-            self._store.add_log(automation_id, f"Started in dev mode (PID: {process.pid})")
+            self._store.add_log(automation_id, f"Started (PID: {process.pid})")
             
             # Start output reader task
             asyncio.create_task(self._read_output(automation_id))
@@ -114,22 +115,27 @@ class AutomationRunner:
         try:
             while True:
                 if running.process.poll() is not None:
-                    # Process ended
+                    # Process ended - read any remaining output
+                    for line in running.process.stdout:
+                        if line:
+                            stripped = line.strip()
+                            running.output_lines.append(stripped)
+                            self._store.add_log(automation_id, stripped)
                     break
                 
                 line = running.process.stdout.readline()
                 if line:
-                    running.output_lines.append(line.strip())
+                    stripped = line.strip()
+                    running.output_lines.append(stripped)
                     # Keep only last 1000 lines
                     running.output_lines = running.output_lines[-1000:]
                     
-                    # Log to store (every 10th line to avoid spam)
-                    if len(running.output_lines) % 10 == 0:
-                        self._store.add_log(automation_id, line.strip())
+                    # Log ALL output to store (important for single-run automations)
+                    self._store.add_log(automation_id, stripped)
                     
                     # Call callback if registered
                     if automation_id in self._output_callbacks:
-                        await self._output_callbacks[automation_id](line.strip())
+                        await self._output_callbacks[automation_id](stripped)
                 
                 await asyncio.sleep(0.01)
             
@@ -137,10 +143,10 @@ class AutomationRunner:
             exit_code = running.process.returncode
             if exit_code == 0:
                 self._store.set_status(automation_id, AutomationStatus.STOPPED)
-                self._store.add_log(automation_id, "Process ended normally")
+                self._store.add_log(automation_id, "✓ Completed")
             else:
                 self._store.set_status(automation_id, AutomationStatus.ERROR, f"Exit code: {exit_code}")
-                self._store.add_log(automation_id, f"Process crashed with exit code {exit_code}")
+                self._store.add_log(automation_id, f"✗ Failed (exit code {exit_code})")
             
             # Cleanup
             if automation_id in self._running:

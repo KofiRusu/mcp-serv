@@ -97,11 +97,11 @@ export function RightPanel() {
   } = useRealtimeWebSocket('all')
 
   // Merge store news with scraped news and realtime news
-  const allNews = realtimeNews.length > 0 
+  const allNews = (realtimeNews?.length ?? 0) > 0 
     ? realtimeNews 
-    : scrapedNews.length > 0 
+    : (scrapedNews?.length ?? 0) > 0 
       ? scrapedNews 
-      : storeNews
+      : storeNews || []
 
   // Filter news for current symbol
   const filteredNews = allNews.filter(n => 

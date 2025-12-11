@@ -220,6 +220,14 @@ class AutomationStore:
             return True
         return False
     
+    def clear_logs(self, automation_id: str) -> bool:
+        """Clear all logs for an automation."""
+        if automation_id in self._automations:
+            self._automations[automation_id].logs = []
+            self._save()
+            return True
+        return False
+    
     def set_status(self, automation_id: str, status: AutomationStatus, error: Optional[str] = None) -> bool:
         """Update automation status."""
         if automation_id in self._automations:

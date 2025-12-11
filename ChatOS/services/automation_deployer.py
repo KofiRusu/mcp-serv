@@ -23,7 +23,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Install dependencies
-RUN pip install --no-cache-install websockets httpx aiofiles
+RUN pip install --no-cache-dir websockets httpx aiofiles
 
 # Copy the automation script
 COPY automation.py /app/automation.py

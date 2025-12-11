@@ -67,7 +67,10 @@ async def connect_and_stream():
                 with open(output_file, "a") as f:
                     f.write(json.dumps(record) + "\\n")
                 
-                print(f"[{{timestamp}}] Received {{STREAM}} update")
+                # Extract and display price in user-friendly format
+                price = float(data.get("p", data.get("c", data.get("price", 0))))
+                if price > 0:
+                    print(f"{{SYMBOL}}: ${{price:,.2f}}")
                 
             except websockets.exceptions.ConnectionClosed:
                 print("Connection closed. Reconnecting in 5s...")

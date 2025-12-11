@@ -26,10 +26,8 @@ import {
   Circle,
   Database,
   AlertTriangle,
-  Loader2,
-  Home
+  Loader2
 } from 'lucide-react'
-import Link from 'next/link'
 
 interface TradingHeaderProps {
   onConnectExchange: () => void
@@ -137,11 +135,6 @@ export function TradingHeader({ onConnectExchange }: TradingHeaderProps) {
 
   return (
     <header className="h-14 border-b border-gray-800 bg-[#0d0d14] flex items-center px-4 gap-4">
-      {/* Home Button */}
-      <Link href="/" className="p-2 rounded-lg hover:bg-gray-800 transition-colors text-gray-400 hover:text-white" title="Go to Home">
-        <Home className="w-5 h-5" />
-      </Link>
-
       {/* Logo & Title */}
       <div className="flex items-center gap-2">
         <Zap className="w-6 h-6 text-purple-500" />
