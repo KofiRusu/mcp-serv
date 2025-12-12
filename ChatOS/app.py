@@ -96,6 +96,8 @@ from ChatOS.api.routes_training_submission import router as training_submission_
 from ChatOS.api.routes_auto_trading import router as auto_trading_router
 from ChatOS.api.routes_realtime_data import router as realtime_data_router
 from ChatOS.api.routes_automations import router as automations_router
+from ChatOS.api.routes_training_exercises import router as training_exercises_router
+from ChatOS.api.routes_training_local import router as training_local_router
 
 # =============================================================================
 # Lifecycle Management
@@ -178,6 +180,8 @@ app.include_router(training_submission_router)
 app.include_router(auto_trading_router)
 app.include_router(realtime_data_router)
 app.include_router(automations_router)
+app.include_router(training_exercises_router)
+app.include_router(training_local_router)
 # Note: notes_db_router must be registered BEFORE notes_router
 # because notes_router has /{note_id} which would match "db" otherwise
 app.include_router(notes_db_router)

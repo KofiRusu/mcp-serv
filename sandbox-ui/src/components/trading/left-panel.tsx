@@ -65,7 +65,7 @@ export function LeftPanel() {
   const cryptoItems = ALL_CRYPTOS.map(createWatchlistItem)
 
   return (
-    <div className="w-64 border-r border-gray-800 bg-[#0d0d14] flex flex-col">
+    <div className="w-56 flex-shrink-0 border-r border-gray-800 bg-[#0d0d14] flex flex-col">
       <Tabs value={selectedTab} onValueChange={(v) => setSelectedTab(v as any)} className="flex-1 flex flex-col">
         <TabsList className="w-full justify-start gap-1 px-2 pt-2 bg-transparent border-b border-gray-800 rounded-none h-auto pb-2">
           <TabsTrigger 

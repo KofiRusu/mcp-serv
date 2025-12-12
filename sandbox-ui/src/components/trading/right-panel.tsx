@@ -112,7 +112,7 @@ export function RightPanel() {
   const activeSentiment = realtimeSentiment || sentiment
 
   return (
-    <div className="h-full w-80 flex-shrink-0 border-l border-gray-800 bg-[#0d0d14] flex flex-col overflow-hidden">
+    <div className="h-full w-72 flex-shrink-0 border-l border-gray-800 bg-[#0d0d14] flex flex-col overflow-hidden">
       <Tabs value={rightPanelTab} onValueChange={(v) => setRightPanelTab(v as any)} className="h-full flex flex-col">
         <TabsList className="w-full justify-start gap-0.5 px-2 pt-2 bg-transparent rounded-none h-auto pb-2 border-b border-gray-800 flex-nowrap overflow-x-auto">
           <TabsTrigger 

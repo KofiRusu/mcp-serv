@@ -218,6 +218,8 @@ interface TradingState {
   // Trading state
   positions: Position[]
   orders: Order[]
+  positionHistory: Position[]
+  orderHistory: Order[]
   
   // Portfolio
   portfolio: PortfolioStats
@@ -379,6 +381,8 @@ export const useTradingStore = create<TradingState>()(
       markets: [],
       positions: [],
       orders: [],
+      positionHistory: [],
+      orderHistory: [],
       portfolio: {
         totalValue: 0,
         dayPnl: 0,
@@ -447,8 +451,20 @@ export const useTradingStore = create<TradingState>()(
           ? (exitPrice - position.entryPrice) * position.size
           : (position.entryPrice - exitPrice) * position.size
 
+        const pnlPercent = ((exitPrice - position.entryPrice) / position.entryPrice) * 100 * (position.side === 'long' ? 1 : -1)
+
+        // Create closed position record for history
+        const closedPosition = {
+          ...position,
+          exitPrice,
+          pnl,
+          pnlPercent,
+          closedAt: new Date().toISOString(),
+        }
+
         set((state) => ({
           positions: state.positions.filter((p) => p.id !== positionId),
+          positionHistory: [closedPosition, ...state.positionHistory].slice(0, 100), // Keep last 100
         }))
 
         // Auto-create journal entry
@@ -484,10 +500,18 @@ export const useTradingStore = create<TradingState>()(
       },
 
       cancelOrder: (orderId) => {
+        const order = get().orders.find((o) => o.id === orderId)
+        if (!order) return
+
+        const cancelledOrder = {
+          ...order,
+          status: 'cancelled' as const,
+          filledAt: new Date().toISOString(),
+        }
+
         set((state) => ({
-          orders: state.orders.map((o) =>
-            o.id === orderId ? { ...o, status: 'cancelled' } : o
-          ),
+          orders: state.orders.filter((o) => o.id !== orderId),
+          orderHistory: [cancelledOrder, ...state.orderHistory].slice(0, 100), // Keep last 100
         }))
       },
 
