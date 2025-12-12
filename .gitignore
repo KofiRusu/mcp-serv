@@ -51,6 +51,20 @@ models/persrm-continuous/training.log
 data/persrm/*.jsonl
 !data/persrm/.gitkeep
 
+# Sandbox UI data directories (keep structure, ignore runtime data)
+sandbox-ui/data/automations/**/*
+!sandbox-ui/data/automations/.gitkeep
+sandbox-ui/data/market-history/**/*
+!sandbox-ui/data/market-history/.gitkeep
+sandbox-ui/data/news/**/*
+!sandbox-ui/data/news/.gitkeep
+sandbox-ui/data/sentiment/**/*
+!sandbox-ui/data/sentiment/.gitkeep
+sandbox-ui/data/backtests/**/*
+!sandbox-ui/data/backtests/.gitkeep
+sandbox-ui/data/training/**/*
+!sandbox-ui/data/training/.gitkeep
+
 # Node modules (sandbox-ui)
 node_modules/
 .next/
