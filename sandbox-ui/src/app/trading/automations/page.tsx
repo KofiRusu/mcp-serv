@@ -47,7 +47,11 @@ import {
   ChevronLeft,
   Sparkles,
   ExternalLink,
-  Database
+  Database,
+  Download,
+  FileCode,
+  FileJson,
+  Copy
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -260,6 +264,135 @@ export default function AutomationsPage() {
     }
   }
 
+  // Export automation as Python code
+  const handleExportPython = async (automation: Automation, e: React.MouseEvent) => {
+    e.stopPropagation()
+    
+    try {
+      // First generate code if not already generated
+      if (!automation.generated_code) {
+        const genRes = await fetch(`http://localhost:8000/api/v1/automations/${automation.id}/generate-code`, {
+          method: 'POST'
+        })
+        if (!genRes.ok) {
+          toast.error('Failed to generate code')
+          return
+        }
+        const genData = await genRes.json()
+        automation.generated_code = genData.code
+      }
+
+      // Create blob and download
+      const blob = new Blob([automation.generated_code || ''], { type: 'text/x-python' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${automation.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.py`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      
+      toast.success('Python code exported!')
+    } catch (e) {
+      toast.error('Failed to export code')
+    }
+  }
+
+  // Export automation as JSON config
+  const handleExportJSON = async (automation: Automation, e: React.MouseEvent) => {
+    e.stopPropagation()
+    
+    try {
+      const exportData = {
+        name: automation.name,
+        description: automation.description,
+        type: automation.type,
+        blocks: automation.blocks,
+        config: automation.config,
+        paper_trading: automation.paper_trading,
+        symbols: automation.symbols,
+        exchange: automation.exchange,
+        exported_at: new Date().toISOString(),
+        version: '1.0'
+      }
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${automation.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_config.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      
+      toast.success('Configuration exported!')
+    } catch (e) {
+      toast.error('Failed to export configuration')
+    }
+  }
+
+  // Copy code to clipboard
+  const handleCopyCode = async (automation: Automation, e: React.MouseEvent) => {
+    e.stopPropagation()
+    
+    try {
+      // First generate code if not already generated
+      if (!automation.generated_code) {
+        const genRes = await fetch(`http://localhost:8000/api/v1/automations/${automation.id}/generate-code`, {
+          method: 'POST'
+        })
+        if (!genRes.ok) {
+          toast.error('Failed to generate code')
+          return
+        }
+        const genData = await genRes.json()
+        automation.generated_code = genData.code
+      }
+
+      await navigator.clipboard.writeText(automation.generated_code || '')
+      toast.success('Code copied to clipboard!')
+    } catch (e) {
+      toast.error('Failed to copy code')
+    }
+  }
+
+  // Export all automations as a bundle
+  const handleExportAll = async () => {
+    try {
+      const exportBundle = {
+        automations: automations.map(a => ({
+          name: a.name,
+          description: a.description,
+          type: a.type,
+          blocks: a.blocks,
+          config: a.config,
+          paper_trading: a.paper_trading,
+          symbols: a.symbols,
+          exchange: a.exchange,
+        })),
+        exported_at: new Date().toISOString(),
+        total: automations.length,
+        version: '1.0'
+      }
+
+      const blob = new Blob([JSON.stringify(exportBundle, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `all_automations_${new Date().toISOString().split('T')[0]}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      
+      toast.success(`Exported ${automations.length} automations!`)
+    } catch (e) {
+      toast.error('Failed to export automations')
+    }
+  }
+
   // Filter automations
   const filteredAutomations = automations.filter(a =>
     a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -316,7 +449,7 @@ export default function AutomationsPage() {
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-gray-900 border-gray-700">
+              <DropdownMenuContent align="end" className="bg-gray-900 border-gray-700 w-52">
                 <DropdownMenuItem asChild>
                   <Link href={`/editor?id=${automation.id}`} className="cursor-pointer">
                     <Code className="h-4 w-4 mr-2" />
@@ -327,6 +460,31 @@ export default function AutomationsPage() {
                   <Terminal className="h-4 w-4 mr-2" />
                   View Logs
                 </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-gray-700" />
+                
+                {/* Export Options */}
+                <DropdownMenuItem 
+                  onClick={(e) => handleExportPython(automation, e)} 
+                  className="cursor-pointer"
+                >
+                  <FileCode className="h-4 w-4 mr-2 text-emerald-400" />
+                  Export Python Code
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={(e) => handleExportJSON(automation, e)} 
+                  className="cursor-pointer"
+                >
+                  <FileJson className="h-4 w-4 mr-2 text-blue-400" />
+                  Export Config (JSON)
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={(e) => handleCopyCode(automation, e)} 
+                  className="cursor-pointer"
+                >
+                  <Copy className="h-4 w-4 mr-2 text-purple-400" />
+                  Copy Code to Clipboard
+                </DropdownMenuItem>
+                
                 <DropdownMenuSeparator className="bg-gray-700" />
                 <DropdownMenuItem
                   onClick={() => handleDelete(automation.id)}
@@ -448,9 +606,20 @@ export default function AutomationsPage() {
                   className="pl-9 w-64 bg-gray-800 border-gray-700"
                 />
               </div>
-              <Button onClick={loadAutomations} variant="outline" size="icon">
+              <Button onClick={loadAutomations} variant="outline" size="icon" title="Refresh">
                 <RefreshCw className="h-4 w-4" />
               </Button>
+              {automations.length > 0 && (
+                <Button 
+                  onClick={handleExportAll} 
+                  variant="outline" 
+                  className="border-gray-700"
+                  title="Export all automations"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export All
+                </Button>
+              )}
               <Link href="/editor">
                 <Button className="bg-emerald-600 hover:bg-emerald-500">
                   <Plus className="h-4 w-4 mr-2" />
