@@ -2,6 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // ==========================================================================
+  // Turbopack Configuration
+  // ==========================================================================
+  
+  // Set the workspace root to avoid lockfile detection warnings
+  turbopack: {
+    root: __dirname,
+  },
+  
+  // ==========================================================================
   // Performance Optimizations
   // ==========================================================================
   
