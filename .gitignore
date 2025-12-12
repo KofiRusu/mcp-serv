@@ -88,3 +88,6 @@ tmp/
 temp/
 *.tmp
 
+
+# Scraper runtime files
+scrapers/scraper.pid
