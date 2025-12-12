@@ -1,31 +1,31 @@
 {
-  "timestamp": "2025-12-06T05:56:21.284290+00:00",
-  "fear_greed_index": 49,
-  "fear_greed_label": "Fear",
-  "btc_dominance": 53.92,
-  "total_market_cap": 2.57,
-  "funding_rate": -0.0067,
-  "long_short_ratio": 1.21,
+  "timestamp": "2025-12-12T16:13:09.469344+00:00",
+  "fear_greed_index": 63,
+  "fear_greed_label": "Greed",
+  "btc_dominance": 53.87,
+  "total_market_cap": 2.47,
+  "funding_rate": 0.0067,
+  "long_short_ratio": 0.95,
   "social_volume": {
-    "twitter": 23,
-    "reddit": -10,
-    "telegram": 8
+    "twitter": 14,
+    "reddit": 38,
+    "telegram": 35
   },
   "symbols": {
     "BTCUSDT": {
-      "sentiment_score": 65,
-      "social_mentions": 4751,
-      "funding_rate": 0.0033
+      "sentiment_score": 49,
+      "social_mentions": 2805,
+      "funding_rate": 0.0031
     },
     "ETHUSDT": {
-      "sentiment_score": 57,
-      "social_mentions": 1846,
-      "funding_rate": 0.0236
+      "sentiment_score": 72,
+      "social_mentions": 2241,
+      "funding_rate": 0.0273
     },
     "SOLUSDT": {
       "sentiment_score": 43,
-      "social_mentions": 444,
-      "funding_rate": 0.0286
+      "social_mentions": 431,
+      "funding_rate": 0.023
     }
   }
 }

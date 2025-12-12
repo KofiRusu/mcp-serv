@@ -23,6 +23,8 @@ import {
   Square,
   RotateCcw,
   RefreshCw,
+  TrendingUp,
+  Workflow,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { 
@@ -57,9 +59,10 @@ const COMMANDS = [
 
 const NAV_ITEMS = [
   { href: "/", label: "Chat", icon: MessageSquare },
+  { href: "/trading", label: "Trading", icon: TrendingUp },
+  { href: "/editor", label: "Automations", icon: Workflow },
   { href: "/notes", label: "Notes", icon: FileText },
   { href: "/diary", label: "Diary", icon: Mic },
-  { href: "/editor", label: "Editor", icon: Code2 },
   { href: "/sandbox", label: "VSCode", icon: Code2 },
 ]
 
