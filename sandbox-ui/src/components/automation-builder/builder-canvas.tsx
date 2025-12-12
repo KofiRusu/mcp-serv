@@ -20,6 +20,10 @@ import {
   FileOutput,
   ImageIcon,
   Upload,
+  Play,
+  Square,
+  Rocket,
+  Loader2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -49,6 +53,10 @@ interface BuilderCanvasProps {
   automationType?: AutomationType
   onExternalDrop?: (template: BlockTemplate, position: { x: number; y: number }) => void
   onUploadDiagram?: () => void
+  onRun?: () => void
+  onDeploy?: () => void
+  isRunning?: boolean
+  status?: string
 }
 
 export interface BlockTemplate {
@@ -190,6 +198,10 @@ export function BuilderCanvas({
   selectedBlockId,
   onSelectBlock,
   onConfigureBlock,
+  onRun,
+  onDeploy,
+  isRunning = false,
+  status = 'draft',
   automationType = 'scraper',
   onExternalDrop,
   onUploadDiagram,
@@ -482,7 +494,49 @@ export function BuilderCanvas({
 
   return (
     <div className="relative flex-1 bg-[#0a0a0f] overflow-hidden">
-      {/* Toolbar */}
+      {/* Run/Deploy buttons - top right */}
+      <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
+        {onRun && (
+          status === 'running' || status === 'testing' ? (
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={onRun}
+              className="gap-2 shadow-lg"
+            >
+              <Square className="h-4 w-4" />
+              Stop
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              onClick={onRun}
+              disabled={isRunning}
+              className="gap-2 bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-500/20"
+            >
+              {isRunning ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}
+              Run
+            </Button>
+          )
+        )}
+        {onDeploy && (
+          <Button
+            size="sm"
+            onClick={onDeploy}
+            disabled={status === 'deployed'}
+            className="gap-2 bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-500/20"
+          >
+            <Rocket className="h-4 w-4" />
+            Deploy
+          </Button>
+        )}
+      </div>
+      
+      {/* Add Block toolbar */}
       <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
         <DropdownMenu open={addBlockDropdownOpen} onOpenChange={setAddBlockDropdownOpen}>
           <DropdownMenuTrigger asChild>

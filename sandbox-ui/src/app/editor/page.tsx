@@ -668,6 +668,42 @@ export default function AutomationBuilderPage() {
             Save
           </Button>
 
+          {/* Run/Deploy buttons in header */}
+          {status === 'running' || status === 'testing' ? (
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={handleStop}
+              className="gap-2"
+            >
+              <Square className="h-4 w-4" />
+              Stop
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              onClick={handleRun}
+              disabled={isRunning}
+              className="gap-2 bg-blue-600 hover:bg-blue-500"
+            >
+              {isRunning ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}
+              Run
+            </Button>
+          )}
+          <Button
+            size="sm"
+            onClick={handleDeploy}
+            disabled={status === 'deployed'}
+            className="gap-2 bg-emerald-600 hover:bg-emerald-500"
+          >
+            <Rocket className="h-4 w-4" />
+            Deploy
+          </Button>
+
           {blocks.length > 1 && (
             <Button
               variant="outline"
@@ -779,12 +815,16 @@ export default function AutomationBuilderPage() {
             onConfigureBlock={handleConfigureBlock}
             automationType={automationType}
             onUploadDiagram={handleUploadDiagramFromCanvas}
+            onRun={handleRun}
+            onDeploy={handleDeploy}
+            isRunning={isRunning}
+            status={status}
           />
           
           {/* Bottom Action Bar */}
-          <div className="h-56 border-t border-gray-800 bg-gray-900/30 flex flex-col">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 flex-shrink-0">
-              <div className="flex items-center gap-2">
+          <div className="h-56 border-t border-gray-800 bg-gray-900/30 flex flex-col flex-shrink-0">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800 flex-shrink-0 min-h-[52px]">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <span className="text-sm font-medium text-white">Output</span>
                 {output.length > 0 && (
                   <Badge variant="secondary" className="text-xs">
