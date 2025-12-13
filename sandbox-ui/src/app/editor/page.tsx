@@ -21,6 +21,11 @@ import {
   PanelLeftClose,
   PanelLeft,
   HelpCircle,
+  ChevronUp,
+  ChevronDown,
+  Maximize2,
+  Minimize2,
+  X,
 } from 'lucide-react'
 import { 
   BuilderCanvas, 
@@ -32,6 +37,10 @@ import {
 } from '@/components/automation-builder'
 import type { Block } from '@/components/automation-builder/block-node'
 import type { AutomationType } from '@/components/automation-builder/builder-canvas'
+import { 
+  executeAutomation, 
+  type BlockOutput 
+} from '@/components/automation-builder/block-configs'
 import { toast } from 'sonner'
 import {
   Dialog,
@@ -94,6 +103,7 @@ export default function AutomationBuilderPage() {
   const [isFirstVisit, setIsFirstVisit] = useState(false)
   const [activity, setActivity] = useState<{ type: 'success' | 'error' | 'info' | 'loading'; message: string } | null>(null)
   const [triggerDiagramUpload, setTriggerDiagramUpload] = useState(false)
+  const [isOutputCollapsed, setIsOutputCollapsed] = useState(false)
 
   // Check for first visit
   useEffect(() => {
@@ -468,40 +478,133 @@ export default function AutomationBuilderPage() {
   }
 
   const handleRun = async () => {
-    if (!automation?.id) {
-      await handleSave()
-    }
-    
-    const currentId = automation?.id
-    if (!currentId) {
-      toast.error('Please save the automation first')
+    // Pre-run validation
+    if (blocks.length === 0) {
+      toast.error('No blocks to run. Add some blocks first!')
       return
     }
 
     setIsRunning(true)
     setOutput([])
+    setStatus('running')
     showActivity('loading', 'Starting automation...')
 
+    // Check if we have a saved automation with an ID (backend available)
+    if (automation?.id) {
+      // Use backend execution with SSE streaming
+      try {
+        // First, save the latest blocks
+        await handleSave()
+        
+        // Start the automation on the backend
+        const runRes = await fetch(`http://localhost:8000/api/v1/automations/${automation.id}/run?auto_generate=true`, {
+          method: 'POST'
+        })
+        
+        if (!runRes.ok) {
+          const error = await runRes.json()
+          throw new Error(error.detail || 'Failed to start automation')
+        }
+        
+        toast.info('Running automation with backend execution...')
+        
+        // Connect to SSE stream for real-time logs
+        const eventSource = new EventSource(
+          `http://localhost:8000/api/v1/automations/${automation.id}/logs/stream`
+        )
+        
+        eventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data)
+            
+            if (data.type === 'log') {
+              setOutput(prev => [...prev, data.message])
+            } else if (data.type === 'status') {
+              setStatus(data.status)
+            } else if (data.type === 'complete') {
+              setStatus(data.status)
+              setIsRunning(false)
+              eventSource.close()
+              
+              if (data.status === 'stopped') {
+                showActivity('success', 'Automation completed!')
+                toast.success('Automation completed!')
+              } else if (data.status === 'error') {
+                showActivity('error', 'Automation failed')
+                toast.error('Automation failed')
+              }
+            } else if (data.type === 'error') {
+              setOutput(prev => [...prev, `❌ ${data.message}`])
+              setIsRunning(false)
+              eventSource.close()
+              showActivity('error', data.message)
+            }
+          } catch (e) {
+            console.error('Failed to parse SSE message:', e)
+          }
+        }
+        
+        eventSource.onerror = () => {
+          // Connection lost - fall back to polling
+          eventSource.close()
+          startLogPolling(automation.id)
+        }
+        
+        return
+      } catch (e: any) {
+        // Backend failed - fall back to frontend simulation
+        console.debug('Backend execution failed, falling back to simulation:', e)
+        toast.warning('Backend unavailable, running frontend simulation')
+      }
+    }
+
+    // Frontend simulation fallback
+    toast.info('Running automation simulation...')
+    
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/automations/${currentId}/run`, {
-        method: 'POST'
+      // Use the frontend block simulator to demonstrate data flow
+      await executeAutomation(blocks, (blockOutput: BlockOutput) => {
+        // Update output in real-time as each block executes
+        if (blockOutput.status === 'running') {
+          const line = `⏳ Processing: ${blockOutput.blockName}...`
+          setOutput(prev => [...prev, line])
+        } else if (blockOutput.status === 'success' && blockOutput.data?.displayText) {
+          const lines = [
+            `┌─ ${blockOutput.blockName} [${blockOutput.blockType.toUpperCase()}]`,
+            `│  ✓ ${blockOutput.data.displayText}`,
+          ]
+          if (blockOutput.data.inputsReceived > 0) {
+            lines.push(`│  📥 Received from ${blockOutput.data.inputsReceived} connected block(s)`)
+          }
+          lines.push(`└─ Done (${blockOutput.duration}ms)`)
+          lines.push('')
+          setOutput(prev => [...prev, ...lines])
+        } else if (blockOutput.status === 'error') {
+          setOutput(prev => [...prev, `❌ Error in ${blockOutput.blockName}: ${blockOutput.error}`])
+        }
       })
       
-      if (res.ok) {
-        setStatus('running')
-        showActivity('success', 'Automation started!')
-        toast.success('Automation started!')
-        
-        // Start polling for logs
-        startLogPolling(currentId)
-      } else {
-        const error = await res.json()
-        throw new Error(error.detail || 'Run failed')
-      }
+      // Add completion message
+      setOutput(prev => [
+        ...prev,
+        '═══════════════════════════════════════════════════════════',
+        '  ✅ AUTOMATION SIMULATION COMPLETED',
+        '═══════════════════════════════════════════════════════════',
+        '',
+        '💡 This was a frontend simulation showing data flow.',
+        '   Save and deploy to run actual backend execution.',
+      ])
+      
+      setStatus('stopped')
+      setIsRunning(false)
+      showActivity('success', 'Simulation completed!')
+      toast.success('Automation simulation completed!')
+      
     } catch (e: any) {
       setIsRunning(false)
-      showActivity('error', 'Failed to start')
-      toast.error(e.message || 'Failed to start automation')
+      setStatus('error')
+      showActivity('error', 'Simulation failed')
+      toast.error(e.message || 'Failed to run automation simulation')
     }
   }
 
@@ -821,18 +924,68 @@ export default function AutomationBuilderPage() {
             status={status}
           />
           
-          {/* Bottom Action Bar */}
-          <div className="h-56 border-t border-gray-800 bg-gray-900/30 flex flex-col flex-shrink-0">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800 flex-shrink-0 min-h-[52px]">
+          {/* Bottom Action Bar - Collapsible Output Panel */}
+          <div 
+            className={cn(
+              "border-t border-gray-800 bg-gray-900/30 flex flex-col flex-shrink-0 transition-all duration-200 ease-in-out",
+              isOutputCollapsed ? "h-12" : "h-56"
+            )}
+          >
+            <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800 flex-shrink-0 min-h-[48px]">
               <div className="flex items-center gap-2 flex-shrink-0">
-                <span className="text-sm font-medium text-white">Output</span>
+                {/* Collapse/Expand Toggle */}
+                <button
+                  onClick={() => setIsOutputCollapsed(!isOutputCollapsed)}
+                  className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+                  title={isOutputCollapsed ? "Expand output" : "Collapse output"}
+                >
+                  {isOutputCollapsed ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </button>
+                
+                <span 
+                  className="text-sm font-medium text-white cursor-pointer hover:text-purple-400 transition-colors"
+                  onClick={() => isOutputCollapsed && setIsOutputCollapsed(false)}
+                >
+                  Output
+                </span>
                 {output.length > 0 && (
                   <Badge variant="secondary" className="text-xs">
                     {output.length} lines
                   </Badge>
                 )}
+                {isRunning && (
+                  <Loader2 className="h-3 w-3 animate-spin text-blue-400" />
+                )}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Maximize/Minimize button */}
+                <button
+                  onClick={() => setIsOutputCollapsed(!isOutputCollapsed)}
+                  className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+                  title={isOutputCollapsed ? "Maximize" : "Minimize"}
+                >
+                  {isOutputCollapsed ? (
+                    <Maximize2 className="h-4 w-4" />
+                  ) : (
+                    <Minimize2 className="h-4 w-4" />
+                  )}
+                </button>
+                
+                {/* Clear output button */}
+                {output.length > 0 && (
+                  <button
+                    onClick={() => setOutput([])}
+                    className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+                    title="Clear output"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+                
                 {status === 'running' || status === 'testing' ? (
                   <Button
                     size="sm"
@@ -871,52 +1024,55 @@ export default function AutomationBuilderPage() {
               </div>
             </div>
             
-            <ScrollArea className="flex-1 p-3 font-mono text-sm">
-              {output.length === 0 ? (
-                <div className="text-gray-500 italic">
-                  Output will appear here when you run the automation...
-                </div>
-              ) : (
-                output.map((line, i) => {
-                  // Parse and format output for user-friendly display
-                  const isPriceOutput = line.includes('$') && !line.includes('[')
-                  const isError = line.toLowerCase().includes('error')
-                  const isConnected = line.toLowerCase().includes('connected')
-                  
-                  if (isPriceOutput) {
-                    // Price output - show prominently
-                    return (
-                      <div key={i} className="py-1 text-green-400 font-semibold text-base">
-                        📈 {line}
-                      </div>
-                    )
-                  } else if (isError) {
-                    return (
-                      <div key={i} className="py-0.5 text-red-400">
-                        ❌ {line}
-                      </div>
-                    )
-                  } else if (isConnected) {
-                    return (
-                      <div key={i} className="py-0.5 text-blue-400">
-                        ✅ {line}
-                      </div>
-                    )
-                  } else {
-                    // Filter out verbose timestamp logs, show only meaningful output
-                    const cleanLine = line.replace(/\[\d{4}-\d{2}-\d{2}T[\d:.]+\]\s*/g, '')
-                    if (cleanLine.includes('Received') && !cleanLine.includes('$')) {
-                      return null // Skip verbose "Received" logs without price
+            {/* Scrollable content - hidden when collapsed */}
+            {!isOutputCollapsed && (
+              <ScrollArea className="flex-1 p-3 font-mono text-sm">
+                {output.length === 0 ? (
+                  <div className="text-gray-500 italic">
+                    Output will appear here when you run the automation...
+                  </div>
+                ) : (
+                  output.map((line, i) => {
+                    // Parse and format output for user-friendly display
+                    const isPriceOutput = line.includes('$') && !line.includes('[')
+                    const isError = line.toLowerCase().includes('error')
+                    const isConnected = line.toLowerCase().includes('connected')
+                    
+                    if (isPriceOutput) {
+                      // Price output - show prominently
+                      return (
+                        <div key={i} className="py-1 text-green-400 font-semibold text-base">
+                          📈 {line}
+                        </div>
+                      )
+                    } else if (isError) {
+                      return (
+                        <div key={i} className="py-0.5 text-red-400">
+                          ❌ {line}
+                        </div>
+                      )
+                    } else if (isConnected) {
+                      return (
+                        <div key={i} className="py-0.5 text-blue-400">
+                          ✅ {line}
+                        </div>
+                      )
+                    } else {
+                      // Filter out verbose timestamp logs, show only meaningful output
+                      const cleanLine = line.replace(/\[\d{4}-\d{2}-\d{2}T[\d:.]+\]\s*/g, '')
+                      if (cleanLine.includes('Received') && !cleanLine.includes('$')) {
+                        return null // Skip verbose "Received" logs without price
+                      }
+                      return (
+                        <div key={i} className="py-0.5 text-gray-400 text-xs">
+                          {cleanLine}
+                        </div>
+                      )
                     }
-                    return (
-                      <div key={i} className="py-0.5 text-gray-400 text-xs">
-                        {cleanLine}
-                      </div>
-                    )
-                  }
-                }).filter(Boolean)
-              )}
-            </ScrollArea>
+                  }).filter(Boolean)
+                )}
+              </ScrollArea>
+            )}
           </div>
         </div>
       </div>

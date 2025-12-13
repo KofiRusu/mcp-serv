@@ -224,6 +224,37 @@ export function BuilderCanvas({
     }
   }, [blocks.length])
 
+  // Handle mouse wheel zoom
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    // Only zoom if not hovering over a block (allow normal scrolling in dropdowns, etc.)
+    if ((e.target as HTMLElement).closest('[data-block-node]')) {
+      return
+    }
+    
+    e.preventDefault()
+    
+    // Get mouse position relative to canvas for zoom origin
+    const canvasRect = canvasRef.current?.getBoundingClientRect()
+    if (!canvasRect) return
+    
+    const mouseX = e.clientX - canvasRect.left
+    const mouseY = e.clientY - canvasRect.top
+    
+    // Calculate new zoom level
+    // Scroll up (negative deltaY) = zoom in, scroll down (positive deltaY) = zoom out
+    const zoomSpeed = 0.001
+    const delta = -e.deltaY * zoomSpeed
+    const newZoom = Math.min(2, Math.max(0.25, zoom + delta * zoom))
+    
+    // Adjust pan to keep mouse position stable (zoom towards cursor)
+    const zoomRatio = newZoom / zoom
+    const newPanX = mouseX - (mouseX - pan.x) * zoomRatio
+    const newPanY = mouseY - (mouseY - pan.y) * zoomRatio
+    
+    setZoom(newZoom)
+    setPan({ x: newPanX, y: newPanY })
+  }, [zoom, pan])
+
   // Handle block drag start
   const handleDragStart = useCallback((e: React.DragEvent, blockId: string) => {
     const block = blocks.find(b => b.id === blockId)
@@ -653,6 +684,7 @@ export function BuilderCanvas({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onWheel={handleWheel}
         onClick={() => onSelectBlock(null)}
         data-tour="canvas"
       >
