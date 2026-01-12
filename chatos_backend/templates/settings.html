@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatOS - Settings</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app settings-app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="logo">
+                    <span class="logo-icon">⚡</span>
+                    <span class="logo-text">ChatOS</span>
+                </a>
+                <span class="version">Settings</span>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="section-title">Navigation</h3>
+                <div class="nav-list">
+                    <a href="#providers" class="nav-item active" data-section="providers">
+                        🔌 Providers
+                    </a>
+                    <a href="#models" class="nav-item" data-section="models">
+                        🤖 Models
+                    </a>
+                    <a href="#council" class="nav-item" data-section="council">
+                        👥 Council
+                    </a>
+                    <a href="#api-keys" class="nav-item" data-section="api-keys">
+                        🔑 API Keys
+                    </a>
+                    <a href="#general" class="nav-item" data-section="general">
+                        ⚙️ General
+                    </a>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <a href="/" class="btn btn-primary btn-small full-width">
+                    ← Back to Chat
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="settings-main">
+            <!-- Providers Section -->
+            <section id="providers" class="settings-section active">
+                <div class="section-header">
+                    <h1>🔌 Model Providers</h1>
+                    <p>Configure connections to local and cloud-based LLM providers.</p>
+                </div>
+
+                <div class="provider-grid" id="provider-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Models Section -->
+            <section id="models" class="settings-section">
+                <div class="section-header">
+                    <h1>🤖 Configured Models</h1>
+                    <p>Manage your active model configurations.</p>
+                    <button class="btn btn-primary" onclick="showAddModelModal()">
+                        ➕ Add Model
+                    </button>
+                </div>
+
+                <div class="models-list" id="models-list">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Council Section -->
+            <section id="council" class="settings-section">
+                <div class="section-header">
+                    <h1>👥 Council Settings</h1>
+                    <p>Configure how multiple models collaborate.</p>
+                </div>
+
+                <div class="settings-form">
+                    <div class="form-group">
+                        <label>Council Strategy</label>
+                        <select id="council-strategy" onchange="updateSettings()">
+                            <option value="longest">Longest Response Wins</option>
+                            <option value="first">First Response Wins</option>
+                            <option value="voting">Similarity Voting</option>
+                        </select>
+                        <span class="form-hint">How to select the best response from multiple models</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="council-enabled" onchange="updateSettings()">
+                            Enable Council Mode
+                        </label>
+                        <span class="form-hint">When enabled, multiple models answer and the best is selected</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="use-local-only" onchange="updateSettings()">
+                            Local Models Only
+                        </label>
+                        <span class="form-hint">Restrict to local models (Ollama, LM Studio, etc.)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="fallback-dummy" onchange="updateSettings()">
+                            Fallback to Dummy Models
+                        </label>
+                        <span class="form-hint">Use built-in dummy models if no real models available</span>
+                    </div>
+                </div>
+
+                <div class="council-members">
+                    <h3>Council Members</h3>
+                    <div id="council-models" class="council-models-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- API Keys Section -->
+            <section id="api-keys" class="settings-section">
+                <div class="section-header">
+                    <h1>🔑 API Keys</h1>
+                    <p>Manage API keys for cloud providers. Keys are stored locally and never sent anywhere.</p>
+                </div>
+
+                <div class="api-keys-list" id="api-keys-list">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- General Section -->
+            <section id="general" class="settings-section">
+                <div class="section-header">
+                    <h1>⚙️ General Settings</h1>
+                    <p>Configure general application behavior.</p>
+                </div>
+
+                <div class="settings-form">
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="rag-enabled" onchange="updateSettings()">
+                            Enable RAG (Retrieval-Augmented Generation)
+                        </label>
+                        <span class="form-hint">Include local document context in responses</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>RAG Top-K Results</label>
+                        <input type="number" id="rag-top-k" min="1" max="10" value="3" onchange="updateSettings()">
+                        <span class="form-hint">Number of document chunks to include</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Memory Max Turns</label>
+                        <input type="number" id="memory-max-turns" min="1" max="50" value="10" onchange="updateSettings()">
+                        <span class="form-hint">How many conversation turns to remember</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Model Modal -->
+    <div id="add-model-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Model</h2>
+                <button class="modal-close" onclick="hideAddModelModal()">×</button>
+            </div>
+            <form id="add-model-form" onsubmit="addModel(event)">
+                <div class="form-group">
+                    <label>Provider</label>
+                    <select id="model-provider" onchange="updateModelIdOptions()">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Model</label>
+                    <select id="model-id">
+                        <!-- Populated by JS -->
+                    </select>
+                    <input type="text" id="model-id-custom" placeholder="Or enter custom model ID" style="margin-top: 8px;">
+                </div>
+                <div class="form-group">
+                    <label>Display Name</label>
+                    <input type="text" id="model-name" required placeholder="e.g., My Llama 3.2">
+                </div>
+                <div class="form-group">
+                    <label>Custom Base URL (optional)</label>
+                    <input type="text" id="model-base-url" placeholder="http://localhost:11434">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Temperature</label>
+                        <input type="number" id="model-temperature" step="0.1" min="0" max="2" value="0.7">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Tokens</label>
+                        <input type="number" id="model-max-tokens" min="100" max="32000" value="2048">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="model-council" checked>
+                        Include in Council
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideAddModelModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Model</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ollama Install Modal -->
+    <div id="ollama-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🦙 Ollama Models</h2>
+                <button class="modal-close" onclick="hideOllamaModal()">×</button>
+            </div>
+            <div class="ollama-content">
+                <div class="ollama-installed">
+                    <h3>Installed Models</h3>
+                    <div id="ollama-installed-list" class="model-chips">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <div class="ollama-available">
+                    <h3>Available Models</h3>
+                    <p class="form-hint">Click to install</p>
+                    <div id="ollama-available-list" class="model-chips">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <div class="ollama-custom">
+                    <h3>Install Custom Model</h3>
+                    <div class="form-row">
+                        <input type="text" id="ollama-custom-model" placeholder="e.g., llama3.2:70b">
+                        <button class="btn btn-primary" onclick="pullOllamaModel()">Pull</button>
+                    </div>
+                </div>
+                <div id="ollama-progress" class="ollama-progress" style="display: none;">
+                    <div class="progress-text">Pulling model...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================================================
+        // State
+        // =============================================================================
+        
+        let providers = [];
+        let models = [];
+        let settings = {};
+        let providerStatuses = {};
+
+        // =============================================================================
+        // Initialization
+        // =============================================================================
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Setup navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = item.dataset.section;
+                    showSection(section);
+                    // Update URL hash without reload
+                    history.pushState(null, '', `#${section}`);
+                });
+            });
+
+            // Load data
+            await Promise.all([
+                loadProviders(),
+                loadModels(),
+                loadSettings(),
+            ]);
+
+            // Handle hash navigation from sidebar links
+            handleHashNavigation();
+            window.addEventListener('hashchange', handleHashNavigation);
+        });
+
+        function handleHashNavigation() {
+            const hash = window.location.hash.replace('#', '');
+            const validSections = ['providers', 'models', 'council', 'api-keys', 'general'];
+            
+            if (hash && validSections.includes(hash)) {
+                showSection(hash);
+                // Load API keys if that section is selected
+                if (hash === 'api-keys') {
+                    loadApiKeyStatuses();
+                }
+            }
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+        }
+
+        // =============================================================================
+        // Data Loading
+        // =============================================================================
+        
+        async function loadProviders() {
+            const res = await fetch('/api/providers');
+            providers = await res.json();
+            renderProviders();
+            populateProviderSelect();
+        }
+
+        async function loadModels() {
+            const res = await fetch('/api/models');
+            models = await res.json();
+            renderModels();
+            renderCouncilModels();
+        }
+
+        async function loadSettings() {
+            const res = await fetch('/api/settings');
+            settings = await res.json();
+            applySettingsToUI();
+        }
+
+        async function checkProviderStatus(providerId) {
+            try {
+                const res = await fetch(`/api/providers/${providerId}/status`);
+                const status = await res.json();
+                providerStatuses[providerId] = status;
+                return status;
+            } catch (e) {
+                return { available: false, error: e.message };
+            }
+        }
+
+        // =============================================================================
+        // Rendering
+        // =============================================================================
+        
+        function renderProviders() {
+            const grid = document.getElementById('provider-grid');
+            
+            // Separate local and API providers
+            const localProviders = providers.filter(p => p.type === 'local' || p.type === 'builtin');
+            const apiProviders = providers.filter(p => p.type === 'api');
+            
+            grid.innerHTML = `
+                <div class="provider-category">
+                    <h2>🖥️ Local Providers</h2>
+                    <div class="provider-cards">
+                        ${localProviders.map(p => renderProviderCard(p)).join('')}
+                    </div>
+                </div>
+                <div class="provider-category">
+                    <h2>☁️ Cloud Providers</h2>
+                    <div class="provider-cards">
+                        ${apiProviders.map(p => renderProviderCard(p)).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Check status for each provider
+            providers.forEach(p => {
+                checkProviderStatus(p.id).then(status => {
+                    updateProviderCardStatus(p.id, status);
+                });
+            });
+        }
+
+        function renderProviderCard(provider) {
+            const icon = getProviderIcon(provider.id);
+            return `
+                <div class="provider-card" id="provider-${provider.id}">
+                    <div class="provider-header">
+                        <span class="provider-icon">${icon}</span>
+                        <div class="provider-info">
+                            <h3>${provider.name}</h3>
+                            <p>${provider.description}</p>
+                        </div>
+                        <span class="provider-status checking">⏳</span>
+                    </div>
+                    <div class="provider-actions">
+                        ${provider.id === 'ollama' ? 
+                            `<button class="btn btn-small" onclick="showOllamaModal()">Manage Models</button>` : 
+                            ''}
+                        ${provider.requires_key ? 
+                            `<button class="btn btn-small" onclick="showApiKeyInput('${provider.id}')">Set API Key</button>` : 
+                            ''}
+                        <button class="btn btn-small btn-secondary" onclick="checkProviderStatus('${provider.id}').then(s => updateProviderCardStatus('${provider.id}', s))">
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="provider-models" id="provider-${provider.id}-models"></div>
+                </div>
+            `;
+        }
+
+        function updateProviderCardStatus(providerId, status) {
+            const card = document.getElementById(`provider-${providerId}`);
+            if (!card) return;
+            
+            const statusEl = card.querySelector('.provider-status');
+            const modelsEl = card.querySelector('.provider-models');
+            
+            if (status.available) {
+                statusEl.className = 'provider-status available';
+                statusEl.textContent = '✅';
+                
+                if (status.models && status.models.length > 0) {
+                    modelsEl.innerHTML = `
+                        <div class="model-chips">
+                            ${status.models.slice(0, 5).map(m => `<span class="model-chip">${m}</span>`).join('')}
+                            ${status.models.length > 5 ? `<span class="model-chip more">+${status.models.length - 5} more</span>` : ''}
+                        </div>
+                    `;
+                }
+            } else {
+                statusEl.className = 'provider-status unavailable';
+                statusEl.textContent = '❌';
+                modelsEl.innerHTML = `<span class="error-text">${status.error || 'Not available'}</span>`;
+            }
+        }
+
+        function getProviderIcon(providerId) {
+            const icons = {
+                'ollama': '🦙',
+                'lm_studio': '🎬',
+                'llama_cpp': '🦙',
+                'openai': '🤖',
+                'anthropic': '🧠',
+                'google': '🔮',
+                'groq': '⚡',
+                'together': '🤝',
+                'openrouter': '🌐',
+                'local_api': '🖥️',
+                'dummy': '🎭',
+            };
+            return icons[providerId] || '🔌';
+        }
+
+        function renderModels() {
+            const list = document.getElementById('models-list');
+            
+            if (models.length === 0) {
+                list.innerHTML = '<div class="empty-state">No models configured. Add one to get started.</div>';
+                return;
+            }
+            
+            list.innerHTML = models.map(m => `
+                <div class="model-card ${m.enabled ? '' : 'disabled'}">
+                    <div class="model-header">
+                        <span class="model-icon">${getProviderIcon(m.provider)}</span>
+                        <div class="model-info">
+                            <h3>${m.name}</h3>
+                            <p>${m.provider} / ${m.model_id}</p>
+                        </div>
+                        <div class="model-badges">
+                            ${m.is_council_member ? '<span class="badge council">Council</span>' : ''}
+                            ${m.enabled ? '<span class="badge enabled">Enabled</span>' : '<span class="badge disabled">Disabled</span>'}
+                        </div>
+                    </div>
+                    <div class="model-settings">
+                        <span>Temp: ${m.temperature}</span>
+                        <span>Max: ${m.max_tokens}</span>
+                    </div>
+                    <div class="model-actions">
+                        <button class="btn btn-small" onclick="toggleModel('${m.id}', ${!m.enabled})">
+                            ${m.enabled ? 'Disable' : 'Enable'}
+                        </button>
+                        <button class="btn btn-small" onclick="toggleCouncil('${m.id}', ${!m.is_council_member})">
+                            ${m.is_council_member ? 'Remove from Council' : 'Add to Council'}
+                        </button>
+                        ${m.provider !== 'dummy' ? `<button class="btn btn-small btn-danger" onclick="deleteModel('${m.id}')">Delete</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCouncilModels() {
+            const container = document.getElementById('council-models');
+            const councilModels = models.filter(m => m.is_council_member && m.enabled);
+            
+            if (councilModels.length === 0) {
+                container.innerHTML = '<div class="empty-state">No council members. Enable models and add them to the council.</div>';
+                return;
+            }
+            
+            container.innerHTML = councilModels.map(m => `
+                <div class="council-member">
+                    <span class="member-icon">${getProviderIcon(m.provider)}</span>
+                    <span class="member-name">${m.name}</span>
+                    <span class="member-model">${m.model_id}</span>
+                </div>
+            `).join('');
+        }
+
+        function applySettingsToUI() {
+            document.getElementById('council-strategy').value = settings.council_strategy || 'longest';
+            document.getElementById('council-enabled').checked = settings.council_enabled !== false;
+            document.getElementById('use-local-only').checked = settings.use_local_only || false;
+            document.getElementById('fallback-dummy').checked = settings.fallback_to_dummy !== false;
+            document.getElementById('rag-enabled').checked = settings.rag_enabled !== false;
+            document.getElementById('rag-top-k').value = settings.rag_top_k || 3;
+            document.getElementById('memory-max-turns').value = settings.memory_max_turns || 10;
+        }
+
+        function populateProviderSelect() {
+            const select = document.getElementById('model-provider');
+            select.innerHTML = providers
+                .filter(p => p.id !== 'dummy')
+                .map(p => `<option value="${p.id}">${p.name}</option>`)
+                .join('');
+            updateModelIdOptions();
+        }
+
+        function updateModelIdOptions() {
+            const providerId = document.getElementById('model-provider').value;
+            const select = document.getElementById('model-id');
+            const provider = providers.find(p => p.id === providerId);
+            
+            if (provider && provider.default_models.length > 0) {
+                select.innerHTML = provider.default_models.map(m => 
+                    `<option value="${m}">${m}</option>`
+                ).join('');
+                select.style.display = 'block';
+            } else {
+                select.innerHTML = '<option value="">Enter custom model ID below</option>';
+            }
+        }
+
+        // =============================================================================
+        // API Keys
+        // =============================================================================
+        
+        async function loadApiKeyStatuses() {
+            const apiProviders = providers.filter(p => p.requires_key);
+            const list = document.getElementById('api-keys-list');
+            
+            let html = '';
+            for (const provider of apiProviders) {
+                const res = await fetch(`/api/providers/${provider.id}/has-key`);
+                const data = await res.json();
+                
+                html += `
+                    <div class="api-key-item">
+                        <div class="api-key-info">
+                            <span class="provider-icon">${getProviderIcon(provider.id)}</span>
+                            <div>
+                                <h3>${provider.name}</h3>
+                                <p>${provider.description}</p>
+                            </div>
+                        </div>
+                        <div class="api-key-status">
+                            ${data.has_key ? 
+                                '<span class="badge enabled">✓ Configured</span>' : 
+                                '<span class="badge disabled">Not set</span>'}
+                        </div>
+                        <div class="api-key-actions">
+                            <input type="password" id="api-key-${provider.id}" placeholder="Enter API key...">
+                            <button class="btn btn-small" onclick="saveApiKey('${provider.id}')">Save</button>
+                            ${data.has_key ? `<button class="btn btn-small btn-danger" onclick="deleteApiKey('${provider.id}')">Remove</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            list.innerHTML = html;
+        }
+
+        async function saveApiKey(providerId) {
+            const input = document.getElementById(`api-key-${providerId}`);
+            const key = input.value.trim();
+            if (!key) return;
+            
+            await fetch(`/api/providers/${providerId}/api-key`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider: providerId, api_key: key }),
+            });
+            
+            input.value = '';
+            loadApiKeyStatuses();
+            checkProviderStatus(providerId).then(s => updateProviderCardStatus(providerId, s));
+        }
+
+        async function deleteApiKey(providerId) {
+            await fetch(`/api/providers/${providerId}/api-key`, { method: 'DELETE' });
+            loadApiKeyStatuses();
+        }
+
+        // =============================================================================
+        // Settings Updates
+        // =============================================================================
+        
+        async function updateSettings() {
+            const updates = {
+                council_strategy: document.getElementById('council-strategy').value,
+                council_enabled: document.getElementById('council-enabled').checked,
+                use_local_only: document.getElementById('use-local-only').checked,
+                fallback_to_dummy: document.getElementById('fallback-dummy').checked,
+                rag_enabled: document.getElementById('rag-enabled').checked,
+                rag_top_k: parseInt(document.getElementById('rag-top-k').value),
+                memory_max_turns: parseInt(document.getElementById('memory-max-turns').value),
+            };
+            
+            await fetch('/api/settings', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates),
+            });
+        }
+
+        // =============================================================================
+        // Model Management
+        // =============================================================================
+        
+        function showAddModelModal() {
+            document.getElementById('add-model-modal').style.display = 'flex';
+        }
+
+        function hideAddModelModal() {
+            document.getElementById('add-model-modal').style.display = 'none';
+        }
+
+        async function addModel(event) {
+            event.preventDefault();
+            
+            const providerId = document.getElementById('model-provider').value;
+            const modelId = document.getElementById('model-id-custom').value.trim() || 
+                           document.getElementById('model-id').value;
+            const name = document.getElementById('model-name').value.trim();
+            const baseUrl = document.getElementById('model-base-url').value.trim();
+            const temperature = parseFloat(document.getElementById('model-temperature').value);
+            const maxTokens = parseInt(document.getElementById('model-max-tokens').value);
+            const isCouncil = document.getElementById('model-council').checked;
+            
+            await fetch('/api/models', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    provider: providerId,
+                    model_id: modelId,
+                    name: name || modelId,
+                    base_url: baseUrl || null,
+                    temperature: temperature,
+                    max_tokens: maxTokens,
+                    is_council_member: isCouncil,
+                }),
+            });
+            
+            hideAddModelModal();
+            loadModels();
+        }
+
+        async function toggleModel(modelId, enabled) {
+            await fetch(`/api/models/${modelId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ enabled }),
+            });
+            loadModels();
+        }
+
+        async function toggleCouncil(modelId, isCouncilMember) {
+            await fetch(`/api/models/${modelId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ is_council_member: isCouncilMember }),
+            });
+            loadModels();
+        }
+
+        async function deleteModel(modelId) {
+            if (!confirm('Delete this model configuration?')) return;
+            await fetch(`/api/models/${modelId}`, { method: 'DELETE' });
+            loadModels();
+        }
+
+        // =============================================================================
+        // Ollama Management
+        // =============================================================================
+        
+        async function showOllamaModal() {
+            document.getElementById('ollama-modal').style.display = 'flex';
+            await refreshOllamaModels();
+        }
+
+        function hideOllamaModal() {
+            document.getElementById('ollama-modal').style.display = 'none';
+        }
+
+        async function refreshOllamaModels() {
+            const status = await checkProviderStatus('ollama');
+            const installedList = document.getElementById('ollama-installed-list');
+            const availableList = document.getElementById('ollama-available-list');
+            
+            if (!status.available) {
+                installedList.innerHTML = '<span class="error-text">Ollama not running</span>';
+                return;
+            }
+            
+            // Installed models
+            installedList.innerHTML = status.models.map(m => `
+                <div class="model-chip installed">
+                    ${m}
+                    <button class="chip-action" onclick="deleteOllamaModel('${m}')" title="Delete">×</button>
+                </div>
+            `).join('') || '<span class="hint-text">No models installed</span>';
+            
+            // Available models (not installed)
+            const provider = providers.find(p => p.id === 'ollama');
+            const available = (provider?.default_models || []).filter(m => !status.models.includes(m));
+            availableList.innerHTML = available.map(m => `
+                <div class="model-chip available" onclick="pullOllamaModelByName('${m}')">
+                    ${m}
+                    <span class="chip-action">+</span>
+                </div>
+            `).join('') || '<span class="hint-text">All default models installed</span>';
+        }
+
+        async function pullOllamaModelByName(modelName) {
+            document.getElementById('ollama-custom-model').value = modelName;
+            await pullOllamaModel();
+        }
+
+        async function pullOllamaModel() {
+            const modelName = document.getElementById('ollama-custom-model').value.trim();
+            if (!modelName) return;
+            
+            const progress = document.getElementById('ollama-progress');
+            progress.style.display = 'block';
+            progress.innerHTML = `<div class="progress-text">Pulling ${modelName}... This may take a while.</div>`;
+            
+            try {
+                const res = await fetch('/api/ollama/pull', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model_name: modelName }),
+                });
+                
+                if (res.ok) {
+                    progress.innerHTML = `<div class="progress-text success">✅ ${modelName} installed!</div>`;
+                    document.getElementById('ollama-custom-model').value = '';
+                    await refreshOllamaModels();
+                } else {
+                    const err = await res.json();
+                    progress.innerHTML = `<div class="progress-text error">❌ ${err.detail}</div>`;
+                }
+            } catch (e) {
+                progress.innerHTML = `<div class="progress-text error">❌ ${e.message}</div>`;
+            }
+            
+            setTimeout(() => { progress.style.display = 'none'; }, 5000);
+        }
+
+        async function deleteOllamaModel(modelName) {
+            if (!confirm(`Delete ${modelName}?`)) return;
+            
+            await fetch(`/api/ollama/model/${modelName}`, { method: 'DELETE' });
+            await refreshOllamaModels();
+        }
+
+        // Initialize API keys section when shown
+        document.querySelector('[data-section="api-keys"]').addEventListener('click', () => {
+            loadApiKeyStatuses();
+        });
+    </script>
+
+    <style>
+        .settings-app {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            height: 100vh;
+        }
+
+        .settings-main {
+            padding: 32px;
+            overflow-y: auto;
+            background: var(--bg-primary);
+        }
+
+        .settings-section {
+            display: none;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        .section-header {
+            margin-bottom: 32px;
+        }
+
+        .section-header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--bg-elevated);
+            color: var(--accent-primary);
+        }
+
+        /* Provider Grid */
+        .provider-category {
+            margin-bottom: 32px;
+        }
+
+        .provider-category h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        .provider-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .provider-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+
+        .provider-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .provider-icon {
+            font-size: 32px;
+        }
+
+        .provider-info {
+            flex: 1;
+        }
+
+        .provider-info h3 {
+            margin: 0 0 4px;
+        }
+
+        .provider-info p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .provider-status {
+            font-size: 20px;
+        }
+
+        .provider-status.checking { opacity: 0.5; }
+        .provider-status.available { color: var(--success); }
+        .provider-status.unavailable { color: var(--error); }
+
+        .provider-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .provider-models {
+            min-height: 30px;
+        }
+
+        .model-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .model-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: var(--bg-tertiary);
+            border-radius: 999px;
+            font-size: 12px;
+        }
+
+        .model-chip.installed {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .model-chip.available {
+            cursor: pointer;
+            border: 1px dashed var(--border-color);
+        }
+
+        .model-chip.available:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .model-chip.more {
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .chip-action {
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        .chip-action:hover {
+            opacity: 1;
+        }
+
+        /* Models List */
+        .models-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .model-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .model-card.disabled {
+            opacity: 0.6;
+        }
+
+        .model-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .model-icon {
+            font-size: 24px;
+        }
+
+        .model-info {
+            flex: 1;
+        }
+
+        .model-info h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .model-info p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .model-badges {
+            display: flex;
+            gap: 6px;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .badge.council {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .badge.enabled {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+        }
+
+        .badge.disabled {
+            background: rgba(255, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        .model-settings {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .model-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Settings Form */
+        .settings-form {
+            max-width: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .form-group input[type="number"] {
+            width: 120px;
+        }
+
+        .form-hint {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        /* Council Members */
+        .council-members {
+            margin-top: 32px;
+        }
+
+        .council-members h3 {
+            margin-bottom: 16px;
+        }
+
+        .council-models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .council-member {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+        }
+
+        .member-icon {
+            font-size: 20px;
+        }
+
+        .member-name {
+            font-weight: 500;
+        }
+
+        .member-model {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        /* API Keys */
+        .api-keys-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .api-key-item {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        .api-key-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .api-key-info h3 {
+            margin: 0;
+        }
+
+        .api-key-info p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .api-key-status {
+            margin-bottom: 12px;
+        }
+
+        .api-key-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .api-key-actions input {
+            flex: 1;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+        }
+
+        /* Ollama Modal */
+        .ollama-content {
+            padding: 20px;
+        }
+
+        .ollama-installed,
+        .ollama-available,
+        .ollama-custom {
+            margin-bottom: 24px;
+        }
+
+        .ollama-installed h3,
+        .ollama-available h3,
+        .ollama-custom h3 {
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .ollama-progress {
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            text-align: center;
+        }
+
+        .progress-text.success { color: var(--success); }
+        .progress-text.error { color: var(--error); }
+
+        /* Utils */
+        .error-text {
+            color: var(--error);
+            font-size: 13px;
+        }
+
+        .hint-text {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+    </style>
+</body>
+</html>
+

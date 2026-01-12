@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGI Core - ChatOS</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border-color: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-purple: #a371f7;
+            --accent-orange: #d29922;
+            --accent-red: #f85149;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .agi-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .agi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+        
+        .agi-header h1 {
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .agi-header h1 span {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .nav-links a:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+        }
+        
+        .panel-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel-body {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .stat-card {
+            background: var(--bg-tertiary);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .item:hover {
+            background: var(--border-color);
+        }
+        
+        .item-title {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .item-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .badge-pending { background: var(--accent-orange); color: #000; }
+        .badge-active { background: var(--accent-blue); color: #000; }
+        .badge-completed { background: var(--accent-green); color: #000; }
+        .badge-failed { background: var(--accent-red); color: #fff; }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--accent-blue);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .input-group input, .input-group textarea {
+            flex: 1;
+            padding: 10px 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+        
+        .tool-card {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        
+        .tool-card:hover {
+            border-color: var(--accent-blue);
+        }
+        
+        .tool-card.dangerous {
+            border-color: var(--accent-orange);
+        }
+        
+        .tool-name {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        
+        .tool-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .priority-select {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .priority-option {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .priority-option.selected {
+            border-color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+        }
+        
+        .result-box {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="agi-container">
+        <header class="agi-header">
+            <h1>🤖 <span>AGI Core</span></h1>
+            <nav class="nav-links">
+                <a href="/">💬 Chat</a>
+                <a href="/training">🧪 Training</a>
+                <a href="/history">📜 History</a>
+                <a href="/settings">⚙️ Settings</a>
+            </nav>
+        </header>
+        
+        <div class="dashboard-grid">
+            <!-- Overview Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>📊 System Overview</h2>
+                    <button class="btn btn-sm btn-secondary" onclick="refreshOverview()">Refresh</button>
+                </div>
+                <div class="panel-body">
+                    <div class="stat-grid" id="overview-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-memories">-</div>
+                            <div class="stat-label">Memories</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-tasks">-</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-goals">-</div>
+                            <div class="stat-label">Goals</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-tools">-</div>
+                            <div class="stat-label">Tools</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Memory Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>🧠 Memory</h2>
+                    <button class="btn btn-sm btn-primary" onclick="openMemoryModal()">+ Remember</button>
+                </div>
+                <div class="panel-body">
+                    <div class="input-group">
+                        <input type="text" id="memory-query" placeholder="Search memories...">
+                        <button class="btn btn-secondary" onclick="searchMemories()">Search</button>
+                    </div>
+                    <div class="item-list" id="memory-list">
+                        <div class="empty-state">
+                            <div class="icon">🧠</div>
+                            <p>Search for memories or add new ones</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tasks Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>📋 Tasks</h2>
+                    <button class="btn btn-sm btn-primary" onclick="openTaskModal()">+ New Task</button>
+                </div>
+                <div class="panel-body">
+                    <div class="item-list" id="task-list">
+                        <div class="empty-state">
+                            <div class="icon">📋</div>
+                            <p>No tasks yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Goals Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>🎯 Goals</h2>
+                    <button class="btn btn-sm btn-primary" onclick="openGoalModal()">+ New Goal</button>
+                </div>
+                <div class="panel-body">
+                    <div class="item-list" id="goal-list">
+                        <div class="empty-state">
+                            <div class="icon">🎯</div>
+                            <p>No goals yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tools Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>🔧 Tools</h2>
+                    <button class="btn btn-sm btn-secondary" onclick="openToolModal()">Execute Tool</button>
+                </div>
+                <div class="panel-body">
+                    <div class="tool-grid" id="tool-list"></div>
+                </div>
+            </div>
+            
+            <!-- Traces Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>📜 Recent Traces</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="item-list" id="trace-list">
+                        <div class="empty-state">
+                            <div class="icon">📜</div>
+                            <p>No execution traces yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Memory Modal -->
+    <div class="modal" id="memory-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Memory</h3>
+                <button class="close-btn" onclick="closeModal('memory-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea id="memory-content" rows="4" placeholder="What should I remember?"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Importance (0-1)</label>
+                    <input type="range" id="memory-importance" min="0" max="1" step="0.1" value="0.5">
+                    <span id="importance-value">0.5</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('memory-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveMemory()">Remember</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task Modal -->
+    <div class="modal" id="task-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Task</h3>
+                <button class="close-btn" onclick="closeModal('task-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="task-title" placeholder="Task title">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="task-description" rows="3" placeholder="Task details..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <div class="priority-select">
+                        <div class="priority-option" data-value="low" onclick="selectPriority(this, 'task')">Low</div>
+                        <div class="priority-option selected" data-value="medium" onclick="selectPriority(this, 'task')">Medium</div>
+                        <div class="priority-option" data-value="high" onclick="selectPriority(this, 'task')">High</div>
+                        <div class="priority-option" data-value="critical" onclick="selectPriority(this, 'task')">Critical</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('task-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveTask()">Create Task</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Goal Modal -->
+    <div class="modal" id="goal-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Goal</h3>
+                <button class="close-btn" onclick="closeModal('goal-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Goal Description</label>
+                    <textarea id="goal-description" rows="4" placeholder="What do you want to achieve?"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Priority (1-10)</label>
+                    <input type="range" id="goal-priority" min="1" max="10" value="5">
+                    <span id="goal-priority-value">5</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('goal-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveGoal()">Create Goal</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tool Execute Modal -->
+    <div class="modal" id="tool-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Execute Tool</h3>
+                <button class="close-btn" onclick="closeModal('tool-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tool</label>
+                    <select id="tool-select" onchange="updateToolArgs()"></select>
+                </div>
+                <div class="form-group">
+                    <label>Arguments (JSON)</label>
+                    <textarea id="tool-args" rows="4" placeholder='{"key": "value"}'>{}</textarea>
+                </div>
+                <div id="tool-result" style="display:none;">
+                    <label>Result:</label>
+                    <div class="result-box" id="tool-result-content"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('tool-modal')">Close</button>
+                <button class="btn btn-primary" onclick="executeTool()">Execute</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api/agi';
+        let selectedTaskPriority = 'medium';
+        let toolsData = [];
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshOverview();
+            loadTasks();
+            loadGoals();
+            loadTools();
+            loadTraces();
+            
+            // Importance slider
+            document.getElementById('memory-importance').addEventListener('input', (e) => {
+                document.getElementById('importance-value').textContent = e.target.value;
+            });
+            
+            // Goal priority slider
+            document.getElementById('goal-priority').addEventListener('input', (e) => {
+                document.getElementById('goal-priority-value').textContent = e.target.value;
+            });
+        });
+        
+        // API helpers
+        async function apiGet(endpoint) {
+            const res = await fetch(API_BASE + endpoint);
+            return res.json();
+        }
+        
+        async function apiPost(endpoint, data) {
+            const res = await fetch(API_BASE + endpoint, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            return res.json();
+        }
+        
+        async function apiDelete(endpoint) {
+            const res = await fetch(API_BASE + endpoint, {method: 'DELETE'});
+            return res.json();
+        }
+        
+        // Overview
+        async function refreshOverview() {
+            const data = await apiGet('/overview');
+            document.getElementById('stat-memories').textContent = data.memory.short_term_count + data.memory.long_term_count;
+            document.getElementById('stat-tasks').textContent = data.tasks.total;
+            document.getElementById('stat-goals').textContent = data.goals.total;
+            document.getElementById('stat-tools').textContent = data.tools.count;
+        }
+        
+        // Memory
+        function openMemoryModal() {
+            document.getElementById('memory-content').value = '';
+            document.getElementById('memory-importance').value = 0.5;
+            document.getElementById('importance-value').textContent = '0.5';
+            openModal('memory-modal');
+        }
+        
+        async function saveMemory() {
+            const content = document.getElementById('memory-content').value;
+            const importance = parseFloat(document.getElementById('memory-importance').value);
+            
+            if (!content.trim()) return alert('Please enter content');
+            
+            await apiPost('/memory/remember', {content, importance});
+            closeModal('memory-modal');
+            refreshOverview();
+        }
+        
+        async function searchMemories() {
+            const query = document.getElementById('memory-query').value;
+            if (!query.trim()) return;
+            
+            const data = await apiPost('/memory/recall', {query, k: 5});
+            renderMemoryList(data.results);
+        }
+        
+        function renderMemoryList(memories) {
+            const list = document.getElementById('memory-list');
+            if (!memories || memories.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="icon">🧠</div><p>No memories found</p></div>';
+                return;
+            }
+            
+            list.innerHTML = memories.map(m => `
+                <div class="item">
+                    <div>
+                        <div class="item-title">${escapeHtml(m.content.substring(0, 60))}${m.content.length > 60 ? '...' : ''}</div>
+                        <div class="item-meta">Importance: ${m.importance.toFixed(1)} | Source: ${m.source}</div>
+                    </div>
+                    <button class="btn btn-sm btn-secondary" onclick="deleteMemory('${m.id}')">×</button>
+                </div>
+            `).join('');
+        }
+        
+        async function deleteMemory(id) {
+            await apiDelete('/memory/' + id);
+            searchMemories();
+            refreshOverview();
+        }
+        
+        // Tasks
+        async function loadTasks() {
+            const data = await apiGet('/tasks');
+            renderTaskList(data.tasks);
+        }
+        
+        function renderTaskList(tasks) {
+            const list = document.getElementById('task-list');
+            if (!tasks || tasks.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No tasks yet</p></div>';
+                return;
+            }
+            
+            const statusEmoji = {pending: '⏳', in_progress: '🔄', completed: '✅', failed: '❌'};
+            
+            list.innerHTML = tasks.map(t => `
+                <div class="item">
+                    <div>
+                        <div class="item-title">
+                            ${statusEmoji[t.status] || '❓'} ${escapeHtml(t.title)}
+                        </div>
+                        <div class="item-meta">Priority: ${t.priority} | Status: ${t.status}</div>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        ${t.status === 'pending' ? `<button class="btn btn-sm btn-primary" onclick="startTask('${t.id}')">Start</button>` : ''}
+                        ${t.status === 'in_progress' ? `<button class="btn btn-sm btn-primary" onclick="completeTask('${t.id}')">Complete</button>` : ''}
+                        <button class="btn btn-sm btn-secondary" onclick="deleteTask('${t.id}')">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function openTaskModal() {
+            document.getElementById('task-title').value = '';
+            document.getElementById('task-description').value = '';
+            selectedTaskPriority = 'medium';
+            document.querySelectorAll('#task-modal .priority-option').forEach(el => {
+                el.classList.toggle('selected', el.dataset.value === 'medium');
+            });
+            openModal('task-modal');
+        }
+        
+        function selectPriority(el, type) {
+            el.parentElement.querySelectorAll('.priority-option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            if (type === 'task') selectedTaskPriority = el.dataset.value;
+        }
+        
+        async function saveTask() {
+            const title = document.getElementById('task-title').value;
+            const description = document.getElementById('task-description').value;
+            
+            if (!title.trim()) return alert('Please enter a title');
+            
+            await apiPost('/tasks', {title, description, priority: selectedTaskPriority});
+            closeModal('task-modal');
+            loadTasks();
+            refreshOverview();
+        }
+        
+        async function startTask(id) {
+            await apiPost('/tasks/' + id + '/start');
+            loadTasks();
+        }
+        
+        async function completeTask(id) {
+            await apiPost('/tasks/' + id + '/complete');
+            loadTasks();
+            refreshOverview();
+        }
+        
+        async function deleteTask(id) {
+            await apiDelete('/tasks/' + id);
+            loadTasks();
+            refreshOverview();
+        }
+        
+        // Goals
+        async function loadGoals() {
+            const data = await apiGet('/goals');
+            renderGoalList(data.goals);
+        }
+        
+        function renderGoalList(goals) {
+            const list = document.getElementById('goal-list');
+            if (!goals || goals.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="icon">🎯</div><p>No goals yet</p></div>';
+                return;
+            }
+            
+            const statusEmoji = {active: '🎯', paused: '⏸️', completed: '✅', failed: '❌'};
+            
+            list.innerHTML = goals.map(g => `
+                <div class="item">
+                    <div>
+                        <div class="item-title">
+                            ${statusEmoji[g.status] || '❓'} ${escapeHtml(g.description.substring(0, 50))}${g.description.length > 50 ? '...' : ''}
+                        </div>
+                        <div class="item-meta">Priority: ${g.priority}/10 | Progress: ${g.progress.toFixed(0)}%</div>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        ${g.status === 'active' ? `<button class="btn btn-sm btn-primary" onclick="completeGoal('${g.id}')">Complete</button>` : ''}
+                        <button class="btn btn-sm btn-secondary" onclick="deleteGoal('${g.id}')">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function openGoalModal() {
+            document.getElementById('goal-description').value = '';
+            document.getElementById('goal-priority').value = 5;
+            document.getElementById('goal-priority-value').textContent = '5';
+            openModal('goal-modal');
+        }
+        
+        async function saveGoal() {
+            const description = document.getElementById('goal-description').value;
+            const priority = parseInt(document.getElementById('goal-priority').value);
+            
+            if (!description.trim()) return alert('Please enter a description');
+            
+            await apiPost('/goals', {description, priority});
+            closeModal('goal-modal');
+            loadGoals();
+            refreshOverview();
+        }
+        
+        async function completeGoal(id) {
+            await apiPost('/goals/' + id + '/complete');
+            loadGoals();
+            refreshOverview();
+        }
+        
+        async function deleteGoal(id) {
+            await apiDelete('/goals/' + id);
+            loadGoals();
+            refreshOverview();
+        }
+        
+        // Tools
+        async function loadTools() {
+            const data = await apiGet('/tools');
+            toolsData = data.tools;
+            renderToolList(data.tools);
+        }
+        
+        function renderToolList(tools) {
+            const list = document.getElementById('tool-list');
+            list.innerHTML = tools.map(t => `
+                <div class="tool-card ${t.is_dangerous ? 'dangerous' : ''}" onclick="selectTool('${t.name}')">
+                    <div class="tool-name">${t.name} ${t.is_dangerous ? '⚠️' : ''}</div>
+                    <div class="tool-desc">${escapeHtml(t.description.substring(0, 50))}...</div>
+                </div>
+            `).join('');
+        }
+        
+        function selectTool(name) {
+            const select = document.getElementById('tool-select');
+            select.innerHTML = toolsData.map(t => 
+                `<option value="${t.name}" ${t.name === name ? 'selected' : ''}>${t.name}</option>`
+            ).join('');
+            document.getElementById('tool-args').value = '{}';
+            document.getElementById('tool-result').style.display = 'none';
+            openModal('tool-modal');
+        }
+        
+        function openToolModal() {
+            const select = document.getElementById('tool-select');
+            select.innerHTML = toolsData.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+            document.getElementById('tool-args').value = '{}';
+            document.getElementById('tool-result').style.display = 'none';
+            openModal('tool-modal');
+        }
+        
+        async function executeTool() {
+            const toolName = document.getElementById('tool-select').value;
+            let args;
+            try {
+                args = JSON.parse(document.getElementById('tool-args').value);
+            } catch (e) {
+                return alert('Invalid JSON in arguments');
+            }
+            
+            const result = await apiPost('/tools/execute', {tool_name: toolName, args});
+            
+            document.getElementById('tool-result').style.display = 'block';
+            document.getElementById('tool-result-content').textContent = JSON.stringify(result, null, 2);
+        }
+        
+        // Traces
+        async function loadTraces() {
+            const data = await apiGet('/traces?limit=10');
+            renderTraceList(data.sessions);
+        }
+        
+        function renderTraceList(sessions) {
+            const list = document.getElementById('trace-list');
+            if (!sessions || sessions.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="icon">📜</div><p>No traces yet</p></div>';
+                return;
+            }
+            
+            list.innerHTML = sessions.map(s => `
+                <div class="item">
+                    <div>
+                        <div class="item-title">${escapeHtml(s.goal?.substring(0, 40) || 'Unknown')}...</div>
+                        <div class="item-meta">Steps: ${s.step_count} | Status: ${s.status}</div>
+                    </div>
+                    <span class="badge badge-${s.status === 'completed' ? 'completed' : s.status === 'failed' ? 'failed' : 'active'}">${s.status}</span>
+                </div>
+            `).join('');
+        }
+        
+        // Modal helpers
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+    </script>
+</body>
+</html>
+
