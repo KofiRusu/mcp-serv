@@ -32,6 +32,9 @@ import {
   RefreshCw,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '' // Empty = same origin
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -653,7 +656,7 @@ Describe what you want to build, or try the suggestions below!`
       formData.append('type', automationType)
 
       // Call the diagram analysis endpoint
-      const response = await fetch('http://localhost:8000/api/v1/automations/analyze-diagram', {
+      const response = await fetch(`${API_BASE}/api/v1/automations/analyze-diagram`, {
         method: 'POST',
         body: formData,
       })
@@ -1059,7 +1062,7 @@ Describe what you want to build, or try the suggestions below!`
       
       const enhancedPrompt = `${messageContent}${canvasContext}`
       
-      const response = await fetch('http://localhost:8000/api/v1/automations/generate', {
+      const response = await fetch(`${API_BASE}/api/v1/automations/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

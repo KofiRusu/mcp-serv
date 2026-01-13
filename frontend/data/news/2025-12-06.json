@@ -1,0 +1,85 @@
+[
+  {
+    "id": "mock-news-0",
+    "title": "Bitcoin breaks new resistance level as institutional interest grows",
+    "source": "Bloomberg Crypto",
+    "url": "https://example.com/news/0",
+    "timestamp": "2025-12-06T04:51:21.252180+00:00",
+    "sentiment": "bullish",
+    "symbols": [
+      "BTCUSDT"
+    ]
+  },
+  {
+    "id": "mock-news-1",
+    "title": "Ethereum upgrade expected to boost network efficiency",
+    "source": "The Block",
+    "url": "https://example.com/news/1",
+    "timestamp": "2025-12-06T03:51:21.252180+00:00",
+    "sentiment": "bullish",
+    "symbols": [
+      "ETHUSDT"
+    ]
+  },
+  {
+    "id": "mock-news-2",
+    "title": "Crypto market sees increased volatility amid regulatory news",
+    "source": "Bloomberg Crypto",
+    "url": "https://example.com/news/2",
+    "timestamp": "2025-12-06T02:51:21.252180+00:00",
+    "sentiment": "neutral",
+    "symbols": []
+  },
+  {
+    "id": "mock-news-3",
+    "title": "Solana DeFi ecosystem reaches new milestone",
+    "source": "The Block",
+    "url": "https://example.com/news/3",
+    "timestamp": "2025-12-06T01:51:21.252180+00:00",
+    "sentiment": "bullish",
+    "symbols": [
+      "SOLUSDT"
+    ]
+  },
+  {
+    "id": "mock-news-4",
+    "title": "Market analysts predict short-term correction",
+    "source": "CoinDesk",
+    "url": "https://example.com/news/4",
+    "timestamp": "2025-12-06T00:51:21.252180+00:00",
+    "sentiment": "bearish",
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT"
+    ]
+  },
+  {
+    "id": "mock-news-5",
+    "title": "Major exchange adds new trading pairs",
+    "source": "Bloomberg Crypto",
+    "url": "https://example.com/news/5",
+    "timestamp": "2025-12-05T23:51:21.252180+00:00",
+    "sentiment": "neutral",
+    "symbols": []
+  },
+  {
+    "id": "mock-news-6",
+    "title": "Bitcoin ETF sees record inflows",
+    "source": "CoinTelegraph",
+    "url": "https://example.com/news/6",
+    "timestamp": "2025-12-05T22:51:21.252180+00:00",
+    "sentiment": "bullish",
+    "symbols": [
+      "BTCUSDT"
+    ]
+  },
+  {
+    "id": "mock-news-7",
+    "title": "Regulatory clarity could boost institutional adoption",
+    "source": "The Block",
+    "url": "https://example.com/news/7",
+    "timestamp": "2025-12-05T21:51:21.252180+00:00",
+    "sentiment": "bullish",
+    "symbols": []
+  }
+]

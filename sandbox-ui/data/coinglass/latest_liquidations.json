@@ -1,0 +1,182 @@
+[
+  {
+    "symbol": "BTCUSDT",
+    "side": "LONG",
+    "price": 99573.6,
+    "size_usd": 495332.85,
+    "size_coin": 4.97454,
+    "exchange": "OKX",
+    "timestamp": 1768332634838
+  },
+  {
+    "symbol": "SOLUSDT",
+    "side": "LONG",
+    "price": 232.07,
+    "size_usd": 16881.64,
+    "size_coin": 72.744219,
+    "exchange": "OKX",
+    "timestamp": 1768332498788
+  },
+  {
+    "symbol": "BTCUSDT",
+    "side": "LONG",
+    "price": 100739.18,
+    "size_usd": 293444.45,
+    "size_coin": 2.912913,
+    "exchange": "Bitget",
+    "timestamp": 1768332123789
+  },
+  {
+    "symbol": "SOLUSDT",
+    "side": "SHORT",
+    "price": 230.25,
+    "size_usd": 16032.62,
+    "size_coin": 69.632693,
+    "exchange": "Bybit",
+    "timestamp": 1768331974187
+  },
+  {
+    "symbol": "BTCUSDT",
+    "side": "LONG",
+    "price": 99229.99,
+    "size_usd": 399191.86,
+    "size_coin": 4.022895,
+    "exchange": "Bitget",
+    "timestamp": 1768331961301
+  },
+  {
+    "symbol": "BTCUSDT",
+    "side": "LONG",
+    "price": 99223.81,
+    "size_usd": 109343.83,
+    "size_coin": 1.101992,
+    "exchange": "Bitget",
+    "timestamp": 1768331879830
+  },
+  {
+    "symbol": "BTCUSDT",
+    "side": "LONG",
+    "price": 99972.45,
+    "size_usd": 395296.97,
+    "size_coin": 3.954059,
+    "exchange": "Bybit",
+    "timestamp": 1768331874174
+  },
+  {
+    "symbol": "BTCUSDT",
+    "side": "LONG",
+    "price": 99176.41,
+    "size_usd": 303530.89,
+    "size_coin": 3.060515,
+    "exchange": "OKX",
+    "timestamp": 1768331769987
+  },
+  {
+    "symbol": "ETHUSDT",
+    "side": "LONG",
+    "price": 3925.01,
+    "size_usd": 80172.98,
+    "size_coin": 20.426203,
+    "exchange": "Bybit",
+    "timestamp": 1768331700652
+  },
+  {
+    "symbol": "BTCUSDT",
+    "side": "LONG",
+    "price": 100262.43,
+    "size_usd": 188731.62,
+    "size_coin": 1.882376,
+    "exchange": "OKX",
+    "timestamp": 1768331637066
+  },
+  {
+    "symbol": "SOLUSDT",
+    "side": "SHORT",
+    "price": 228.26,
+    "size_usd": 22835.45,
+    "size_coin": 100.043522,
+    "exchange": "Bitget",
+    "timestamp": 1768331569440
+  },
+  {
+    "symbol": "BTCUSDT",
+    "side": "LONG",
+    "price": 99964.62,
+    "size_usd": 150503.37,
+    "size_coin": 1.505566,
+    "exchange": "Binance",
+    "timestamp": 1768331552150
+  },
+  {
+    "symbol": "BTCUSDT",
+    "side": "SHORT",
+    "price": 99876.69,
+    "size_usd": 92287.67,
+    "size_coin": 0.924016,
+    "exchange": "OKX",
+    "timestamp": 1768331289709
+  },
+  {
+    "symbol": "ETHUSDT",
+    "side": "LONG",
+    "price": 3880.2,
+    "size_usd": 28907.63,
+    "size_coin": 7.450034,
+    "exchange": "Bitget",
+    "timestamp": 1768331272914
+  },
+  {
+    "symbol": "BTCUSDT",
+    "side": "SHORT",
+    "price": 100253.12,
+    "size_usd": 236979.18,
+    "size_coin": 2.363809,
+    "exchange": "Bitget",
+    "timestamp": 1768331240838
+  },
+  {
+    "symbol": "SOLUSDT",
+    "side": "LONG",
+    "price": 228.03,
+    "size_usd": 1311.68,
+    "size_coin": 5.752196,
+    "exchange": "Binance",
+    "timestamp": 1768330407484
+  },
+  {
+    "symbol": "SOLUSDT",
+    "side": "SHORT",
+    "price": 229.1,
+    "size_usd": 11934.33,
+    "size_coin": 52.092165,
+    "exchange": "Bybit",
+    "timestamp": 1768330209553
+  },
+  {
+    "symbol": "ETHUSDT",
+    "side": "LONG",
+    "price": 3918.46,
+    "size_usd": 130134.16,
+    "size_coin": 33.210548,
+    "exchange": "Bitget",
+    "timestamp": 1768330105149
+  },
+  {
+    "symbol": "ETHUSDT",
+    "side": "LONG",
+    "price": 3866.3,
+    "size_usd": 56342.29,
+    "size_coin": 14.572665,
+    "exchange": "Bitget",
+    "timestamp": 1768328749552
+  },
+  {
+    "symbol": "SOLUSDT",
+    "side": "LONG",
+    "price": 229.16,
+    "size_usd": 7325.44,
+    "size_coin": 31.96642,
+    "exchange": "Binance",
+    "timestamp": 1768327890209
+  }
+]

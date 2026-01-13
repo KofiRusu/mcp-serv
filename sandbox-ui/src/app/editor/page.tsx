@@ -67,6 +67,8 @@ interface Automation {
   paper_trading?: boolean
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '' // Empty = same origin
+
 const STATUS_COLORS: Record<string, string> = {
   draft: 'bg-gray-500',
   testing: 'bg-yellow-500',
@@ -135,7 +137,7 @@ export default function AutomationBuilderPage() {
   const startLogPolling = useCallback((automationId: string) => {
     const pollLogs = async () => {
       try {
-        const logsRes = await fetch(`http://localhost:8000/api/v1/automations/${automationId}`)
+        const logsRes = await fetch(`${API_BASE}/api/v1/automations/${automationId}`)
         if (logsRes.ok) {
           const data = await logsRes.json()
           setOutput(data.logs || [])
@@ -174,7 +176,7 @@ export default function AutomationBuilderPage() {
       // Try backend first
       let data = null
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/automations/${id}`)
+        const res = await fetch(`${API_BASE}/api/v1/automations/${id}`)
         if (res.ok) {
           data = await res.json()
         }
@@ -414,13 +416,13 @@ export default function AutomationBuilderPage() {
       try {
         let res
         if (automation?.id) {
-          res = await fetch(`http://localhost:8000/api/v1/automations/${automation.id}`, {
+          res = await fetch(`${API_BASE}/api/v1/automations/${automation.id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           })
         } else {
-          res = await fetch('http://localhost:8000/api/v1/automations/', {
+          res = await fetch('${API_BASE}/api/v1/automations/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -497,7 +499,7 @@ export default function AutomationBuilderPage() {
         await handleSave()
         
         // Start the automation on the backend
-        const runRes = await fetch(`http://localhost:8000/api/v1/automations/${automation.id}/run?auto_generate=true`, {
+        const runRes = await fetch(`${API_BASE}/api/v1/automations/${automation.id}/run?auto_generate=true`, {
           method: 'POST'
         })
         
@@ -510,7 +512,7 @@ export default function AutomationBuilderPage() {
         
         // Connect to SSE stream for real-time logs
         const eventSource = new EventSource(
-          `http://localhost:8000/api/v1/automations/${automation.id}/logs/stream`
+          `${API_BASE}/api/v1/automations/${automation.id}/logs/stream`
         )
         
         eventSource.onmessage = (event) => {
@@ -612,7 +614,7 @@ export default function AutomationBuilderPage() {
     if (!automation?.id) return
 
     try {
-      await fetch(`http://localhost:8000/api/v1/automations/${automation.id}/stop`, {
+      await fetch(`${API_BASE}/api/v1/automations/${automation.id}/stop`, {
         method: 'POST'
       })
       setStatus('stopped')
@@ -638,7 +640,7 @@ export default function AutomationBuilderPage() {
     showActivity('loading', 'Deploying to Docker...')
 
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/automations/${currentId}/deploy`, {
+      const res = await fetch(`${API_BASE}/api/v1/automations/${currentId}/deploy`, {
         method: 'POST'
       })
       

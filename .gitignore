@@ -91,3 +91,9 @@ temp/
 
 # Scraper runtime files
 scrapers/scraper.pid
+
+# Large data files
+*.jsonl
+data/automations/*/BTCUSDT_trades.jsonl
+frontend/data/automations/*/*.jsonl
+sandbox-ui/data/automations/*/*.jsonl

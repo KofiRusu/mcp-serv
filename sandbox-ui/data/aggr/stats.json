@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-01-13T19:30:43.928157+00:00",
+  "symbols": {
+    "BTCUSDT": {
+      "symbol": "BTCUSDT",
+      "total_buy_volume": 0.0,
+      "total_sell_volume": 0.0,
+      "total_buy_count": 0,
+      "total_sell_count": 0,
+      "cvd": 0.0,
+      "buy_sell_ratio": 0,
+      "recent_large_trades": []
+    },
+    "ETHUSDT": {
+      "symbol": "ETHUSDT",
+      "total_buy_volume": 0.0,
+      "total_sell_volume": 0.0,
+      "total_buy_count": 0,
+      "total_sell_count": 0,
+      "cvd": 0.0,
+      "buy_sell_ratio": 0,
+      "recent_large_trades": []
+    },
+    "SOLUSDT": {
+      "symbol": "SOLUSDT",
+      "total_buy_volume": 0.0,
+      "total_sell_volume": 0.0,
+      "total_buy_count": 0,
+      "total_sell_count": 0,
+      "cvd": 0.0,
+      "buy_sell_ratio": 0,
+      "recent_large_trades": []
+    }
+  }
+}

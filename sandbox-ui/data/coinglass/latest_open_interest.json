@@ -1,0 +1,17 @@
+{
+  "BTCUSDT": {
+    "symbol": "BTCUSDT",
+    "open_interest": 94411.657,
+    "timestamp": "2026-01-13T19:30:32.955003+00:00"
+  },
+  "ETHUSDT": {
+    "symbol": "ETHUSDT",
+    "open_interest": 2292111.728,
+    "timestamp": "2026-01-13T19:30:33.189575+00:00"
+  },
+  "SOLUSDT": {
+    "symbol": "SOLUSDT",
+    "open_interest": 10776915.78,
+    "timestamp": "2026-01-13T19:30:33.421700+00:00"
+  }
+}

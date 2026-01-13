@@ -98,6 +98,8 @@ from chatos_backend.api.routes_realtime_data import router as realtime_data_rout
 from chatos_backend.api.routes_automations import router as automations_router
 from chatos_backend.api.routes_training_exercises import router as training_exercises_router
 from chatos_backend.api.routes_training_local import router as training_local_router
+from chatos_backend.api.routes_ip_whitelist import router as ip_whitelist_router
+from chatos_backend.api.routes_monitoring import router as monitoring_router
 
 # =============================================================================
 # Lifecycle Management
@@ -189,6 +191,9 @@ app.include_router(transcripts_router)
 app.include_router(search_router)
 app.include_router(uploads_router)
 app.include_router(notes_router)
+# Admin routers for IP whitelist and monitoring
+app.include_router(ip_whitelist_router)
+app.include_router(monitoring_router)
 
 
 # =============================================================================

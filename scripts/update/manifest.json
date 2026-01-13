@@ -1,0 +1,60 @@
+{
+  "version": "1.0.0",
+  "description": "Cross-OS update pipeline configuration for ChatOS-v2.0",
+  "os_support": ["linux", "darwin"],
+  "paths": {
+    "include": [
+      "chatos_backend/",
+      "frontend/",
+      "scripts/",
+      "cli/",
+      "docs/",
+      "tests/",
+      "*.sh",
+      "*.py",
+      "*.json",
+      "*.yml",
+      "*.yaml",
+      "*.md"
+    ],
+    "exclude": [
+      "node_modules/",
+      ".venv/",
+      "__pycache__/",
+      "*.pyc",
+      ".git/",
+      "*.log",
+      "frontend/data/",
+      "data/",
+      "models/",
+      "logs/"
+    ]
+  },
+  "executables": [
+    "*.sh",
+    "cli/chatos",
+    "cli/trading",
+    "cli/hf-trading"
+  ],
+  "env_files": {
+    "template": ".env.example",
+    "local": ".env.local",
+    "frontend_template": "frontend/.env.example",
+    "frontend_local": "frontend/.env.local"
+  },
+  "validation": {
+    "python_syntax": true,
+    "python_tests": true,
+    "frontend_build": true,
+    "backend_health": true,
+    "health_endpoint": "/health",
+    "test_timeout_seconds": 300,
+    "startup_timeout_seconds": 30
+  },
+  "transforms": {
+    "line_endings": "lf",
+    "set_executable_bits": true,
+    "generate_env_local": true
+  }
+}
+

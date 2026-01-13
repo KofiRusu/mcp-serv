@@ -50,7 +50,22 @@ export interface UseRealtimeWebSocketReturn {
   refresh: () => void
 }
 
-const DEFAULT_WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws/realtime'
+// Auto-detect WebSocket URL from current location
+const getWebSocketUrl = (): string => {
+  if (typeof window === 'undefined') return ''
+  
+  if (process.env.NEXT_PUBLIC_WS_URL) {
+    return process.env.NEXT_PUBLIC_WS_URL
+  }
+  
+  // Use same origin with correct protocol
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const host = window.location.host
+  // Backend endpoint is /api/v1/realtime/ws
+  return `${protocol}//${host}/api/v1/realtime/ws`
+}
+
+const DEFAULT_WS_URL = getWebSocketUrl()
 
 export function useRealtimeWebSocket(
   _channel: string | UseRealtimeWebSocketOptions = {}

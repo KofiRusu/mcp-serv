@@ -11,7 +11,13 @@ interface TerminalProps {
   onReady?: () => void
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+// Get API URL - empty means same origin
+const getApiUrl = () => {
+  if (typeof window === 'undefined') return ''
+  return process.env.NEXT_PUBLIC_API_URL || ''
+}
+
+const API_URL = getApiUrl()
 
 export function Terminal({ sessionId = "default", onReady }: TerminalProps) {
   const terminalRef = useRef<HTMLDivElement>(null)
@@ -24,7 +30,15 @@ export function Terminal({ sessionId = "default", onReady }: TerminalProps) {
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return
 
-    const wsUrl = API_URL.replace("http", "ws")
+    // Build WebSocket URL from current location or API_URL
+    let wsUrl: string
+    if (typeof window !== 'undefined') {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const host = API_URL || window.location.host
+      wsUrl = API_URL ? API_URL.replace(/^https?:/, protocol) : `${protocol}//${host}`
+    } else {
+      wsUrl = API_URL || 'ws://localhost:8000'
+    }
     const ws = new WebSocket(`${wsUrl}/api/terminal/ws/${sessionId}`)
     
     ws.onopen = () => {

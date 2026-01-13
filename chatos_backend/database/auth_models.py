@@ -196,6 +196,57 @@ class AuditLog(Base):
 
 
 # =============================================================================
+# IP Whitelist Model
+# =============================================================================
+
+class IPWhitelist(Base):
+    """
+    SQLAlchemy model for IP address whitelist.
+    
+    Controls which IP addresses are allowed to access the system
+    when IP whitelisting is enabled.
+    """
+    __tablename__ = "ip_whitelist"
+    __table_args__ = (
+        Index("ix_ip_whitelist_active", "is_active"),
+        {"schema": "chatos"},
+    )
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    ip_address = Column(INET, nullable=False, unique=True)
+    description = Column(String(255))
+    created_by_session_id = Column(UUID(as_uuid=True), ForeignKey("chatos.user_sessions.id", ondelete="SET NULL"))
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    is_active = Column(Boolean, default=True)
+    
+    # Optional: CIDR notation support for IP ranges
+    cidr_notation = Column(String(50))  # e.g., "192.168.1.0/24"
+    
+    # Optional: Expiration for temporary access
+    expires_at = Column(DateTime)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for API responses."""
+        return {
+            "id": str(self.id),
+            "ip_address": str(self.ip_address) if self.ip_address else None,
+            "description": self.description,
+            "cidr_notation": self.cidr_notation,
+            "is_active": self.is_active,
+            "expires_at": self.expires_at.isoformat() if self.expires_at else None,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+    
+    def is_expired(self) -> bool:
+        """Check if the whitelist entry has expired."""
+        if self.expires_at is None:
+            return False
+        return datetime.utcnow() > self.expires_at
+
+
+# =============================================================================
 # Export all models
 # =============================================================================
 
@@ -204,5 +255,6 @@ __all__ = [
     "APIUsageLog",
     "FeatureUsage",
     "AuditLog",
+    "IPWhitelist",
 ]
 

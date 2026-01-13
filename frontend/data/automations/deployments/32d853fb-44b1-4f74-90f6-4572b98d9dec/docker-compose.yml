@@ -1,0 +1,21 @@
+# Auto-generated docker-compose for E2E Test Automation
+version: '3.8'
+
+services:
+  e2e-test-automation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chatos-automation-32d853fb-44b1-4f74-90f6-4572b98d9dec
+    restart: unless-stopped
+    volumes:
+      - /home/kr/ChatOS-v2.0/sandbox-ui/data/automations/32d853fb-44b1-4f74-90f6-4572b98d9dec:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - chatos-automations
+
+networks:
+  chatos-automations:
+    name: chatos-automations
+    external: true

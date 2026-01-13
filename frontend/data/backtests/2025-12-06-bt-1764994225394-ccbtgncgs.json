@@ -1,0 +1,893 @@
+{
+  "config": {
+    "symbols": [
+      "SOLUSDT"
+    ],
+    "timeframe": "5m",
+    "days": 7,
+    "initialBalance": 10000,
+    "maxPositionSize": 0.1,
+    "maxConcurrentPositions": 3,
+    "tradingFee": 0.001,
+    "slippage": 0.0005,
+    "maxDrawdownLimit": 0.15,
+    "riskPerTrade": 0.05,
+    "stopLossPercent": 0.1,
+    "takeProfitPercent": 0.04
+  },
+  "portfolio": {
+    "balance": 12084.478857637287,
+    "equity": 12084.478857637287,
+    "positions": [],
+    "totalPnl": 2084.4788576372866,
+    "totalPnlPercent": 0.20844788576372866,
+    "maxDrawdown": 0.05164781192857391,
+    "currentDrawdown": 0,
+    "peakEquity": 12084.478857637287
+  },
+  "trades": [
+    {
+      "id": "trade-0",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 204.23646335963122,
+      "exitPrice": 203.10369334693584,
+      "entryTime": 1764389425395,
+      "exitTime": 1764389485395,
+      "size": 0.1,
+      "pnl": 228.2851657554353,
+      "pnlPercent": 0.02282851657554353,
+      "fees": 0.45657033151087056,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-1",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 203.83326745373563,
+      "exitPrice": 197.89005367879022,
+      "entryTime": 1764395473395,
+      "exitTime": 1764395533395,
+      "size": 0.1,
+      "pnl": 207.2736531867936,
+      "pnlPercent": 0.020264751112019364,
+      "fees": 0.4145473063735872,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-2",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 199.3548652359002,
+      "exitPrice": 198.7146662387446,
+      "entryTime": 1764401521395,
+      "exitTime": 1764401581395,
+      "size": 0.1,
+      "pnl": 288.0189078161446,
+      "pnlPercent": 0.027599758940876615,
+      "fees": 0.5760378156322892,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-3",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 197.17929355072715,
+      "exitPrice": 204.07939282620185,
+      "entryTime": 1764407569395,
+      "exitTime": 1764407629395,
+      "size": 0.1,
+      "pnl": 163.08741509154217,
+      "pnlPercent": 0.015208302606376671,
+      "fees": 0.32617483018308435,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-4",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 196.1580638980293,
+      "exitPrice": 200.58433202688985,
+      "entryTime": 1764413617395,
+      "exitTime": 1764413677395,
+      "size": 0.1,
+      "pnl": 69.18344082852201,
+      "pnlPercent": 0.006354879104581886,
+      "fees": 0.13836688165704403,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-5",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 201.81486627194465,
+      "exitPrice": 204.75990654574508,
+      "entryTime": 1764419665395,
+      "exitTime": 1764419725395,
+      "size": 0.1,
+      "pnl": 189.26499278847936,
+      "pnlPercent": 0.01727524722162678,
+      "fees": 0.3785299855769587,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-8",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 202.45099074195986,
+      "exitPrice": 198.30574207661755,
+      "entryTime": 1764437809395,
+      "exitTime": 1764437869395,
+      "size": 0.1,
+      "pnl": -107.36345258677797,
+      "pnlPercent": -0.009633230909652714,
+      "fees": 0.21472690517355594,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-10",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 198.1729242292287,
+      "exitPrice": 195.30211199765844,
+      "entryTime": 1764449905395,
+      "exitTime": 1764449965395,
+      "size": 0.1,
+      "pnl": -235.86881891597318,
+      "pnlPercent": -0.02136928416480828,
+      "fees": 0.4717376378319464,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-11",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 196.75257202610834,
+      "exitPrice": 197.00656291389325,
+      "entryTime": 1764455953395,
+      "exitTime": 1764456013395,
+      "size": 0.1,
+      "pnl": -232.3884583655599,
+      "pnlPercent": -0.02151370227335085,
+      "fees": 0.4647769167311198,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-12",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 196.2393909940626,
+      "exitPrice": 201.154050175358,
+      "entryTime": 1764462001395,
+      "exitTime": 1764462061395,
+      "size": 0.1,
+      "pnl": 78.48655195152452,
+      "pnlPercent": 0.007425763288558186,
+      "fees": 0.15697310390304903,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-25",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 200.57832795761172,
+      "exitPrice": 203.95905425900054,
+      "entryTime": 1764540625395,
+      "exitTime": 1764540685395,
+      "size": 0.1,
+      "pnl": -42.658033547448724,
+      "pnlPercent": -0.0040062092491711075,
+      "fees": 0.08531606709489745,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-26",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 197.86042574036878,
+      "exitPrice": 195.21345000911654,
+      "entryTime": 1764546673395,
+      "exitTime": 1764546733395,
+      "size": 0.1,
+      "pnl": 338.43129690344625,
+      "pnlPercent": 0.03191146079289717,
+      "fees": 0.6768625938068925,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-27",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 201.87681826988896,
+      "exitPrice": 204.92555547811273,
+      "entryTime": 1764552721395,
+      "exitTime": 1764552781395,
+      "size": 0.1,
+      "pnl": 357.051621564636,
+      "pnlPercent": 0.03262606828095772,
+      "fees": 0.714103243129272,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-28",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 204.85239250702216,
+      "exitPrice": 197.63374253736106,
+      "entryTime": 1764558769395,
+      "exitTime": 1764558829395,
+      "size": 0.1,
+      "pnl": 121.34798111273676,
+      "pnlPercent": 0.010737995108982254,
+      "fees": 0.24269596222547352,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-33",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 197.92439040528575,
+      "exitPrice": 200.00965529965237,
+      "entryTime": 1764589009395,
+      "exitTime": 1764589069395,
+      "size": 0.1,
+      "pnl": -69.14807393775826,
+      "pnlPercent": -0.006053856781284429,
+      "fees": 0.1382961478755165,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-34",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 204.8754245591806,
+      "exitPrice": 201.61316164346965,
+      "entryTime": 1764595057395,
+      "exitTime": 1764595117395,
+      "size": 0.1,
+      "pnl": 8.14082381576712,
+      "pnlPercent": 0.0007170634027592257,
+      "fees": 0.01628164763153424,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-36",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 195.3782091022089,
+      "exitPrice": 196.61591259831775,
+      "entryTime": 1764607153395,
+      "exitTime": 1764607213395,
+      "size": 0.1,
+      "pnl": 43.58881046214343,
+      "pnlPercent": 0.0038366564646869876,
+      "fees": 0.08717762092428685,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-37",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 201.053673761757,
+      "exitPrice": 197.68571117319317,
+      "entryTime": 1764613201395,
+      "exitTime": 1764613261395,
+      "size": 0.1,
+      "pnl": 99.35822472214107,
+      "pnlPercent": 0.008712016102797406,
+      "fees": 0.19871644944428216,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-41",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 202.05874329347472,
+      "exitPrice": 198.37837047731682,
+      "entryTime": 1764637393395,
+      "exitTime": 1764637453395,
+      "size": 0.1,
+      "pnl": -38.80583461454109,
+      "pnlPercent": -0.0033732201072842714,
+      "fees": 0.07761166922908218,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-46",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 199.8662565622853,
+      "exitPrice": 195.22285881788636,
+      "entryTime": 1764667633395,
+      "exitTime": 1764667693395,
+      "size": 0.1,
+      "pnl": -218.73781520425308,
+      "pnlPercent": -0.019078269056777765,
+      "fees": 0.4374756304085062,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-50",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 196.53210466532244,
+      "exitPrice": 196.38849427252342,
+      "entryTime": 1764691825395,
+      "exitTime": 1764691885395,
+      "size": 0.1,
+      "pnl": -99.54413785421706,
+      "pnlPercent": -0.008851083401250414,
+      "fees": 0.19908827570843413,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-51",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 200.19790261384932,
+      "exitPrice": 203.00363144591333,
+      "entryTime": 1764697873395,
+      "exitTime": 1764697933395,
+      "size": 0.1,
+      "pnl": -13.603837943103173,
+      "pnlPercent": -0.0012204030450344502,
+      "fees": 0.027207675886206345,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-54",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 203.81698956395115,
+      "exitPrice": 204.02371359707956,
+      "entryTime": 1764716017395,
+      "exitTime": 1764716077395,
+      "size": 0.1,
+      "pnl": 80.69758884019677,
+      "pnlPercent": 0.007248242744711857,
+      "fees": 0.16139517768039355,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-55",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 203.16103181109358,
+      "exitPrice": 200.81483367081105,
+      "entryTime": 1764722065395,
+      "exitTime": 1764722125395,
+      "size": 0.1,
+      "pnl": 17.628587330817663,
+      "pnlPercent": 0.0015720022521791936,
+      "fees": 0.035257174661635325,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-61",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 200.43305669766983,
+      "exitPrice": 197.3079414336707,
+      "entryTime": 1764758353395,
+      "exitTime": 1764758413395,
+      "size": 0.1,
+      "pnl": 49.32983824441183,
+      "pnlPercent": 0.0043920084600280775,
+      "fees": 0.09865967648882366,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-70",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 195.9707949663589,
+      "exitPrice": 198.038089238232,
+      "entryTime": 1764812785395,
+      "exitTime": 1764812845395,
+      "size": 0.1,
+      "pnl": 194.9857940532098,
+      "pnlPercent": 0.017284355869898432,
+      "fees": 0.3899715881064196,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-75",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 198.4657244789081,
+      "exitPrice": 196.53038957064416,
+      "entryTime": 1764843025395,
+      "exitTime": 1764843085395,
+      "size": 0.1,
+      "pnl": -44.42632973305002,
+      "pnlPercent": -0.0038712239670147773,
+      "fees": 0.08885265946610003,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-76",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 195.02993679943958,
+      "exitPrice": 200.79558645834177,
+      "entryTime": 1764849073395,
+      "exitTime": 1764849133395,
+      "size": 0.1,
+      "pnl": -69.10414122680592,
+      "pnlPercent": -0.006045002020767239,
+      "fees": 0.13820828245361186,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-77",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 201.8666873334882,
+      "exitPrice": 203.22577366469946,
+      "entryTime": 1764855121395,
+      "exitTime": 1764855181395,
+      "size": 0.1,
+      "pnl": 236.21162818493502,
+      "pnlPercent": 0.02078868063356277,
+      "fees": 0.47242325636987004,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-83",
+      "symbol": "SOLUSDT",
+      "side": "long",
+      "entryPrice": 200.97296641729537,
+      "exitPrice": 202.44450063178292,
+      "entryTime": 1764891409395,
+      "exitTime": 1764891469395,
+      "size": 0.1,
+      "pnl": 162.42717110826683,
+      "pnlPercent": 0.014003883502057057,
+      "fees": 0.3248543422165337,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-99",
+      "symbol": "SOLUSDT",
+      "side": "short",
+      "entryPrice": 197.6232479023653,
+      "exitPrice": 204.23668953129152,
+      "entryTime": 1764988177395,
+      "exitTime": 1764988237395,
+      "size": 0.1,
+      "pnl": 323.328297805627,
+      "pnlPercent": 0.02749121322448702,
+      "fees": 0.646656595611254,
+      "reason": "Take Profit"
+    }
+  ],
+  "metrics": {
+    "totalReturn": 0.20844788576372866,
+    "annualizedReturn": 10.869068329108709,
+    "totalTrades": 31,
+    "winningTrades": 20,
+    "losingTrades": 11,
+    "winRate": 0.6451612903225806,
+    "profitFactor": 2.779098497231881,
+    "maxDrawdown": 0.05164781192857391,
+    "sharpeRatio": 2.3842590213985,
+    "sortinoRatio": 2.8977571632571246,
+    "averageTradeReturn": 0.00623430260365135,
+    "averageTradeDuration": 30,
+    "largestWin": 357.051621564636,
+    "largestLoss": -235.86881891597318,
+    "consecutiveWins": 3,
+    "consecutiveLosses": 2,
+    "expectancy": 0.029181963114593784
+  },
+  "equityCurve": [
+    {
+      "timestamp": 1764389425395,
+      "equity": 10228.285165755435
+    },
+    {
+      "timestamp": 1764395473395,
+      "equity": 10435.558818942229
+    },
+    {
+      "timestamp": 1764401521395,
+      "equity": 10723.577726758373
+    },
+    {
+      "timestamp": 1764407569395,
+      "equity": 10886.665141849915
+    },
+    {
+      "timestamp": 1764413617395,
+      "equity": 10955.848582678436
+    },
+    {
+      "timestamp": 1764419665395,
+      "equity": 11145.113575466916
+    },
+    {
+      "timestamp": 1764425713395,
+      "equity": 11145.113575466916
+    },
+    {
+      "timestamp": 1764431761395,
+      "equity": 11145.113575466916
+    },
+    {
+      "timestamp": 1764437809395,
+      "equity": 11037.750122880137
+    },
+    {
+      "timestamp": 1764443857395,
+      "equity": 11037.750122880137
+    },
+    {
+      "timestamp": 1764449905395,
+      "equity": 10801.881303964165
+    },
+    {
+      "timestamp": 1764455953395,
+      "equity": 10569.492845598605
+    },
+    {
+      "timestamp": 1764462001395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764468049395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764474097395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764480145395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764486193395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764492241395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764498289395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764504337395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764510385395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764516433395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764522481395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764528529395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764534577395,
+      "equity": 10647.979397550129
+    },
+    {
+      "timestamp": 1764540625395,
+      "equity": 10605.32136400268
+    },
+    {
+      "timestamp": 1764546673395,
+      "equity": 10943.752660906126
+    },
+    {
+      "timestamp": 1764552721395,
+      "equity": 11300.804282470763
+    },
+    {
+      "timestamp": 1764558769395,
+      "equity": 11422.152263583499
+    },
+    {
+      "timestamp": 1764564817395,
+      "equity": 11422.152263583499
+    },
+    {
+      "timestamp": 1764570865395,
+      "equity": 11422.152263583499
+    },
+    {
+      "timestamp": 1764576913395,
+      "equity": 11422.152263583499
+    },
+    {
+      "timestamp": 1764582961395,
+      "equity": 11422.152263583499
+    },
+    {
+      "timestamp": 1764589009395,
+      "equity": 11353.00418964574
+    },
+    {
+      "timestamp": 1764595057395,
+      "equity": 11361.145013461508
+    },
+    {
+      "timestamp": 1764601105395,
+      "equity": 11361.145013461508
+    },
+    {
+      "timestamp": 1764607153395,
+      "equity": 11404.73382392365
+    },
+    {
+      "timestamp": 1764613201395,
+      "equity": 11504.09204864579
+    },
+    {
+      "timestamp": 1764619249395,
+      "equity": 11504.09204864579
+    },
+    {
+      "timestamp": 1764625297395,
+      "equity": 11504.09204864579
+    },
+    {
+      "timestamp": 1764631345395,
+      "equity": 11504.09204864579
+    },
+    {
+      "timestamp": 1764637393395,
+      "equity": 11465.28621403125
+    },
+    {
+      "timestamp": 1764643441395,
+      "equity": 11465.28621403125
+    },
+    {
+      "timestamp": 1764649489395,
+      "equity": 11465.28621403125
+    },
+    {
+      "timestamp": 1764655537395,
+      "equity": 11465.28621403125
+    },
+    {
+      "timestamp": 1764661585395,
+      "equity": 11465.28621403125
+    },
+    {
+      "timestamp": 1764667633395,
+      "equity": 11246.548398826997
+    },
+    {
+      "timestamp": 1764673681395,
+      "equity": 11246.548398826997
+    },
+    {
+      "timestamp": 1764679729395,
+      "equity": 11246.548398826997
+    },
+    {
+      "timestamp": 1764685777395,
+      "equity": 11246.548398826997
+    },
+    {
+      "timestamp": 1764691825395,
+      "equity": 11147.00426097278
+    },
+    {
+      "timestamp": 1764697873395,
+      "equity": 11133.400423029678
+    },
+    {
+      "timestamp": 1764703921395,
+      "equity": 11133.400423029678
+    },
+    {
+      "timestamp": 1764709969395,
+      "equity": 11133.400423029678
+    },
+    {
+      "timestamp": 1764716017395,
+      "equity": 11214.098011869875
+    },
+    {
+      "timestamp": 1764722065395,
+      "equity": 11231.726599200692
+    },
+    {
+      "timestamp": 1764728113395,
+      "equity": 11231.726599200692
+    },
+    {
+      "timestamp": 1764734161395,
+      "equity": 11231.726599200692
+    },
+    {
+      "timestamp": 1764740209395,
+      "equity": 11231.726599200692
+    },
+    {
+      "timestamp": 1764746257395,
+      "equity": 11231.726599200692
+    },
+    {
+      "timestamp": 1764752305395,
+      "equity": 11231.726599200692
+    },
+    {
+      "timestamp": 1764758353395,
+      "equity": 11281.056437445104
+    },
+    {
+      "timestamp": 1764764401395,
+      "equity": 11281.056437445104
+    },
+    {
+      "timestamp": 1764770449395,
+      "equity": 11281.056437445104
+    },
+    {
+      "timestamp": 1764776497395,
+      "equity": 11281.056437445104
+    },
+    {
+      "timestamp": 1764782545395,
+      "equity": 11281.056437445104
+    },
+    {
+      "timestamp": 1764788593395,
+      "equity": 11281.056437445104
+    },
+    {
+      "timestamp": 1764794641395,
+      "equity": 11281.056437445104
+    },
+    {
+      "timestamp": 1764800689395,
+      "equity": 11281.056437445104
+    },
+    {
+      "timestamp": 1764806737395,
+      "equity": 11281.056437445104
+    },
+    {
+      "timestamp": 1764812785395,
+      "equity": 11476.042231498313
+    },
+    {
+      "timestamp": 1764818833395,
+      "equity": 11476.042231498313
+    },
+    {
+      "timestamp": 1764824881395,
+      "equity": 11476.042231498313
+    },
+    {
+      "timestamp": 1764830929395,
+      "equity": 11476.042231498313
+    },
+    {
+      "timestamp": 1764836977395,
+      "equity": 11476.042231498313
+    },
+    {
+      "timestamp": 1764843025395,
+      "equity": 11431.615901765263
+    },
+    {
+      "timestamp": 1764849073395,
+      "equity": 11362.511760538457
+    },
+    {
+      "timestamp": 1764855121395,
+      "equity": 11598.723388723392
+    },
+    {
+      "timestamp": 1764861169395,
+      "equity": 11598.723388723392
+    },
+    {
+      "timestamp": 1764867217395,
+      "equity": 11598.723388723392
+    },
+    {
+      "timestamp": 1764873265395,
+      "equity": 11598.723388723392
+    },
+    {
+      "timestamp": 1764879313395,
+      "equity": 11598.723388723392
+    },
+    {
+      "timestamp": 1764885361395,
+      "equity": 11598.723388723392
+    },
+    {
+      "timestamp": 1764891409395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764897457395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764903505395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764909553395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764915601395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764921649395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764927697395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764933745395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764939793395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764945841395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764951889395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764957937395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764963985395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764970033395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764976081395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764982129395,
+      "equity": 11761.15055983166
+    },
+    {
+      "timestamp": 1764988177395,
+      "equity": 12084.478857637287
+    }
+  ],
+  "signals": [],
+  "dateRange": {
+    "start": "2025-11-29T04:10:25.395Z",
+    "end": "2025-12-06T04:10:25.395Z"
+  },
+  "startTime": "2025-12-06T04:10:25.394Z",
+  "endTime": "2025-12-06T04:10:30.440Z",
+  "duration": 5046
+}

@@ -51,7 +51,7 @@ interface QueueStatus {
   queue_size: number;
 }
 
-const API_BASE = 'http://localhost:8000/api/training';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api/training` : '/api/training';
 
 const CATEGORIES = [
   { value: 'trading', label: '📈 Trading' },

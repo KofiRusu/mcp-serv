@@ -101,6 +101,8 @@ const TYPE_CONFIG: Record<string, { icon: string; label: string; color: string }
   backtest: { icon: '📜', label: 'Backtest', color: 'text-purple-400' },
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '' // Empty = same origin
+
 export default function AutomationsPage() {
   const router = useRouter()
   const [automations, setAutomations] = useState<Automation[]>([])
@@ -118,7 +120,7 @@ export default function AutomationsPage() {
 
       // Try to load from backend
       try {
-        const res = await fetch('http://localhost:8000/api/v1/automations/')
+        const res = await fetch(`${API_BASE}/api/v1/automations/`)
         if (res.ok) {
           backendAutomations = await res.json()
         }
@@ -161,7 +163,7 @@ export default function AutomationsPage() {
   // Actions
   const handleRun = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/automations/${id}/run`, {
+      const res = await fetch(`${API_BASE}/api/v1/automations/${id}/run`, {
         method: 'POST'
       })
       if (res.ok) {
@@ -178,7 +180,7 @@ export default function AutomationsPage() {
 
   const handleStop = async (id: string) => {
     try {
-      await fetch(`http://localhost:8000/api/v1/automations/${id}/stop`, { method: 'POST' })
+      await fetch(`${API_BASE}/api/v1/automations/${id}/stop`, { method: 'POST' })
       toast.info('Automation stopped')
       loadAutomations()
     } catch (e) {
@@ -188,7 +190,7 @@ export default function AutomationsPage() {
 
   const handleDeploy = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/automations/${id}/deploy`, {
+      const res = await fetch(`${API_BASE}/api/v1/automations/${id}/deploy`, {
         method: 'POST'
       })
       if (res.ok) {
@@ -205,7 +207,7 @@ export default function AutomationsPage() {
 
   const handleUndeploy = async (id: string) => {
     try {
-      await fetch(`http://localhost:8000/api/v1/automations/${id}/undeploy`, { method: 'POST' })
+      await fetch(`${API_BASE}/api/v1/automations/${id}/undeploy`, { method: 'POST' })
       toast.info('Container stopped')
       loadAutomations()
     } catch (e) {
@@ -229,7 +231,7 @@ export default function AutomationsPage() {
         toast.success('Automation deleted')
       } else {
         // Delete from backend
-        await fetch(`http://localhost:8000/api/v1/automations/${id}`, { method: 'DELETE' })
+        await fetch(`${API_BASE}/api/v1/automations/${id}`, { method: 'DELETE' })
         toast.success('Automation deleted')
       }
       loadAutomations()
@@ -244,7 +246,7 @@ export default function AutomationsPage() {
     
     try {
       // Try container logs first
-      let res = await fetch(`http://localhost:8000/api/v1/automations/${automation.id}/container-logs?lines=100`)
+      let res = await fetch(`${API_BASE}/api/v1/automations/${automation.id}/container-logs?lines=100`)
       if (res.ok) {
         const data = await res.json()
         if (data.logs) {
@@ -254,7 +256,7 @@ export default function AutomationsPage() {
       }
       
       // Fall back to dev mode output
-      res = await fetch(`http://localhost:8000/api/v1/automations/${automation.id}/output?lines=100`)
+      res = await fetch(`${API_BASE}/api/v1/automations/${automation.id}/output?lines=100`)
       if (res.ok) {
         const data = await res.json()
         setLogs(data.output?.join('\n') || 'No logs available')
@@ -271,7 +273,7 @@ export default function AutomationsPage() {
     try {
       // First generate code if not already generated
       if (!automation.generated_code) {
-        const genRes = await fetch(`http://localhost:8000/api/v1/automations/${automation.id}/generate-code`, {
+        const genRes = await fetch(`${API_BASE}/api/v1/automations/${automation.id}/generate-code`, {
           method: 'POST'
         })
         if (!genRes.ok) {
@@ -340,7 +342,7 @@ export default function AutomationsPage() {
     try {
       // First generate code if not already generated
       if (!automation.generated_code) {
-        const genRes = await fetch(`http://localhost:8000/api/v1/automations/${automation.id}/generate-code`, {
+        const genRes = await fetch(`${API_BASE}/api/v1/automations/${automation.id}/generate-code`, {
           method: 'POST'
         })
         if (!genRes.ok) {

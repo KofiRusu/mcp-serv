@@ -1,0 +1,805 @@
+{
+  "config": {
+    "symbols": [
+      "BTCUSDT"
+    ],
+    "timeframe": "1m",
+    "initialBalance": 10000,
+    "maxPositionSize": 0.1,
+    "maxConcurrentPositions": 3,
+    "tradingFee": 0.001,
+    "slippage": 0.0005,
+    "maxDrawdownLimit": 0.15,
+    "riskPerTrade": 0.05,
+    "stopLossPercent": 0.1,
+    "takeProfitPercent": 0.04,
+    "days": 3
+  },
+  "portfolio": {
+    "balance": 10438.455539104805,
+    "equity": 10438.455539104805,
+    "positions": [],
+    "totalPnl": 438.4555391048052,
+    "totalPnlPercent": 0.04384555391048052,
+    "maxDrawdown": 0.05806376568744461,
+    "currentDrawdown": 0,
+    "peakEquity": 10944.927218973096
+  },
+  "trades": [
+    {
+      "id": "trade-0",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 50400.16282035151,
+      "exitPrice": 52468.14681775477,
+      "entryTime": 1764986700387,
+      "exitTime": 1764986760387,
+      "size": 0.1,
+      "pnl": -227.44369840332394,
+      "pnlPercent": -0.022744369840332394,
+      "fees": 0.45488739680664786,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-7",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 57297.86124344247,
+      "exitPrice": 56857.68837246574,
+      "entryTime": 1764987121089,
+      "exitTime": 1764987181089,
+      "size": 0.1,
+      "pnl": 99.27438752270558,
+      "pnlPercent": 0.01015848714081962,
+      "fees": 0.19854877504541116,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-16",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 50164.849339203975,
+      "exitPrice": 55555.300727108995,
+      "entryTime": 1764987662239,
+      "exitTime": 1764987722239,
+      "size": 0.1,
+      "pnl": -238.2980558648734,
+      "pnlPercent": -0.024139195998116415,
+      "fees": 0.4765961117297468,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-23",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 50607.34004875355,
+      "exitPrice": 53715.07045916649,
+      "entryTime": 1764988083020,
+      "exitTime": 1764988143020,
+      "size": 0.1,
+      "pnl": 283.496197631804,
+      "pnlPercent": 0.029428062209826154,
+      "fees": 0.566992395263608,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-27",
+      "symbol": "BTCUSDT",
+      "side": "short",
+      "entryPrice": 54332.21275676634,
+      "exitPrice": 56655.8765186784,
+      "entryTime": 1764988323425,
+      "exitTime": 1764988383425,
+      "size": 0.1,
+      "pnl": 100.20197704399787,
+      "pnlPercent": 0.010104032039507799,
+      "fees": 0.20040395408799574,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-28",
+      "symbol": "BTCUSDT",
+      "side": "short",
+      "entryPrice": 52065.98574585923,
+      "exitPrice": 59399.76533797319,
+      "entryTime": 1764988383526,
+      "exitTime": 1764988443526,
+      "size": 0.1,
+      "pnl": 125.89912024999931,
+      "pnlPercent": 0.012568255904648731,
+      "fees": 0.25179824049999866,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-29",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 53381.74467567058,
+      "exitPrice": 58630.69091411207,
+      "entryTime": 1764988443626,
+      "exitTime": 1764988503626,
+      "size": 0.1,
+      "pnl": -115.01147980249593,
+      "pnlPercent": -0.01133885502964558,
+      "fees": 0.23002295960499186,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-30",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 52083.97558999018,
+      "exitPrice": 50167.428146536615,
+      "entryTime": 1764988503727,
+      "exitTime": 1764988563727,
+      "size": 0.1,
+      "pnl": 10.902167010956818,
+      "pnlPercent": 0.0010871597764903138,
+      "fees": 0.021804334021913636,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-47",
+      "symbol": "BTCUSDT",
+      "side": "short",
+      "entryPrice": 57606.67506518063,
+      "exitPrice": 59984.52308581152,
+      "entryTime": 1764989525516,
+      "exitTime": 1764989585516,
+      "size": 0.1,
+      "pnl": -25.76477681343239,
+      "pnlPercent": -0.0025664631840617673,
+      "fees": 0.05152955362686478,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-51",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 56228.473682263786,
+      "exitPrice": 53181.16672397372,
+      "entryTime": 1764989765932,
+      "exitTime": 1764989825932,
+      "size": 0.1,
+      "pnl": 128.1644024416131,
+      "pnlPercent": 0.012799473468746207,
+      "fees": 0.25632880488322624,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-58",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 59647.97187765549,
+      "exitPrice": 59837.639283999524,
+      "entryTime": 1764990186635,
+      "exitTime": 1764990246635,
+      "size": 0.1,
+      "pnl": 75.26777777907364,
+      "pnlPercent": 0.00742181824540248,
+      "fees": 0.1505355555581473,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-60",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 52105.72506314645,
+      "exitPrice": 54807.4097706898,
+      "entryTime": 1764990306835,
+      "exitTime": 1764990366835,
+      "size": 0.1,
+      "pnl": 322.608291750229,
+      "pnlPercent": 0.03157660204135766,
+      "fees": 0.645216583500458,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-61",
+      "symbol": "BTCUSDT",
+      "side": "short",
+      "entryPrice": 54979.50963749604,
+      "exitPrice": 50426.59336020117,
+      "entryTime": 1764990366954,
+      "exitTime": 1764990426954,
+      "size": 0.1,
+      "pnl": 177.5462384877236,
+      "pnlPercent": 0.01684611887323636,
+      "fees": 0.3550924769754472,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-62",
+      "symbol": "BTCUSDT",
+      "side": "short",
+      "entryPrice": 53492.96045259254,
+      "exitPrice": 57475.64383840893,
+      "entryTime": 1764990427101,
+      "exitTime": 1764990487101,
+      "size": 0.1,
+      "pnl": -38.982846069310284,
+      "pnlPercent": -0.003637530913694745,
+      "fees": 0.07796569213862058,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-70",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 50075.64741378249,
+      "exitPrice": 56691.557392041585,
+      "entryTime": 1764990907940,
+      "exitTime": 1764990967940,
+      "size": 0.1,
+      "pnl": -196.03048747465598,
+      "pnlPercent": -0.018358593662757047,
+      "fees": 0.39206097494931197,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-74",
+      "symbol": "BTCUSDT",
+      "side": "short",
+      "entryPrice": 59324.877280219494,
+      "exitPrice": 58704.586201422615,
+      "entryTime": 1764991148342,
+      "exitTime": 1764991208342,
+      "size": 0.1,
+      "pnl": -205.44497060155285,
+      "pnlPercent": -0.0196001066586686,
+      "fees": 0.41088994120310574,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-75",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 51403.60840834702,
+      "exitPrice": 58244.42877871056,
+      "entryTime": 1764991208442,
+      "exitTime": 1764991268442,
+      "size": 0.1,
+      "pnl": 216.41661745363257,
+      "pnlPercent": 0.02105960737710636,
+      "fees": 0.43283323490726516,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-76",
+      "symbol": "BTCUSDT",
+      "side": "short",
+      "entryPrice": 56725.93911366329,
+      "exitPrice": 59688.1533120166,
+      "entryTime": 1764991268544,
+      "exitTime": 1764991328544,
+      "size": 0.1,
+      "pnl": 151.58126926785152,
+      "pnlPercent": 0.014446216149194807,
+      "fees": 0.3031625385357031,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-78",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 54065.68461231513,
+      "exitPrice": 52276.33795979672,
+      "entryTime": 1764991388746,
+      "exitTime": 1764991448746,
+      "size": 0.1,
+      "pnl": 300.5450873631519,
+      "pnlPercent": 0.028235089988985107,
+      "fees": 0.6010901747263038,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-81",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 52655.40931302695,
+      "exitPrice": 51153.8526897633,
+      "entryTime": 1764991569047,
+      "exitTime": 1764991629047,
+      "size": 0.1,
+      "pnl": -181.49693071375006,
+      "pnlPercent": -0.016582744415067838,
+      "fees": 0.3629938614275001,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-82",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 59492.576129574496,
+      "exitPrice": 51848.06622155359,
+      "entryTime": 1764991629148,
+      "exitTime": 1764991689148,
+      "size": 0.1,
+      "pnl": -267.21830759092694,
+      "pnlPercent": -0.02482650051465529,
+      "fees": 0.5344366151818539,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-85",
+      "symbol": "BTCUSDT",
+      "side": "short",
+      "entryPrice": 58431.909170523926,
+      "exitPrice": 58308.55251138121,
+      "entryTime": 1764991809449,
+      "exitTime": 1764991869449,
+      "size": 0.1,
+      "pnl": 206.83467944391398,
+      "pnlPercent": 0.019705649983523137,
+      "fees": 0.41366935888782796,
+      "reason": "Take Profit"
+    },
+    {
+      "id": "trade-93",
+      "symbol": "BTCUSDT",
+      "side": "short",
+      "entryPrice": 50627.027724649124,
+      "exitPrice": 53192.77079045954,
+      "entryTime": 1764992290252,
+      "exitTime": 1764992350252,
+      "size": 0.1,
+      "pnl": -162.429825989411,
+      "pnlPercent": -0.015176036426595025,
+      "fees": 0.324859651978822,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-97",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 54489.99663875057,
+      "exitPrice": 55345.059872577265,
+      "entryTime": 1764992530652,
+      "exitTime": 1764992590652,
+      "size": 0.1,
+      "pnl": -231.19330465841404,
+      "pnlPercent": -0.021933565017748933,
+      "fees": 0.46238660931682807,
+      "reason": "Stop Loss"
+    },
+    {
+      "id": "trade-98",
+      "symbol": "BTCUSDT",
+      "side": "long",
+      "entryPrice": 59832.92583147577,
+      "exitPrice": 52252.05888383269,
+      "entryTime": 1764992590752,
+      "exitTime": 1764992650752,
+      "size": 0.1,
+      "pnl": 129.032009640297,
+      "pnlPercent": 0.012515928681319698,
+      "fees": 0.25806401928059397,
+      "reason": "Take Profit"
+    }
+  ],
+  "metrics": {
+    "totalReturn": 0.04384555391048052,
+    "annualizedReturn": 5.334542392441797,
+    "totalTrades": 25,
+    "winningTrades": 14,
+    "losingTrades": 11,
+    "winRate": 0.56,
+    "profitFactor": 1.2320712069948359,
+    "maxDrawdown": 0.05806376568744461,
+    "sharpeRatio": 2.1811949675503337,
+    "sortinoRatio": 2.0113938705324186,
+    "averageTradeReturn": 0.001881941608752832,
+    "averageTradeDuration": 30,
+    "largestWin": 322.608291750229,
+    "largestLoss": -267.21830759092694,
+    "consecutiveWins": 3,
+    "consecutiveLosses": 2,
+    "expectancy": 0.021176392671581206
+  },
+  "equityCurve": [
+    {
+      "timestamp": 1764986700387,
+      "equity": 9772.556301596676
+    },
+    {
+      "timestamp": 1764986760488,
+      "equity": 9772.556301596676
+    },
+    {
+      "timestamp": 1764986820589,
+      "equity": 9772.556301596676
+    },
+    {
+      "timestamp": 1764986880689,
+      "equity": 9772.556301596676
+    },
+    {
+      "timestamp": 1764986940789,
+      "equity": 9772.556301596676
+    },
+    {
+      "timestamp": 1764987000889,
+      "equity": 9772.556301596676
+    },
+    {
+      "timestamp": 1764987060989,
+      "equity": 9772.556301596676
+    },
+    {
+      "timestamp": 1764987121089,
+      "equity": 9871.830689119382
+    },
+    {
+      "timestamp": 1764987181259,
+      "equity": 9871.830689119382
+    },
+    {
+      "timestamp": 1764987241359,
+      "equity": 9871.830689119382
+    },
+    {
+      "timestamp": 1764987301459,
+      "equity": 9871.830689119382
+    },
+    {
+      "timestamp": 1764987361596,
+      "equity": 9871.830689119382
+    },
+    {
+      "timestamp": 1764987421836,
+      "equity": 9871.830689119382
+    },
+    {
+      "timestamp": 1764987481937,
+      "equity": 9871.830689119382
+    },
+    {
+      "timestamp": 1764987542037,
+      "equity": 9871.830689119382
+    },
+    {
+      "timestamp": 1764987602138,
+      "equity": 9871.830689119382
+    },
+    {
+      "timestamp": 1764987662239,
+      "equity": 9633.532633254508
+    },
+    {
+      "timestamp": 1764987722339,
+      "equity": 9633.532633254508
+    },
+    {
+      "timestamp": 1764987782441,
+      "equity": 9633.532633254508
+    },
+    {
+      "timestamp": 1764987842541,
+      "equity": 9633.532633254508
+    },
+    {
+      "timestamp": 1764987902719,
+      "equity": 9633.532633254508
+    },
+    {
+      "timestamp": 1764987962819,
+      "equity": 9633.532633254508
+    },
+    {
+      "timestamp": 1764988022919,
+      "equity": 9633.532633254508
+    },
+    {
+      "timestamp": 1764988083020,
+      "equity": 9917.028830886313
+    },
+    {
+      "timestamp": 1764988143122,
+      "equity": 9917.028830886313
+    },
+    {
+      "timestamp": 1764988203223,
+      "equity": 9917.028830886313
+    },
+    {
+      "timestamp": 1764988263323,
+      "equity": 9917.028830886313
+    },
+    {
+      "timestamp": 1764988323425,
+      "equity": 10017.230807930311
+    },
+    {
+      "timestamp": 1764988383526,
+      "equity": 10143.129928180311
+    },
+    {
+      "timestamp": 1764988443626,
+      "equity": 10028.118448377816
+    },
+    {
+      "timestamp": 1764988503727,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764988563845,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764988623945,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764988684110,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764988744211,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764988804311,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764988864411,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764988924512,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764988984612,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764989044712,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764989104813,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764989164914,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764989225015,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764989285115,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764989345215,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764989405316,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764989465416,
+      "equity": 10039.020615388772
+    },
+    {
+      "timestamp": 1764989525516,
+      "equity": 10013.25583857534
+    },
+    {
+      "timestamp": 1764989585616,
+      "equity": 10013.25583857534
+    },
+    {
+      "timestamp": 1764989645731,
+      "equity": 10013.25583857534
+    },
+    {
+      "timestamp": 1764989705831,
+      "equity": 10013.25583857534
+    },
+    {
+      "timestamp": 1764989765932,
+      "equity": 10141.420241016953
+    },
+    {
+      "timestamp": 1764989826032,
+      "equity": 10141.420241016953
+    },
+    {
+      "timestamp": 1764989886133,
+      "equity": 10141.420241016953
+    },
+    {
+      "timestamp": 1764989946233,
+      "equity": 10141.420241016953
+    },
+    {
+      "timestamp": 1764990006334,
+      "equity": 10141.420241016953
+    },
+    {
+      "timestamp": 1764990066434,
+      "equity": 10141.420241016953
+    },
+    {
+      "timestamp": 1764990126534,
+      "equity": 10141.420241016953
+    },
+    {
+      "timestamp": 1764990186635,
+      "equity": 10216.688018796027
+    },
+    {
+      "timestamp": 1764990246735,
+      "equity": 10216.688018796027
+    },
+    {
+      "timestamp": 1764990306835,
+      "equity": 10539.296310546255
+    },
+    {
+      "timestamp": 1764990366954,
+      "equity": 10716.842549033978
+    },
+    {
+      "timestamp": 1764990427101,
+      "equity": 10677.859702964668
+    },
+    {
+      "timestamp": 1764990487202,
+      "equity": 10677.859702964668
+    },
+    {
+      "timestamp": 1764990547303,
+      "equity": 10677.859702964668
+    },
+    {
+      "timestamp": 1764990607403,
+      "equity": 10677.859702964668
+    },
+    {
+      "timestamp": 1764990667538,
+      "equity": 10677.859702964668
+    },
+    {
+      "timestamp": 1764990727638,
+      "equity": 10677.859702964668
+    },
+    {
+      "timestamp": 1764990787739,
+      "equity": 10677.859702964668
+    },
+    {
+      "timestamp": 1764990847840,
+      "equity": 10677.859702964668
+    },
+    {
+      "timestamp": 1764990907940,
+      "equity": 10481.829215490012
+    },
+    {
+      "timestamp": 1764990968040,
+      "equity": 10481.829215490012
+    },
+    {
+      "timestamp": 1764991028140,
+      "equity": 10481.829215490012
+    },
+    {
+      "timestamp": 1764991088240,
+      "equity": 10481.829215490012
+    },
+    {
+      "timestamp": 1764991148342,
+      "equity": 10276.384244888459
+    },
+    {
+      "timestamp": 1764991208442,
+      "equity": 10492.800862342092
+    },
+    {
+      "timestamp": 1764991268544,
+      "equity": 10644.382131609944
+    },
+    {
+      "timestamp": 1764991328645,
+      "equity": 10644.382131609944
+    },
+    {
+      "timestamp": 1764991388746,
+      "equity": 10944.927218973096
+    },
+    {
+      "timestamp": 1764991448847,
+      "equity": 10944.927218973096
+    },
+    {
+      "timestamp": 1764991508947,
+      "equity": 10944.927218973096
+    },
+    {
+      "timestamp": 1764991569047,
+      "equity": 10763.430288259346
+    },
+    {
+      "timestamp": 1764991629148,
+      "equity": 10496.211980668419
+    },
+    {
+      "timestamp": 1764991689249,
+      "equity": 10496.211980668419
+    },
+    {
+      "timestamp": 1764991749349,
+      "equity": 10496.211980668419
+    },
+    {
+      "timestamp": 1764991809449,
+      "equity": 10703.046660112333
+    },
+    {
+      "timestamp": 1764991869549,
+      "equity": 10703.046660112333
+    },
+    {
+      "timestamp": 1764991929650,
+      "equity": 10703.046660112333
+    },
+    {
+      "timestamp": 1764991989751,
+      "equity": 10703.046660112333
+    },
+    {
+      "timestamp": 1764992049851,
+      "equity": 10703.046660112333
+    },
+    {
+      "timestamp": 1764992109951,
+      "equity": 10703.046660112333
+    },
+    {
+      "timestamp": 1764992170051,
+      "equity": 10703.046660112333
+    },
+    {
+      "timestamp": 1764992230151,
+      "equity": 10703.046660112333
+    },
+    {
+      "timestamp": 1764992290252,
+      "equity": 10540.616834122922
+    },
+    {
+      "timestamp": 1764992350352,
+      "equity": 10540.616834122922
+    },
+    {
+      "timestamp": 1764992410452,
+      "equity": 10540.616834122922
+    },
+    {
+      "timestamp": 1764992470552,
+      "equity": 10540.616834122922
+    },
+    {
+      "timestamp": 1764992530652,
+      "equity": 10309.423529464508
+    },
+    {
+      "timestamp": 1764992590752,
+      "equity": 10438.455539104805
+    },
+    {
+      "timestamp": 1764992650856,
+      "equity": 10438.455539104805
+    }
+  ],
+  "signals": [],
+  "startTime": "2025-12-06T03:45:00.387Z",
+  "endTime": "2025-12-06T03:45:10.956Z",
+  "duration": 10569
+}

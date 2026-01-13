@@ -76,7 +76,7 @@ export interface ExecutionResult {
   execution_time?: number
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '' // Empty = same origin
 
 /**
  * Send a chat message to the API

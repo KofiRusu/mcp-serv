@@ -99,7 +99,7 @@ interface StartOptions {
 // Constants
 // =============================================================================
 
-const DEFAULT_API_BASE = 'http://localhost:8000'
+const DEFAULT_API_BASE = process.env.NEXT_PUBLIC_API_URL || '' // Empty = same origin
 const MAX_ACTIVITIES = 100
 const RECONNECT_DELAY = 3000
 

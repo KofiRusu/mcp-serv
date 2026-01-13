@@ -1,0 +1,5342 @@
+[
+  {
+    "timestamp": 1764967638203,
+    "recordedAt": "2025-12-05T20:47:18.203Z",
+    "trades": [
+      {
+        "id": "1825575468",
+        "price": 3022.5,
+        "amount": 0.0071,
+        "side": "sell",
+        "timestamp": 1764967633138
+      },
+      {
+        "id": "1825575469",
+        "price": 3022.49,
+        "amount": 0.027,
+        "side": "sell",
+        "timestamp": 1764967633143
+      },
+      {
+        "id": "1825575470",
+        "price": 3022.48,
+        "amount": 0.0003,
+        "side": "sell",
+        "timestamp": 1764967633143
+      },
+      {
+        "id": "1825575471",
+        "price": 3022.48,
+        "amount": 0.0331,
+        "side": "sell",
+        "timestamp": 1764967633145
+      },
+      {
+        "id": "1825575472",
+        "price": 3022.48,
+        "amount": 1.7365,
+        "side": "sell",
+        "timestamp": 1764967633173
+      },
+      {
+        "id": "1825575473",
+        "price": 3022.48,
+        "amount": 0.0169,
+        "side": "sell",
+        "timestamp": 1764967633185
+      },
+      {
+        "id": "1825575474",
+        "price": 3022.49,
+        "amount": 3.3103,
+        "side": "buy",
+        "timestamp": 1764967633517
+      },
+      {
+        "id": "1825575475",
+        "price": 3022.48,
+        "amount": 0.0099,
+        "side": "sell",
+        "timestamp": 1764967633551
+      },
+      {
+        "id": "1825575476",
+        "price": 3022.48,
+        "amount": 0.0135,
+        "side": "sell",
+        "timestamp": 1764967633820
+      },
+      {
+        "id": "1825575477",
+        "price": 3022.47,
+        "amount": 1.6714,
+        "side": "sell",
+        "timestamp": 1764967633851
+      },
+      {
+        "id": "1825575478",
+        "price": 3022.47,
+        "amount": 1.594,
+        "side": "sell",
+        "timestamp": 1764967633895
+      },
+      {
+        "id": "1825575479",
+        "price": 3022.46,
+        "amount": 0.0119,
+        "side": "sell",
+        "timestamp": 1764967633895
+      },
+      {
+        "id": "1825575480",
+        "price": 3022.45,
+        "amount": 3.037,
+        "side": "buy",
+        "timestamp": 1764967634070
+      },
+      {
+        "id": "1825575481",
+        "price": 3022.45,
+        "amount": 0.0643,
+        "side": "buy",
+        "timestamp": 1764967634104
+      },
+      {
+        "id": "1825575482",
+        "price": 3022.44,
+        "amount": 1.7014,
+        "side": "sell",
+        "timestamp": 1764967634233
+      },
+      {
+        "id": "1825575483",
+        "price": 3022.44,
+        "amount": 0.0218,
+        "side": "sell",
+        "timestamp": 1764967634442
+      },
+      {
+        "id": "1825575484",
+        "price": 3022.43,
+        "amount": 0.0085,
+        "side": "sell",
+        "timestamp": 1764967634442
+      },
+      {
+        "id": "1825575485",
+        "price": 3022.41,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967634442
+      },
+      {
+        "id": "1825575486",
+        "price": 3022.36,
+        "amount": 0.0011,
+        "side": "sell",
+        "timestamp": 1764967634442
+      },
+      {
+        "id": "1825575487",
+        "price": 3022.37,
+        "amount": 3.3104,
+        "side": "buy",
+        "timestamp": 1764967634491
+      },
+      {
+        "id": "1825575488",
+        "price": 3022.37,
+        "amount": 0.0829,
+        "side": "buy",
+        "timestamp": 1764967634944
+      },
+      {
+        "id": "1825575489",
+        "price": 3022.36,
+        "amount": 0.0213,
+        "side": "sell",
+        "timestamp": 1764967635489
+      },
+      {
+        "id": "1825575490",
+        "price": 3022.35,
+        "amount": 0.0118,
+        "side": "sell",
+        "timestamp": 1764967635489
+      },
+      {
+        "id": "1825575491",
+        "price": 3022.36,
+        "amount": 3.3104,
+        "side": "buy",
+        "timestamp": 1764967635544
+      },
+      {
+        "id": "1825575492",
+        "price": 3022.35,
+        "amount": 0.0395,
+        "side": "sell",
+        "timestamp": 1764967636138
+      },
+      {
+        "id": "1825575493",
+        "price": 3022.34,
+        "amount": 0.2898,
+        "side": "sell",
+        "timestamp": 1764967636138
+      },
+      {
+        "id": "1825575494",
+        "price": 3022.34,
+        "amount": 0.022,
+        "side": "sell",
+        "timestamp": 1764967636156
+      },
+      {
+        "id": "1825575495",
+        "price": 3022.33,
+        "amount": 0.0102,
+        "side": "sell",
+        "timestamp": 1764967636156
+      },
+      {
+        "id": "1825575496",
+        "price": 3022.3,
+        "amount": 0.0199,
+        "side": "sell",
+        "timestamp": 1764967636159
+      },
+      {
+        "id": "1825575497",
+        "price": 3022.27,
+        "amount": 0.017,
+        "side": "sell",
+        "timestamp": 1764967636164
+      },
+      {
+        "id": "1825575498",
+        "price": 3022.27,
+        "amount": 0.0169,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575499",
+        "price": 3022.26,
+        "amount": 0.0136,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575500",
+        "price": 3022.25,
+        "amount": 0.022,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575501",
+        "price": 3022.24,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575502",
+        "price": 3022.23,
+        "amount": 0.0099,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575503",
+        "price": 3022.2,
+        "amount": 0.002,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575504",
+        "price": 3022.2,
+        "amount": 0.0196,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575505",
+        "price": 3022.19,
+        "amount": 0.0029,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575506",
+        "price": 3022.19,
+        "amount": 0.0235,
+        "side": "sell",
+        "timestamp": 1764967636168
+      },
+      {
+        "id": "1825575507",
+        "price": 3022.15,
+        "amount": 0.0331,
+        "side": "sell",
+        "timestamp": 1764967636170
+      },
+      {
+        "id": "1825575508",
+        "price": 3022.15,
+        "amount": 0.05,
+        "side": "sell",
+        "timestamp": 1764967636180
+      },
+      {
+        "id": "1825575509",
+        "price": 3022.15,
+        "amount": 0.095,
+        "side": "sell",
+        "timestamp": 1764967636186
+      },
+      {
+        "id": "1825575510",
+        "price": 3022.15,
+        "amount": 0.0661,
+        "side": "sell",
+        "timestamp": 1764967636190
+      },
+      {
+        "id": "1825575511",
+        "price": 3022.15,
+        "amount": 0.0245,
+        "side": "sell",
+        "timestamp": 1764967636190
+      },
+      {
+        "id": "1825575512",
+        "price": 3022.15,
+        "amount": 0.0197,
+        "side": "sell",
+        "timestamp": 1764967636255
+      },
+      {
+        "id": "1825575513",
+        "price": 3022.16,
+        "amount": 3.3106,
+        "side": "buy",
+        "timestamp": 1764967636518
+      },
+      {
+        "id": "1825575514",
+        "price": 3022.16,
+        "amount": 0.5,
+        "side": "buy",
+        "timestamp": 1764967636620
+      },
+      {
+        "id": "1825575515",
+        "price": 3022.16,
+        "amount": 0.0017,
+        "side": "buy",
+        "timestamp": 1764967637068
+      },
+      {
+        "id": "1825575516",
+        "price": 3022.16,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967637234
+      },
+      {
+        "id": "1825575517",
+        "price": 3022.16,
+        "amount": 3.3104,
+        "side": "buy",
+        "timestamp": 1764967637687
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967663119,
+    "recordedAt": "2025-12-05T20:47:43.119Z",
+    "trades": [
+      {
+        "id": "1825575468",
+        "price": 3022.5,
+        "amount": 0.0071,
+        "side": "sell",
+        "timestamp": 1764967633138
+      },
+      {
+        "id": "1825575469",
+        "price": 3022.49,
+        "amount": 0.027,
+        "side": "sell",
+        "timestamp": 1764967633143
+      },
+      {
+        "id": "1825575470",
+        "price": 3022.48,
+        "amount": 0.0003,
+        "side": "sell",
+        "timestamp": 1764967633143
+      },
+      {
+        "id": "1825575471",
+        "price": 3022.48,
+        "amount": 0.0331,
+        "side": "sell",
+        "timestamp": 1764967633145
+      },
+      {
+        "id": "1825575472",
+        "price": 3022.48,
+        "amount": 1.7365,
+        "side": "sell",
+        "timestamp": 1764967633173
+      },
+      {
+        "id": "1825575473",
+        "price": 3022.48,
+        "amount": 0.0169,
+        "side": "sell",
+        "timestamp": 1764967633185
+      },
+      {
+        "id": "1825575474",
+        "price": 3022.49,
+        "amount": 3.3103,
+        "side": "buy",
+        "timestamp": 1764967633517
+      },
+      {
+        "id": "1825575475",
+        "price": 3022.48,
+        "amount": 0.0099,
+        "side": "sell",
+        "timestamp": 1764967633551
+      },
+      {
+        "id": "1825575476",
+        "price": 3022.48,
+        "amount": 0.0135,
+        "side": "sell",
+        "timestamp": 1764967633820
+      },
+      {
+        "id": "1825575477",
+        "price": 3022.47,
+        "amount": 1.6714,
+        "side": "sell",
+        "timestamp": 1764967633851
+      },
+      {
+        "id": "1825575478",
+        "price": 3022.47,
+        "amount": 1.594,
+        "side": "sell",
+        "timestamp": 1764967633895
+      },
+      {
+        "id": "1825575479",
+        "price": 3022.46,
+        "amount": 0.0119,
+        "side": "sell",
+        "timestamp": 1764967633895
+      },
+      {
+        "id": "1825575480",
+        "price": 3022.45,
+        "amount": 3.037,
+        "side": "buy",
+        "timestamp": 1764967634070
+      },
+      {
+        "id": "1825575481",
+        "price": 3022.45,
+        "amount": 0.0643,
+        "side": "buy",
+        "timestamp": 1764967634104
+      },
+      {
+        "id": "1825575482",
+        "price": 3022.44,
+        "amount": 1.7014,
+        "side": "sell",
+        "timestamp": 1764967634233
+      },
+      {
+        "id": "1825575483",
+        "price": 3022.44,
+        "amount": 0.0218,
+        "side": "sell",
+        "timestamp": 1764967634442
+      },
+      {
+        "id": "1825575484",
+        "price": 3022.43,
+        "amount": 0.0085,
+        "side": "sell",
+        "timestamp": 1764967634442
+      },
+      {
+        "id": "1825575485",
+        "price": 3022.41,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967634442
+      },
+      {
+        "id": "1825575486",
+        "price": 3022.36,
+        "amount": 0.0011,
+        "side": "sell",
+        "timestamp": 1764967634442
+      },
+      {
+        "id": "1825575487",
+        "price": 3022.37,
+        "amount": 3.3104,
+        "side": "buy",
+        "timestamp": 1764967634491
+      },
+      {
+        "id": "1825575488",
+        "price": 3022.37,
+        "amount": 0.0829,
+        "side": "buy",
+        "timestamp": 1764967634944
+      },
+      {
+        "id": "1825575489",
+        "price": 3022.36,
+        "amount": 0.0213,
+        "side": "sell",
+        "timestamp": 1764967635489
+      },
+      {
+        "id": "1825575490",
+        "price": 3022.35,
+        "amount": 0.0118,
+        "side": "sell",
+        "timestamp": 1764967635489
+      },
+      {
+        "id": "1825575491",
+        "price": 3022.36,
+        "amount": 3.3104,
+        "side": "buy",
+        "timestamp": 1764967635544
+      },
+      {
+        "id": "1825575492",
+        "price": 3022.35,
+        "amount": 0.0395,
+        "side": "sell",
+        "timestamp": 1764967636138
+      },
+      {
+        "id": "1825575493",
+        "price": 3022.34,
+        "amount": 0.2898,
+        "side": "sell",
+        "timestamp": 1764967636138
+      },
+      {
+        "id": "1825575494",
+        "price": 3022.34,
+        "amount": 0.022,
+        "side": "sell",
+        "timestamp": 1764967636156
+      },
+      {
+        "id": "1825575495",
+        "price": 3022.33,
+        "amount": 0.0102,
+        "side": "sell",
+        "timestamp": 1764967636156
+      },
+      {
+        "id": "1825575496",
+        "price": 3022.3,
+        "amount": 0.0199,
+        "side": "sell",
+        "timestamp": 1764967636159
+      },
+      {
+        "id": "1825575497",
+        "price": 3022.27,
+        "amount": 0.017,
+        "side": "sell",
+        "timestamp": 1764967636164
+      },
+      {
+        "id": "1825575498",
+        "price": 3022.27,
+        "amount": 0.0169,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575499",
+        "price": 3022.26,
+        "amount": 0.0136,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575500",
+        "price": 3022.25,
+        "amount": 0.022,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575501",
+        "price": 3022.24,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575502",
+        "price": 3022.23,
+        "amount": 0.0099,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575503",
+        "price": 3022.2,
+        "amount": 0.002,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575504",
+        "price": 3022.2,
+        "amount": 0.0196,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575505",
+        "price": 3022.19,
+        "amount": 0.0029,
+        "side": "sell",
+        "timestamp": 1764967636166
+      },
+      {
+        "id": "1825575506",
+        "price": 3022.19,
+        "amount": 0.0235,
+        "side": "sell",
+        "timestamp": 1764967636168
+      },
+      {
+        "id": "1825575507",
+        "price": 3022.15,
+        "amount": 0.0331,
+        "side": "sell",
+        "timestamp": 1764967636170
+      },
+      {
+        "id": "1825575508",
+        "price": 3022.15,
+        "amount": 0.05,
+        "side": "sell",
+        "timestamp": 1764967636180
+      },
+      {
+        "id": "1825575509",
+        "price": 3022.15,
+        "amount": 0.095,
+        "side": "sell",
+        "timestamp": 1764967636186
+      },
+      {
+        "id": "1825575510",
+        "price": 3022.15,
+        "amount": 0.0661,
+        "side": "sell",
+        "timestamp": 1764967636190
+      },
+      {
+        "id": "1825575511",
+        "price": 3022.15,
+        "amount": 0.0245,
+        "side": "sell",
+        "timestamp": 1764967636190
+      },
+      {
+        "id": "1825575512",
+        "price": 3022.15,
+        "amount": 0.0197,
+        "side": "sell",
+        "timestamp": 1764967636255
+      },
+      {
+        "id": "1825575513",
+        "price": 3022.16,
+        "amount": 3.3106,
+        "side": "buy",
+        "timestamp": 1764967636518
+      },
+      {
+        "id": "1825575514",
+        "price": 3022.16,
+        "amount": 0.5,
+        "side": "buy",
+        "timestamp": 1764967636620
+      },
+      {
+        "id": "1825575515",
+        "price": 3022.16,
+        "amount": 0.0017,
+        "side": "buy",
+        "timestamp": 1764967637068
+      },
+      {
+        "id": "1825575516",
+        "price": 3022.16,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967637234
+      },
+      {
+        "id": "1825575517",
+        "price": 3022.16,
+        "amount": 3.3104,
+        "side": "buy",
+        "timestamp": 1764967637687
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967693129,
+    "recordedAt": "2025-12-05T20:48:13.129Z",
+    "trades": [
+      {
+        "id": "1825576192",
+        "price": 3018.43,
+        "amount": 3.3149,
+        "side": "buy",
+        "timestamp": 1764967663432
+      },
+      {
+        "id": "1825576193",
+        "price": 3018.42,
+        "amount": 0.0093,
+        "side": "sell",
+        "timestamp": 1764967663662
+      },
+      {
+        "id": "1825576194",
+        "price": 3018.42,
+        "amount": 0.0115,
+        "side": "sell",
+        "timestamp": 1764967663703
+      },
+      {
+        "id": "1825576195",
+        "price": 3018.42,
+        "amount": 0.0341,
+        "side": "sell",
+        "timestamp": 1764967663825
+      },
+      {
+        "id": "1825576196",
+        "price": 3018.41,
+        "amount": 0.0222,
+        "side": "sell",
+        "timestamp": 1764967663825
+      },
+      {
+        "id": "1825576197",
+        "price": 3018.4,
+        "amount": 0.0437,
+        "side": "sell",
+        "timestamp": 1764967663825
+      },
+      {
+        "id": "1825576198",
+        "price": 3018.39,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967663825
+      },
+      {
+        "id": "1825576199",
+        "price": 3018.37,
+        "amount": 0.0042,
+        "side": "sell",
+        "timestamp": 1764967663825
+      },
+      {
+        "id": "1825576200",
+        "price": 3018.36,
+        "amount": 0.0143,
+        "side": "sell",
+        "timestamp": 1764967663825
+      },
+      {
+        "id": "1825576201",
+        "price": 3018.34,
+        "amount": 0.0072,
+        "side": "sell",
+        "timestamp": 1764967663825
+      },
+      {
+        "id": "1825576202",
+        "price": 3018.33,
+        "amount": 0.2038,
+        "side": "sell",
+        "timestamp": 1764967663825
+      },
+      {
+        "id": "1825576203",
+        "price": 3018.33,
+        "amount": 0.1711,
+        "side": "sell",
+        "timestamp": 1764967663837
+      },
+      {
+        "id": "1825576204",
+        "price": 3018.32,
+        "amount": 2.6753,
+        "side": "sell",
+        "timestamp": 1764967663837
+      },
+      {
+        "id": "1825576205",
+        "price": 3018.3,
+        "amount": 0.155,
+        "side": "sell",
+        "timestamp": 1764967663839
+      },
+      {
+        "id": "1825576206",
+        "price": 3018.29,
+        "amount": 0.0764,
+        "side": "sell",
+        "timestamp": 1764967663840
+      },
+      {
+        "id": "1825576207",
+        "price": 3018.26,
+        "amount": 0.0239,
+        "side": "sell",
+        "timestamp": 1764967663843
+      },
+      {
+        "id": "1825576208",
+        "price": 3018.26,
+        "amount": 0.0091,
+        "side": "sell",
+        "timestamp": 1764967663843
+      },
+      {
+        "id": "1825576209",
+        "price": 3018.25,
+        "amount": 0.0239,
+        "side": "sell",
+        "timestamp": 1764967663843
+      },
+      {
+        "id": "1825576210",
+        "price": 3018.23,
+        "amount": 0.0332,
+        "side": "sell",
+        "timestamp": 1764967663843
+      },
+      {
+        "id": "1825576211",
+        "price": 3018.23,
+        "amount": 0.0361,
+        "side": "sell",
+        "timestamp": 1764967663843
+      },
+      {
+        "id": "1825576212",
+        "price": 3018.22,
+        "amount": 0.0184,
+        "side": "sell",
+        "timestamp": 1764967663843
+      },
+      {
+        "id": "1825576213",
+        "price": 3018.2,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967663843
+      },
+      {
+        "id": "1825576214",
+        "price": 3018.18,
+        "amount": 0.0099,
+        "side": "sell",
+        "timestamp": 1764967663843
+      },
+      {
+        "id": "1825576215",
+        "price": 3018.18,
+        "amount": 0.0662,
+        "side": "sell",
+        "timestamp": 1764967663843
+      },
+      {
+        "id": "1825576216",
+        "price": 3018.18,
+        "amount": 0.0398,
+        "side": "sell",
+        "timestamp": 1764967663847
+      },
+      {
+        "id": "1825576217",
+        "price": 3018.17,
+        "amount": 0.0204,
+        "side": "sell",
+        "timestamp": 1764967663847
+      },
+      {
+        "id": "1825576218",
+        "price": 3018.16,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967663847
+      },
+      {
+        "id": "1825576219",
+        "price": 3018.15,
+        "amount": 0.0058,
+        "side": "sell",
+        "timestamp": 1764967663847
+      },
+      {
+        "id": "1825576220",
+        "price": 3018.14,
+        "amount": 0.0042,
+        "side": "sell",
+        "timestamp": 1764967663847
+      },
+      {
+        "id": "1825576221",
+        "price": 3018.09,
+        "amount": 0.0072,
+        "side": "sell",
+        "timestamp": 1764967663847
+      },
+      {
+        "id": "1825576222",
+        "price": 3018.09,
+        "amount": 0.0104,
+        "side": "buy",
+        "timestamp": 1764967663965
+      },
+      {
+        "id": "1825576223",
+        "price": 3018.08,
+        "amount": 0.0331,
+        "side": "sell",
+        "timestamp": 1764967664080
+      },
+      {
+        "id": "1825576224",
+        "price": 3018.08,
+        "amount": 0.0662,
+        "side": "sell",
+        "timestamp": 1764967664081
+      },
+      {
+        "id": "1825576225",
+        "price": 3018.08,
+        "amount": 0.0662,
+        "side": "sell",
+        "timestamp": 1764967664081
+      },
+      {
+        "id": "1825576226",
+        "price": 3018.08,
+        "amount": 0.0662,
+        "side": "sell",
+        "timestamp": 1764967664081
+      },
+      {
+        "id": "1825576227",
+        "price": 3018.08,
+        "amount": 0.0331,
+        "side": "sell",
+        "timestamp": 1764967664081
+      },
+      {
+        "id": "1825576228",
+        "price": 3018.08,
+        "amount": 0.3868,
+        "side": "sell",
+        "timestamp": 1764967664085
+      },
+      {
+        "id": "1825576229",
+        "price": 3018.07,
+        "amount": 0.0204,
+        "side": "sell",
+        "timestamp": 1764967664085
+      },
+      {
+        "id": "1825576230",
+        "price": 3018.06,
+        "amount": 0.0051,
+        "side": "sell",
+        "timestamp": 1764967664085
+      },
+      {
+        "id": "1825576231",
+        "price": 3018.05,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967664085
+      },
+      {
+        "id": "1825576232",
+        "price": 3018.03,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967664085
+      },
+      {
+        "id": "1825576233",
+        "price": 3018.02,
+        "amount": 0.0211,
+        "side": "sell",
+        "timestamp": 1764967664085
+      },
+      {
+        "id": "1825576234",
+        "price": 3018.01,
+        "amount": 0.0332,
+        "side": "sell",
+        "timestamp": 1764967664124
+      },
+      {
+        "id": "1825576235",
+        "price": 3018.01,
+        "amount": 0.0662,
+        "side": "sell",
+        "timestamp": 1764967664451
+      },
+      {
+        "id": "1825576236",
+        "price": 3018.01,
+        "amount": 0.0662,
+        "side": "sell",
+        "timestamp": 1764967664451
+      },
+      {
+        "id": "1825576237",
+        "price": 3018.01,
+        "amount": 0.0662,
+        "side": "sell",
+        "timestamp": 1764967664451
+      },
+      {
+        "id": "1825576238",
+        "price": 3018.01,
+        "amount": 0.05,
+        "side": "sell",
+        "timestamp": 1764967664453
+      },
+      {
+        "id": "1825576239",
+        "price": 3018.02,
+        "amount": 3.3153,
+        "side": "buy",
+        "timestamp": 1764967664717
+      },
+      {
+        "id": "1825576240",
+        "price": 3018.02,
+        "amount": 0.0718,
+        "side": "buy",
+        "timestamp": 1764967664887
+      },
+      {
+        "id": "1825576241",
+        "price": 3018.01,
+        "amount": 0.0331,
+        "side": "sell",
+        "timestamp": 1764967665358
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967723125,
+    "recordedAt": "2025-12-05T20:48:43.125Z",
+    "trades": [
+      {
+        "id": "1825576818",
+        "price": 3020.88,
+        "amount": 0.1029,
+        "side": "buy",
+        "timestamp": 1764967693165
+      },
+      {
+        "id": "1825576819",
+        "price": 3020.89,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967693167
+      },
+      {
+        "id": "1825576820",
+        "price": 3020.92,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967693167
+      },
+      {
+        "id": "1825576821",
+        "price": 3020.93,
+        "amount": 0.0072,
+        "side": "buy",
+        "timestamp": 1764967693167
+      },
+      {
+        "id": "1825576822",
+        "price": 3020.94,
+        "amount": 0.0086,
+        "side": "buy",
+        "timestamp": 1764967693167
+      },
+      {
+        "id": "1825576823",
+        "price": 3020.95,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967693167
+      },
+      {
+        "id": "1825576824",
+        "price": 3020.96,
+        "amount": 0.0128,
+        "side": "buy",
+        "timestamp": 1764967693167
+      },
+      {
+        "id": "1825576825",
+        "price": 3020.97,
+        "amount": 0.076,
+        "side": "buy",
+        "timestamp": 1764967693566
+      },
+      {
+        "id": "1825576826",
+        "price": 3020.98,
+        "amount": 0.0222,
+        "side": "buy",
+        "timestamp": 1764967693566
+      },
+      {
+        "id": "1825576827",
+        "price": 3020.99,
+        "amount": 0.0218,
+        "side": "buy",
+        "timestamp": 1764967693566
+      },
+      {
+        "id": "1825576828",
+        "price": 3021,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967693566
+      },
+      {
+        "id": "1825576829",
+        "price": 3021.01,
+        "amount": 0.0539,
+        "side": "buy",
+        "timestamp": 1764967693620
+      },
+      {
+        "id": "1825576830",
+        "price": 3021.02,
+        "amount": 0.0222,
+        "side": "buy",
+        "timestamp": 1764967693620
+      },
+      {
+        "id": "1825576831",
+        "price": 3021.04,
+        "amount": 0.0038,
+        "side": "buy",
+        "timestamp": 1764967693620
+      },
+      {
+        "id": "1825576832",
+        "price": 3021.07,
+        "amount": 0.0521,
+        "side": "buy",
+        "timestamp": 1764967693620
+      },
+      {
+        "id": "1825576833",
+        "price": 3021.07,
+        "amount": 0.028,
+        "side": "buy",
+        "timestamp": 1764967693622
+      },
+      {
+        "id": "1825576834",
+        "price": 3021.08,
+        "amount": 0.0171,
+        "side": "buy",
+        "timestamp": 1764967693622
+      },
+      {
+        "id": "1825576835",
+        "price": 3021.09,
+        "amount": 0.0151,
+        "side": "buy",
+        "timestamp": 1764967693622
+      },
+      {
+        "id": "1825576836",
+        "price": 3021.1,
+        "amount": 0.1488,
+        "side": "buy",
+        "timestamp": 1764967693666
+      },
+      {
+        "id": "1825576837",
+        "price": 3021.11,
+        "amount": 3.3116,
+        "side": "buy",
+        "timestamp": 1764967693731
+      },
+      {
+        "id": "1825576838",
+        "price": 3021.11,
+        "amount": 0.0083,
+        "side": "buy",
+        "timestamp": 1764967693740
+      },
+      {
+        "id": "1825576839",
+        "price": 3021.11,
+        "amount": 0.0083,
+        "side": "buy",
+        "timestamp": 1764967693740
+      },
+      {
+        "id": "1825576840",
+        "price": 3021.11,
+        "amount": 0.0083,
+        "side": "buy",
+        "timestamp": 1764967693741
+      },
+      {
+        "id": "1825576841",
+        "price": 3021.11,
+        "amount": 0.0083,
+        "side": "buy",
+        "timestamp": 1764967693741
+      },
+      {
+        "id": "1825576842",
+        "price": 3021.11,
+        "amount": 0.0309,
+        "side": "buy",
+        "timestamp": 1764967693741
+      },
+      {
+        "id": "1825576843",
+        "price": 3021.12,
+        "amount": 0.053,
+        "side": "buy",
+        "timestamp": 1764967693743
+      },
+      {
+        "id": "1825576844",
+        "price": 3021.13,
+        "amount": 0.0137,
+        "side": "buy",
+        "timestamp": 1764967693743
+      },
+      {
+        "id": "1825576845",
+        "price": 3021.15,
+        "amount": 0.0618,
+        "side": "buy",
+        "timestamp": 1764967693764
+      },
+      {
+        "id": "1825576846",
+        "price": 3021.16,
+        "amount": 0.0205,
+        "side": "buy",
+        "timestamp": 1764967693764
+      },
+      {
+        "id": "1825576847",
+        "price": 3021.17,
+        "amount": 0.0349,
+        "side": "buy",
+        "timestamp": 1764967693764
+      },
+      {
+        "id": "1825576848",
+        "price": 3021.18,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967693764
+      },
+      {
+        "id": "1825576849",
+        "price": 3021.19,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967693764
+      },
+      {
+        "id": "1825576850",
+        "price": 3021.2,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967693764
+      },
+      {
+        "id": "1825576851",
+        "price": 3021.21,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967693764
+      },
+      {
+        "id": "1825576852",
+        "price": 3021.23,
+        "amount": 0.0008,
+        "side": "buy",
+        "timestamp": 1764967693764
+      },
+      {
+        "id": "1825576853",
+        "price": 3021.23,
+        "amount": 0.8638,
+        "side": "buy",
+        "timestamp": 1764967693766
+      },
+      {
+        "id": "1825576854",
+        "price": 3021.22,
+        "amount": 0.0059,
+        "side": "sell",
+        "timestamp": 1764967693790
+      },
+      {
+        "id": "1825576855",
+        "price": 3021.22,
+        "amount": 0.0331,
+        "side": "sell",
+        "timestamp": 1764967694417
+      },
+      {
+        "id": "1825576856",
+        "price": 3021.22,
+        "amount": 0.2334,
+        "side": "sell",
+        "timestamp": 1764967694429
+      },
+      {
+        "id": "1825576857",
+        "price": 3021.15,
+        "amount": 0.0693,
+        "side": "buy",
+        "timestamp": 1764967694437
+      },
+      {
+        "id": "1825576858",
+        "price": 3021.15,
+        "amount": 0.367,
+        "side": "buy",
+        "timestamp": 1764967694641
+      },
+      {
+        "id": "1825576859",
+        "price": 3021.15,
+        "amount": 3.3117,
+        "side": "buy",
+        "timestamp": 1764967694820
+      },
+      {
+        "id": "1825576860",
+        "price": 3021.14,
+        "amount": 0.0099,
+        "side": "sell",
+        "timestamp": 1764967695029
+      },
+      {
+        "id": "1825576861",
+        "price": 3021.11,
+        "amount": 0.0071,
+        "side": "sell",
+        "timestamp": 1764967695029
+      },
+      {
+        "id": "1825576862",
+        "price": 3021.1,
+        "amount": 0.0161,
+        "side": "sell",
+        "timestamp": 1764967695029
+      },
+      {
+        "id": "1825576863",
+        "price": 3021.1,
+        "amount": 0.4274,
+        "side": "sell",
+        "timestamp": 1764967695031
+      },
+      {
+        "id": "1825576864",
+        "price": 3021.1,
+        "amount": 0.0066,
+        "side": "sell",
+        "timestamp": 1764967695038
+      },
+      {
+        "id": "1825576865",
+        "price": 3021,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967695038
+      },
+      {
+        "id": "1825576866",
+        "price": 3020.97,
+        "amount": 0.0054,
+        "side": "sell",
+        "timestamp": 1764967695038
+      },
+      {
+        "id": "1825576867",
+        "price": 3020.96,
+        "amount": 0.0194,
+        "side": "sell",
+        "timestamp": 1764967695038
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967753111,
+    "recordedAt": "2025-12-05T20:49:13.111Z",
+    "trades": [
+      {
+        "id": "1825577274",
+        "price": 3019.29,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577275",
+        "price": 3019.3,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577276",
+        "price": 3019.33,
+        "amount": 0.0468,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577277",
+        "price": 3019.34,
+        "amount": 0.0072,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577278",
+        "price": 3019.35,
+        "amount": 0.0089,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577279",
+        "price": 3019.36,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577280",
+        "price": 3019.38,
+        "amount": 0.0086,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577281",
+        "price": 3019.39,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577282",
+        "price": 3019.45,
+        "amount": 0.0102,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577283",
+        "price": 3019.46,
+        "amount": 0.0025,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577284",
+        "price": 3019.47,
+        "amount": 0.0033,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577285",
+        "price": 3019.49,
+        "amount": 0.0054,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577286",
+        "price": 3019.5,
+        "amount": 0.0017,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577287",
+        "price": 3019.51,
+        "amount": 0.0268,
+        "side": "buy",
+        "timestamp": 1764967715757
+      },
+      {
+        "id": "1825577288",
+        "price": 3019.51,
+        "amount": 0.0605,
+        "side": "buy",
+        "timestamp": 1764967716066
+      },
+      {
+        "id": "1825577289",
+        "price": 3019.52,
+        "amount": 3.3133,
+        "side": "buy",
+        "timestamp": 1764967716125
+      },
+      {
+        "id": "1825577290",
+        "price": 3019.52,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967716355
+      },
+      {
+        "id": "1825577291",
+        "price": 3019.52,
+        "amount": 0.084,
+        "side": "buy",
+        "timestamp": 1764967716416
+      },
+      {
+        "id": "1825577292",
+        "price": 3019.53,
+        "amount": 0.0086,
+        "side": "buy",
+        "timestamp": 1764967716416
+      },
+      {
+        "id": "1825577293",
+        "price": 3019.54,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967716416
+      },
+      {
+        "id": "1825577294",
+        "price": 3019.55,
+        "amount": 0.0072,
+        "side": "buy",
+        "timestamp": 1764967716416
+      },
+      {
+        "id": "1825577295",
+        "price": 3019.56,
+        "amount": 3.3133,
+        "side": "buy",
+        "timestamp": 1764967717123
+      },
+      {
+        "id": "1825577296",
+        "price": 3019.56,
+        "amount": 5.0243,
+        "side": "buy",
+        "timestamp": 1764967717228
+      },
+      {
+        "id": "1825577297",
+        "price": 3019.57,
+        "amount": 0.0137,
+        "side": "buy",
+        "timestamp": 1764967717228
+      },
+      {
+        "id": "1825577298",
+        "price": 3019.58,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967717228
+      },
+      {
+        "id": "1825577299",
+        "price": 3019.59,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967717228
+      },
+      {
+        "id": "1825577300",
+        "price": 3019.6,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967717228
+      },
+      {
+        "id": "1825577301",
+        "price": 3019.61,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967717228
+      },
+      {
+        "id": "1825577302",
+        "price": 3019.62,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967717228
+      },
+      {
+        "id": "1825577303",
+        "price": 3019.64,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967717228
+      },
+      {
+        "id": "1825577304",
+        "price": 3019.65,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967717228
+      },
+      {
+        "id": "1825577305",
+        "price": 3019.67,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967717230
+      },
+      {
+        "id": "1825577306",
+        "price": 3019.69,
+        "amount": 0.0017,
+        "side": "buy",
+        "timestamp": 1764967717230
+      },
+      {
+        "id": "1825577307",
+        "price": 3019.73,
+        "amount": 0.0054,
+        "side": "buy",
+        "timestamp": 1764967717230
+      },
+      {
+        "id": "1825577308",
+        "price": 3019.74,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967717254
+      },
+      {
+        "id": "1825577309",
+        "price": 3019.74,
+        "amount": 0.065,
+        "side": "buy",
+        "timestamp": 1764967717416
+      },
+      {
+        "id": "1825577310",
+        "price": 3019.75,
+        "amount": 3.3128,
+        "side": "buy",
+        "timestamp": 1764967718117
+      },
+      {
+        "id": "1825577311",
+        "price": 3019.75,
+        "amount": 0.0049,
+        "side": "buy",
+        "timestamp": 1764967718208
+      },
+      {
+        "id": "1825577312",
+        "price": 3019.75,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967719117
+      },
+      {
+        "id": "1825577313",
+        "price": 3019.75,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967720317
+      },
+      {
+        "id": "1825577314",
+        "price": 3019.75,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967720824
+      },
+      {
+        "id": "1825577315",
+        "price": 3019.75,
+        "amount": 0.0036,
+        "side": "buy",
+        "timestamp": 1764967721137
+      },
+      {
+        "id": "1825577316",
+        "price": 3019.75,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967721329
+      },
+      {
+        "id": "1825577317",
+        "price": 3019.75,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967722717
+      },
+      {
+        "id": "1825577318",
+        "price": 3019.75,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967723747
+      },
+      {
+        "id": "1825577319",
+        "price": 3019.75,
+        "amount": 0.0501,
+        "side": "buy",
+        "timestamp": 1764967724775
+      },
+      {
+        "id": "1825577320",
+        "price": 3019.75,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967724818
+      },
+      {
+        "id": "1825577321",
+        "price": 3019.74,
+        "amount": 1.098,
+        "side": "sell",
+        "timestamp": 1764967724822
+      },
+      {
+        "id": "1825577322",
+        "price": 3019.75,
+        "amount": 0.0761,
+        "side": "buy",
+        "timestamp": 1764967725080
+      },
+      {
+        "id": "1825577323",
+        "price": 3019.74,
+        "amount": 0.2647,
+        "side": "sell",
+        "timestamp": 1764967725452
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967784449,
+    "recordedAt": "2025-12-05T20:49:44.449Z",
+    "trades": [
+      {
+        "id": "1825577926",
+        "price": 3018.78,
+        "amount": 0.0072,
+        "side": "buy",
+        "timestamp": 1764967754730
+      },
+      {
+        "id": "1825577927",
+        "price": 3018.79,
+        "amount": 0.3984,
+        "side": "buy",
+        "timestamp": 1764967754853
+      },
+      {
+        "id": "1825577928",
+        "price": 3018.8,
+        "amount": 0.0205,
+        "side": "buy",
+        "timestamp": 1764967754853
+      },
+      {
+        "id": "1825577929",
+        "price": 3018.81,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967754853
+      },
+      {
+        "id": "1825577930",
+        "price": 3018.82,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967754853
+      },
+      {
+        "id": "1825577931",
+        "price": 3018.84,
+        "amount": 0.0038,
+        "side": "buy",
+        "timestamp": 1764967754855
+      },
+      {
+        "id": "1825577932",
+        "price": 3018.86,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967754855
+      },
+      {
+        "id": "1825577933",
+        "price": 3018.87,
+        "amount": 0.0483,
+        "side": "buy",
+        "timestamp": 1764967754856
+      },
+      {
+        "id": "1825577934",
+        "price": 3018.88,
+        "amount": 0.0287,
+        "side": "buy",
+        "timestamp": 1764967754857
+      },
+      {
+        "id": "1825577935",
+        "price": 3018.89,
+        "amount": 0.022,
+        "side": "buy",
+        "timestamp": 1764967754858
+      },
+      {
+        "id": "1825577936",
+        "price": 3018.9,
+        "amount": 0.0489,
+        "side": "buy",
+        "timestamp": 1764967754885
+      },
+      {
+        "id": "1825577937",
+        "price": 3018.91,
+        "amount": 0.0188,
+        "side": "buy",
+        "timestamp": 1764967754885
+      },
+      {
+        "id": "1825577938",
+        "price": 3018.92,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967754885
+      },
+      {
+        "id": "1825577939",
+        "price": 3018.95,
+        "amount": 0.0356,
+        "side": "buy",
+        "timestamp": 1764967754885
+      },
+      {
+        "id": "1825577940",
+        "price": 3018.96,
+        "amount": 0.0252,
+        "side": "buy",
+        "timestamp": 1764967754885
+      },
+      {
+        "id": "1825577941",
+        "price": 3018.97,
+        "amount": 0.0059,
+        "side": "sell",
+        "timestamp": 1764967754887
+      },
+      {
+        "id": "1825577942",
+        "price": 3018.98,
+        "amount": 0.1406,
+        "side": "buy",
+        "timestamp": 1764967754898
+      },
+      {
+        "id": "1825577943",
+        "price": 3018.99,
+        "amount": 0.0222,
+        "side": "buy",
+        "timestamp": 1764967754898
+      },
+      {
+        "id": "1825577944",
+        "price": 3019,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967754900
+      },
+      {
+        "id": "1825577945",
+        "price": 3019.02,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967754900
+      },
+      {
+        "id": "1825577946",
+        "price": 3019.03,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967754900
+      },
+      {
+        "id": "1825577947",
+        "price": 3019.04,
+        "amount": 0.1557,
+        "side": "buy",
+        "timestamp": 1764967755042
+      },
+      {
+        "id": "1825577948",
+        "price": 3019.05,
+        "amount": 0.0256,
+        "side": "buy",
+        "timestamp": 1764967755044
+      },
+      {
+        "id": "1825577949",
+        "price": 3019.06,
+        "amount": 0.0123,
+        "side": "buy",
+        "timestamp": 1764967755044
+      },
+      {
+        "id": "1825577950",
+        "price": 3019.1,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967755044
+      },
+      {
+        "id": "1825577951",
+        "price": 3019.11,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967755044
+      },
+      {
+        "id": "1825577952",
+        "price": 3019.12,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967755044
+      },
+      {
+        "id": "1825577953",
+        "price": 3019.13,
+        "amount": 0.0466,
+        "side": "buy",
+        "timestamp": 1764967755046
+      },
+      {
+        "id": "1825577954",
+        "price": 3019.14,
+        "amount": 0.0841,
+        "side": "buy",
+        "timestamp": 1764967755076
+      },
+      {
+        "id": "1825577955",
+        "price": 3019.15,
+        "amount": 0.0256,
+        "side": "buy",
+        "timestamp": 1764967755076
+      },
+      {
+        "id": "1825577956",
+        "price": 3019.16,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967755076
+      },
+      {
+        "id": "1825577957",
+        "price": 3019.2,
+        "amount": 0.0205,
+        "side": "buy",
+        "timestamp": 1764967755076
+      },
+      {
+        "id": "1825577958",
+        "price": 3019.19,
+        "amount": 0.3636,
+        "side": "sell",
+        "timestamp": 1764967755082
+      },
+      {
+        "id": "1825577959",
+        "price": 3019.2,
+        "amount": 0.0501,
+        "side": "buy",
+        "timestamp": 1764967755182
+      },
+      {
+        "id": "1825577960",
+        "price": 3019.21,
+        "amount": 0.0222,
+        "side": "buy",
+        "timestamp": 1764967755182
+      },
+      {
+        "id": "1825577961",
+        "price": 3019.24,
+        "amount": 0.0251,
+        "side": "buy",
+        "timestamp": 1764967755182
+      },
+      {
+        "id": "1825577962",
+        "price": 3019.26,
+        "amount": 0.1051,
+        "side": "buy",
+        "timestamp": 1764967755182
+      },
+      {
+        "id": "1825577963",
+        "price": 3019.28,
+        "amount": 0.0038,
+        "side": "buy",
+        "timestamp": 1764967755182
+      },
+      {
+        "id": "1825577964",
+        "price": 3019.3,
+        "amount": 0.0238,
+        "side": "buy",
+        "timestamp": 1764967755182
+      },
+      {
+        "id": "1825577965",
+        "price": 3019.32,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967755182
+      },
+      {
+        "id": "1825577966",
+        "price": 3019.33,
+        "amount": 0.0083,
+        "side": "buy",
+        "timestamp": 1764967755200
+      },
+      {
+        "id": "1825577967",
+        "price": 3019.33,
+        "amount": 0.0083,
+        "side": "buy",
+        "timestamp": 1764967755200
+      },
+      {
+        "id": "1825577968",
+        "price": 3019.33,
+        "amount": 0.0735,
+        "side": "buy",
+        "timestamp": 1764967755212
+      },
+      {
+        "id": "1825577969",
+        "price": 3019.34,
+        "amount": 0.0204,
+        "side": "buy",
+        "timestamp": 1764967755212
+      },
+      {
+        "id": "1825577970",
+        "price": 3019.35,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967755212
+      },
+      {
+        "id": "1825577971",
+        "price": 3019.36,
+        "amount": 0.0316,
+        "side": "buy",
+        "timestamp": 1764967755212
+      },
+      {
+        "id": "1825577972",
+        "price": 3019.38,
+        "amount": 0.003,
+        "side": "buy",
+        "timestamp": 1764967755212
+      },
+      {
+        "id": "1825577973",
+        "price": 3019.38,
+        "amount": 0.0364,
+        "side": "buy",
+        "timestamp": 1764967755215
+      },
+      {
+        "id": "1825577974",
+        "price": 3019.39,
+        "amount": 0.0655,
+        "side": "buy",
+        "timestamp": 1764967755310
+      },
+      {
+        "id": "1825577975",
+        "price": 3019.39,
+        "amount": 1.3009,
+        "side": "buy",
+        "timestamp": 1764967755460
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967813107,
+    "recordedAt": "2025-12-05T20:50:13.107Z",
+    "trades": [
+      {
+        "id": "1825578271",
+        "price": 3018.79,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967772912
+      },
+      {
+        "id": "1825578272",
+        "price": 3018.83,
+        "amount": 0.0255,
+        "side": "buy",
+        "timestamp": 1764967772912
+      },
+      {
+        "id": "1825578273",
+        "price": 3018.84,
+        "amount": 0.0072,
+        "side": "buy",
+        "timestamp": 1764967772912
+      },
+      {
+        "id": "1825578274",
+        "price": 3018.85,
+        "amount": 0.0178,
+        "side": "buy",
+        "timestamp": 1764967772912
+      },
+      {
+        "id": "1825578275",
+        "price": 3018.85,
+        "amount": 3.3142,
+        "side": "buy",
+        "timestamp": 1764967772918
+      },
+      {
+        "id": "1825578276",
+        "price": 3018.84,
+        "amount": 0.0024,
+        "side": "sell",
+        "timestamp": 1764967772928
+      },
+      {
+        "id": "1825578277",
+        "price": 3018.84,
+        "amount": 0.0059,
+        "side": "sell",
+        "timestamp": 1764967773135
+      },
+      {
+        "id": "1825578278",
+        "price": 3018.84,
+        "amount": 1.29,
+        "side": "sell",
+        "timestamp": 1764967773310
+      },
+      {
+        "id": "1825578279",
+        "price": 3018.85,
+        "amount": 0.0033,
+        "side": "buy",
+        "timestamp": 1764967773507
+      },
+      {
+        "id": "1825578280",
+        "price": 3018.85,
+        "amount": 0.0731,
+        "side": "buy",
+        "timestamp": 1764967773917
+      },
+      {
+        "id": "1825578281",
+        "price": 3018.85,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967774035
+      },
+      {
+        "id": "1825578282",
+        "price": 3018.85,
+        "amount": 0.0665,
+        "side": "buy",
+        "timestamp": 1764967774177
+      },
+      {
+        "id": "1825578283",
+        "price": 3018.86,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967774177
+      },
+      {
+        "id": "1825578284",
+        "price": 3018.87,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967774177
+      },
+      {
+        "id": "1825578285",
+        "price": 3018.88,
+        "amount": 0.0103,
+        "side": "buy",
+        "timestamp": 1764967774177
+      },
+      {
+        "id": "1825578286",
+        "price": 3018.89,
+        "amount": 0.0072,
+        "side": "buy",
+        "timestamp": 1764967774177
+      },
+      {
+        "id": "1825578287",
+        "price": 3018.9,
+        "amount": 0.041,
+        "side": "buy",
+        "timestamp": 1764967774177
+      },
+      {
+        "id": "1825578288",
+        "price": 3018.9,
+        "amount": 3.314,
+        "side": "buy",
+        "timestamp": 1764967774918
+      },
+      {
+        "id": "1825578289",
+        "price": 3018.9,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967774949
+      },
+      {
+        "id": "1825578290",
+        "price": 3018.9,
+        "amount": 0.0661,
+        "side": "buy",
+        "timestamp": 1764967775286
+      },
+      {
+        "id": "1825578291",
+        "price": 3018.89,
+        "amount": 0.08,
+        "side": "sell",
+        "timestamp": 1764967775510
+      },
+      {
+        "id": "1825578292",
+        "price": 3018.9,
+        "amount": 3.314,
+        "side": "buy",
+        "timestamp": 1764967776018
+      },
+      {
+        "id": "1825578293",
+        "price": 3018.9,
+        "amount": 3.3141,
+        "side": "buy",
+        "timestamp": 1764967776962
+      },
+      {
+        "id": "1825578294",
+        "price": 3018.9,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967777300
+      },
+      {
+        "id": "1825578295",
+        "price": 3018.9,
+        "amount": 2.4654,
+        "side": "buy",
+        "timestamp": 1764967777956
+      },
+      {
+        "id": "1825578296",
+        "price": 3018.9,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967777999
+      },
+      {
+        "id": "1825578297",
+        "price": 3018.9,
+        "amount": 3.3139,
+        "side": "buy",
+        "timestamp": 1764967779060
+      },
+      {
+        "id": "1825578298",
+        "price": 3018.89,
+        "amount": 5,
+        "side": "sell",
+        "timestamp": 1764967779312
+      },
+      {
+        "id": "1825578299",
+        "price": 3018.89,
+        "amount": 0.0069,
+        "side": "sell",
+        "timestamp": 1764967779397
+      },
+      {
+        "id": "1825578300",
+        "price": 3018.9,
+        "amount": 0.0389,
+        "side": "buy",
+        "timestamp": 1764967779717
+      },
+      {
+        "id": "1825578301",
+        "price": 3018.9,
+        "amount": 0.0368,
+        "side": "buy",
+        "timestamp": 1764967779764
+      },
+      {
+        "id": "1825578302",
+        "price": 3018.9,
+        "amount": 3.3139,
+        "side": "buy",
+        "timestamp": 1764967780134
+      },
+      {
+        "id": "1825578303",
+        "price": 3018.9,
+        "amount": 3.3139,
+        "side": "buy",
+        "timestamp": 1764967781246
+      },
+      {
+        "id": "1825578304",
+        "price": 3018.9,
+        "amount": 0.0083,
+        "side": "buy",
+        "timestamp": 1764967782044
+      },
+      {
+        "id": "1825578305",
+        "price": 3018.9,
+        "amount": 0.0083,
+        "side": "buy",
+        "timestamp": 1764967782044
+      },
+      {
+        "id": "1825578306",
+        "price": 3018.9,
+        "amount": 0.0485,
+        "side": "buy",
+        "timestamp": 1764967782071
+      },
+      {
+        "id": "1825578307",
+        "price": 3018.91,
+        "amount": 0.0235,
+        "side": "buy",
+        "timestamp": 1764967782071
+      },
+      {
+        "id": "1825578308",
+        "price": 3018.93,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967782071
+      },
+      {
+        "id": "1825578309",
+        "price": 3018.94,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967782071
+      },
+      {
+        "id": "1825578310",
+        "price": 3018.95,
+        "amount": 0.0038,
+        "side": "buy",
+        "timestamp": 1764967782071
+      },
+      {
+        "id": "1825578311",
+        "price": 3018.96,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967782071
+      },
+      {
+        "id": "1825578312",
+        "price": 3018.98,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967782071
+      },
+      {
+        "id": "1825578313",
+        "price": 3018.99,
+        "amount": 0.0123,
+        "side": "buy",
+        "timestamp": 1764967782071
+      },
+      {
+        "id": "1825578314",
+        "price": 3019,
+        "amount": 0.0299,
+        "side": "buy",
+        "timestamp": 1764967782071
+      },
+      {
+        "id": "1825578315",
+        "price": 3019,
+        "amount": 3.3138,
+        "side": "buy",
+        "timestamp": 1764967782504
+      },
+      {
+        "id": "1825578316",
+        "price": 3018.99,
+        "amount": 0.8166,
+        "side": "sell",
+        "timestamp": 1764967783465
+      },
+      {
+        "id": "1825578317",
+        "price": 3019,
+        "amount": 3.3138,
+        "side": "buy",
+        "timestamp": 1764967783661
+      },
+      {
+        "id": "1825578318",
+        "price": 3019,
+        "amount": 1.5749,
+        "side": "buy",
+        "timestamp": 1764967784717
+      },
+      {
+        "id": "1825578319",
+        "price": 3019,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967785066
+      },
+      {
+        "id": "1825578320",
+        "price": 3019,
+        "amount": 3.3138,
+        "side": "buy",
+        "timestamp": 1764967785665
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967843127,
+    "recordedAt": "2025-12-05T20:50:43.127Z",
+    "trades": [
+      {
+        "id": "1825578901",
+        "price": 3019.92,
+        "amount": 0.1481,
+        "side": "sell",
+        "timestamp": 1764967809871
+      },
+      {
+        "id": "1825578902",
+        "price": 3019.92,
+        "amount": 0.1025,
+        "side": "sell",
+        "timestamp": 1764967809878
+      },
+      {
+        "id": "1825578903",
+        "price": 3019.92,
+        "amount": 0.1077,
+        "side": "sell",
+        "timestamp": 1764967809884
+      },
+      {
+        "id": "1825578904",
+        "price": 3019.93,
+        "amount": 0.0511,
+        "side": "buy",
+        "timestamp": 1764967810146
+      },
+      {
+        "id": "1825578905",
+        "price": 3019.94,
+        "amount": 0.0242,
+        "side": "buy",
+        "timestamp": 1764967810146
+      },
+      {
+        "id": "1825578906",
+        "price": 3019.95,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967810146
+      },
+      {
+        "id": "1825578907",
+        "price": 3019.96,
+        "amount": 0.0089,
+        "side": "buy",
+        "timestamp": 1764967810146
+      },
+      {
+        "id": "1825578908",
+        "price": 3019.97,
+        "amount": 0.0443,
+        "side": "buy",
+        "timestamp": 1764967810146
+      },
+      {
+        "id": "1825578909",
+        "price": 3019.97,
+        "amount": 0.0303,
+        "side": "buy",
+        "timestamp": 1764967810275
+      },
+      {
+        "id": "1825578910",
+        "price": 3019.97,
+        "amount": 1.2222,
+        "side": "buy",
+        "timestamp": 1764967810308
+      },
+      {
+        "id": "1825578911",
+        "price": 3019.97,
+        "amount": 0.0463,
+        "side": "buy",
+        "timestamp": 1764967810778
+      },
+      {
+        "id": "1825578912",
+        "price": 3019.98,
+        "amount": 0.0086,
+        "side": "buy",
+        "timestamp": 1764967810780
+      },
+      {
+        "id": "1825578913",
+        "price": 3019.99,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967810780
+      },
+      {
+        "id": "1825578914",
+        "price": 3020,
+        "amount": 0.0086,
+        "side": "buy",
+        "timestamp": 1764967810780
+      },
+      {
+        "id": "1825578915",
+        "price": 3020.02,
+        "amount": 0.0516,
+        "side": "buy",
+        "timestamp": 1764967810799
+      },
+      {
+        "id": "1825578916",
+        "price": 3020.03,
+        "amount": 0.0188,
+        "side": "buy",
+        "timestamp": 1764967810799
+      },
+      {
+        "id": "1825578917",
+        "price": 3020.06,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967810799
+      },
+      {
+        "id": "1825578918",
+        "price": 3020.07,
+        "amount": 0.0238,
+        "side": "buy",
+        "timestamp": 1764967810799
+      },
+      {
+        "id": "1825578919",
+        "price": 3020.09,
+        "amount": 0.0129,
+        "side": "buy",
+        "timestamp": 1764967810799
+      },
+      {
+        "id": "1825578920",
+        "price": 3020.1,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967810799
+      },
+      {
+        "id": "1825578921",
+        "price": 3020.13,
+        "amount": 0.0162,
+        "side": "buy",
+        "timestamp": 1764967810799
+      },
+      {
+        "id": "1825578922",
+        "price": 3020.13,
+        "amount": 1.2263,
+        "side": "buy",
+        "timestamp": 1764967811416
+      },
+      {
+        "id": "1825578923",
+        "price": 3020.13,
+        "amount": 3.3126,
+        "side": "buy",
+        "timestamp": 1764967812417
+      },
+      {
+        "id": "1825578924",
+        "price": 3020.13,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967812512
+      },
+      {
+        "id": "1825578925",
+        "price": 3020.12,
+        "amount": 0.5159,
+        "side": "sell",
+        "timestamp": 1764967812771
+      },
+      {
+        "id": "1825578926",
+        "price": 3020.12,
+        "amount": 0.0512,
+        "side": "sell",
+        "timestamp": 1764967812898
+      },
+      {
+        "id": "1825578927",
+        "price": 3020.11,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967812898
+      },
+      {
+        "id": "1825578928",
+        "price": 3020.11,
+        "amount": 0.0474,
+        "side": "sell",
+        "timestamp": 1764967813018
+      },
+      {
+        "id": "1825578929",
+        "price": 3020.1,
+        "amount": 0.0154,
+        "side": "sell",
+        "timestamp": 1764967813018
+      },
+      {
+        "id": "1825578930",
+        "price": 3020.05,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967813018
+      },
+      {
+        "id": "1825578931",
+        "price": 3020.04,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967813018
+      },
+      {
+        "id": "1825578932",
+        "price": 3020.03,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967813018
+      },
+      {
+        "id": "1825578933",
+        "price": 3020.02,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967813020
+      },
+      {
+        "id": "1825578934",
+        "price": 3020.01,
+        "amount": 0.0238,
+        "side": "sell",
+        "timestamp": 1764967813020
+      },
+      {
+        "id": "1825578935",
+        "price": 3020,
+        "amount": 0.0089,
+        "side": "sell",
+        "timestamp": 1764967813020
+      },
+      {
+        "id": "1825578936",
+        "price": 3019.99,
+        "amount": 0.7446,
+        "side": "sell",
+        "timestamp": 1764967813029
+      },
+      {
+        "id": "1825578937",
+        "price": 3019.98,
+        "amount": 0.0296,
+        "side": "sell",
+        "timestamp": 1764967813030
+      },
+      {
+        "id": "1825578938",
+        "price": 3019.97,
+        "amount": 0.0242,
+        "side": "sell",
+        "timestamp": 1764967813032
+      },
+      {
+        "id": "1825578939",
+        "price": 3019.96,
+        "amount": 0.0034,
+        "side": "sell",
+        "timestamp": 1764967813032
+      },
+      {
+        "id": "1825578940",
+        "price": 3019.95,
+        "amount": 0.063,
+        "side": "sell",
+        "timestamp": 1764967813035
+      },
+      {
+        "id": "1825578941",
+        "price": 3019.94,
+        "amount": 0.0136,
+        "side": "sell",
+        "timestamp": 1764967813035
+      },
+      {
+        "id": "1825578942",
+        "price": 3019.93,
+        "amount": 0.0072,
+        "side": "sell",
+        "timestamp": 1764967813035
+      },
+      {
+        "id": "1825578943",
+        "price": 3019.93,
+        "amount": 0.0083,
+        "side": "buy",
+        "timestamp": 1764967813091
+      },
+      {
+        "id": "1825578944",
+        "price": 3019.93,
+        "amount": 3.3131,
+        "side": "buy",
+        "timestamp": 1764967813518
+      },
+      {
+        "id": "1825578945",
+        "price": 3019.92,
+        "amount": 0.5362,
+        "side": "sell",
+        "timestamp": 1764967813622
+      },
+      {
+        "id": "1825578946",
+        "price": 3019.91,
+        "amount": 0.0137,
+        "side": "sell",
+        "timestamp": 1764967813622
+      },
+      {
+        "id": "1825578947",
+        "price": 3019.86,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967814160
+      },
+      {
+        "id": "1825578948",
+        "price": 3019.85,
+        "amount": 0.2,
+        "side": "sell",
+        "timestamp": 1764967814290
+      },
+      {
+        "id": "1825578949",
+        "price": 3019.86,
+        "amount": 0.003,
+        "side": "buy",
+        "timestamp": 1764967814511
+      },
+      {
+        "id": "1825578950",
+        "price": 3019.86,
+        "amount": 1.2353,
+        "side": "buy",
+        "timestamp": 1764967814543
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967873121,
+    "recordedAt": "2025-12-05T20:51:13.121Z",
+    "trades": [
+      {
+        "id": "1825579395",
+        "price": 3020.6,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967832379
+      },
+      {
+        "id": "1825579396",
+        "price": 3020.59,
+        "amount": 0.04,
+        "side": "sell",
+        "timestamp": 1764967832379
+      },
+      {
+        "id": "1825579397",
+        "price": 3020.58,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967832379
+      },
+      {
+        "id": "1825579398",
+        "price": 3020.57,
+        "amount": 0.1416,
+        "side": "sell",
+        "timestamp": 1764967832416
+      },
+      {
+        "id": "1825579399",
+        "price": 3020.56,
+        "amount": 0.0485,
+        "side": "sell",
+        "timestamp": 1764967832447
+      },
+      {
+        "id": "1825579400",
+        "price": 3020.55,
+        "amount": 0.027,
+        "side": "sell",
+        "timestamp": 1764967832447
+      },
+      {
+        "id": "1825579401",
+        "price": 3020.54,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967832447
+      },
+      {
+        "id": "1825579402",
+        "price": 3020.55,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967832475
+      },
+      {
+        "id": "1825579403",
+        "price": 3020.54,
+        "amount": 0.0561,
+        "side": "sell",
+        "timestamp": 1764967832841
+      },
+      {
+        "id": "1825579404",
+        "price": 3020.53,
+        "amount": 0.0485,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579405",
+        "price": 3020.52,
+        "amount": 0.0205,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579406",
+        "price": 3020.49,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579407",
+        "price": 3020.48,
+        "amount": 0.0234,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579408",
+        "price": 3020.47,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579409",
+        "price": 3020.46,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579410",
+        "price": 3020.45,
+        "amount": 0.0349,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579411",
+        "price": 3020.44,
+        "amount": 0.022,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579412",
+        "price": 3020.43,
+        "amount": 0.0217,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579413",
+        "price": 3020.4,
+        "amount": 0.0035,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579414",
+        "price": 3020.38,
+        "amount": 0.0284,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579415",
+        "price": 3020.32,
+        "amount": 0.0347,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579416",
+        "price": 3020.28,
+        "amount": 0.0662,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579417",
+        "price": 3020.25,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579418",
+        "price": 3020.24,
+        "amount": 0.0397,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579419",
+        "price": 3020.23,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579420",
+        "price": 3020.19,
+        "amount": 0.0054,
+        "side": "sell",
+        "timestamp": 1764967832866
+      },
+      {
+        "id": "1825579421",
+        "price": 3020.19,
+        "amount": 3.3125,
+        "side": "buy",
+        "timestamp": 1764967833018
+      },
+      {
+        "id": "1825579422",
+        "price": 3020.19,
+        "amount": 0.0042,
+        "side": "buy",
+        "timestamp": 1764967833572
+      },
+      {
+        "id": "1825579423",
+        "price": 3020.19,
+        "amount": 0.0034,
+        "side": "buy",
+        "timestamp": 1764967833711
+      },
+      {
+        "id": "1825579424",
+        "price": 3020.19,
+        "amount": 0.0024,
+        "side": "buy",
+        "timestamp": 1764967833815
+      },
+      {
+        "id": "1825579425",
+        "price": 3020.19,
+        "amount": 3.3125,
+        "side": "buy",
+        "timestamp": 1764967834068
+      },
+      {
+        "id": "1825579426",
+        "price": 3020.19,
+        "amount": 3.3126,
+        "side": "buy",
+        "timestamp": 1764967835018
+      },
+      {
+        "id": "1825579427",
+        "price": 3020.19,
+        "amount": 0.0658,
+        "side": "buy",
+        "timestamp": 1764967835631
+      },
+      {
+        "id": "1825579428",
+        "price": 3020.19,
+        "amount": 0.0017,
+        "side": "buy",
+        "timestamp": 1764967836150
+      },
+      {
+        "id": "1825579429",
+        "price": 3020.19,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967836177
+      },
+      {
+        "id": "1825579430",
+        "price": 3020.19,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967837217
+      },
+      {
+        "id": "1825579431",
+        "price": 3020.18,
+        "amount": 0.1,
+        "side": "sell",
+        "timestamp": 1764967838101
+      },
+      {
+        "id": "1825579432",
+        "price": 3020.19,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967838317
+      },
+      {
+        "id": "1825579433",
+        "price": 3020.19,
+        "amount": 0.0022,
+        "side": "buy",
+        "timestamp": 1764967838934
+      },
+      {
+        "id": "1825579434",
+        "price": 3020.19,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967839231
+      },
+      {
+        "id": "1825579435",
+        "price": 3020.19,
+        "amount": 0.0019,
+        "side": "buy",
+        "timestamp": 1764967840136
+      },
+      {
+        "id": "1825579436",
+        "price": 3020.19,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967840444
+      },
+      {
+        "id": "1825579437",
+        "price": 3020.18,
+        "amount": 0.6957,
+        "side": "sell",
+        "timestamp": 1764967841146
+      },
+      {
+        "id": "1825579438",
+        "price": 3020.19,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967841418
+      },
+      {
+        "id": "1825579439",
+        "price": 3020.19,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967842617
+      },
+      {
+        "id": "1825579440",
+        "price": 3020.18,
+        "amount": 0.0536,
+        "side": "sell",
+        "timestamp": 1764967842861
+      },
+      {
+        "id": "1825579441",
+        "price": 3020.19,
+        "amount": 0.2648,
+        "side": "buy",
+        "timestamp": 1764967843513
+      },
+      {
+        "id": "1825579442",
+        "price": 3020.19,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967843684
+      },
+      {
+        "id": "1825579443",
+        "price": 3020.19,
+        "amount": 3.3129,
+        "side": "buy",
+        "timestamp": 1764967844770
+      },
+      {
+        "id": "1825579444",
+        "price": 3020.19,
+        "amount": 0.0189,
+        "side": "buy",
+        "timestamp": 1764967845034
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967903142,
+    "recordedAt": "2025-12-05T20:51:43.142Z",
+    "trades": [
+      {
+        "id": "1825579927",
+        "price": 3019.75,
+        "amount": 0.0166,
+        "side": "sell",
+        "timestamp": 1764967873427
+      },
+      {
+        "id": "1825579928",
+        "price": 3019.74,
+        "amount": 0.0034,
+        "side": "sell",
+        "timestamp": 1764967873427
+      },
+      {
+        "id": "1825579929",
+        "price": 3019.72,
+        "amount": 0.002,
+        "side": "sell",
+        "timestamp": 1764967873427
+      },
+      {
+        "id": "1825579930",
+        "price": 3019.75,
+        "amount": 0.0183,
+        "side": "sell",
+        "timestamp": 1764967873428
+      },
+      {
+        "id": "1825579931",
+        "price": 3019.74,
+        "amount": 0.0153,
+        "side": "sell",
+        "timestamp": 1764967873428
+      },
+      {
+        "id": "1825579932",
+        "price": 3019.65,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967873428
+      },
+      {
+        "id": "1825579933",
+        "price": 3019.64,
+        "amount": 0.0027,
+        "side": "sell",
+        "timestamp": 1764967873431
+      },
+      {
+        "id": "1825579934",
+        "price": 3019.63,
+        "amount": 0.0132,
+        "side": "sell",
+        "timestamp": 1764967873431
+      },
+      {
+        "id": "1825579935",
+        "price": 3019.61,
+        "amount": 0.002,
+        "side": "sell",
+        "timestamp": 1764967873431
+      },
+      {
+        "id": "1825579936",
+        "price": 3019.59,
+        "amount": 0.035,
+        "side": "sell",
+        "timestamp": 1764967873431
+      },
+      {
+        "id": "1825579937",
+        "price": 3019.55,
+        "amount": 0.0146,
+        "side": "sell",
+        "timestamp": 1764967873431
+      },
+      {
+        "id": "1825579938",
+        "price": 3019.55,
+        "amount": 0.0019,
+        "side": "sell",
+        "timestamp": 1764967873437
+      },
+      {
+        "id": "1825579939",
+        "price": 3019.55,
+        "amount": 0.2369,
+        "side": "sell",
+        "timestamp": 1764967873439
+      },
+      {
+        "id": "1825579940",
+        "price": 3019.55,
+        "amount": 0.5958,
+        "side": "sell",
+        "timestamp": 1764967873442
+      },
+      {
+        "id": "1825579941",
+        "price": 3019.55,
+        "amount": 0.045,
+        "side": "sell",
+        "timestamp": 1764967873453
+      },
+      {
+        "id": "1825579942",
+        "price": 3019.54,
+        "amount": 0.0153,
+        "side": "sell",
+        "timestamp": 1764967873454
+      },
+      {
+        "id": "1825579943",
+        "price": 3019.53,
+        "amount": 0.0716,
+        "side": "sell",
+        "timestamp": 1764967873454
+      },
+      {
+        "id": "1825579944",
+        "price": 3019.53,
+        "amount": 0.006,
+        "side": "buy",
+        "timestamp": 1764967873928
+      },
+      {
+        "id": "1825579945",
+        "price": 3019.53,
+        "amount": 0.006,
+        "side": "buy",
+        "timestamp": 1764967874103
+      },
+      {
+        "id": "1825579946",
+        "price": 3019.53,
+        "amount": 3.3135,
+        "side": "buy",
+        "timestamp": 1764967874288
+      },
+      {
+        "id": "1825579947",
+        "price": 3019.53,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967874882
+      },
+      {
+        "id": "1825579948",
+        "price": 3019.53,
+        "amount": 0.0658,
+        "side": "buy",
+        "timestamp": 1764967875250
+      },
+      {
+        "id": "1825579949",
+        "price": 3019.53,
+        "amount": 3.3135,
+        "side": "buy",
+        "timestamp": 1764967875280
+      },
+      {
+        "id": "1825579950",
+        "price": 3019.53,
+        "amount": 12.5213,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579951",
+        "price": 3019.54,
+        "amount": 0.0086,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579952",
+        "price": 3019.55,
+        "amount": 0.0072,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579953",
+        "price": 3019.56,
+        "amount": 0.2063,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579954",
+        "price": 3019.57,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579955",
+        "price": 3019.58,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579956",
+        "price": 3019.59,
+        "amount": 0.0137,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579957",
+        "price": 3019.6,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579958",
+        "price": 3019.61,
+        "amount": 0.0072,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579959",
+        "price": 3019.62,
+        "amount": 0.8437,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579960",
+        "price": 3019.64,
+        "amount": 0.0916,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579961",
+        "price": 3019.65,
+        "amount": 0.0105,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579962",
+        "price": 3019.66,
+        "amount": 1.3457,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579963",
+        "price": 3019.67,
+        "amount": 4.4385,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579964",
+        "price": 3019.77,
+        "amount": 0.05,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579965",
+        "price": 3019.78,
+        "amount": 0.1,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579966",
+        "price": 3019.8,
+        "amount": 0.0017,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579967",
+        "price": 3019.83,
+        "amount": 0.0017,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579968",
+        "price": 3019.84,
+        "amount": 0.0017,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579969",
+        "price": 3019.87,
+        "amount": 17.522,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579970",
+        "price": 3019.9,
+        "amount": 15.9122,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579971",
+        "price": 3019.91,
+        "amount": 2.4335,
+        "side": "buy",
+        "timestamp": 1764967875468
+      },
+      {
+        "id": "1825579972",
+        "price": 3019.79,
+        "amount": 1.6588,
+        "side": "sell",
+        "timestamp": 1764967875471
+      },
+      {
+        "id": "1825579973",
+        "price": 3019.8,
+        "amount": 0.0019,
+        "side": "buy",
+        "timestamp": 1764967876156
+      },
+      {
+        "id": "1825579974",
+        "price": 3019.8,
+        "amount": 3.3135,
+        "side": "buy",
+        "timestamp": 1764967876282
+      },
+      {
+        "id": "1825579975",
+        "price": 3019.8,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967876622
+      },
+      {
+        "id": "1825579976",
+        "price": 3019.8,
+        "amount": 1,
+        "side": "buy",
+        "timestamp": 1764967876912
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967933114,
+    "recordedAt": "2025-12-05T20:52:13.114Z",
+    "trades": [
+      {
+        "id": "1825580682",
+        "price": 3016.58,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967903896
+      },
+      {
+        "id": "1825580683",
+        "price": 3016.59,
+        "amount": 0.0086,
+        "side": "buy",
+        "timestamp": 1764967903896
+      },
+      {
+        "id": "1825580684",
+        "price": 3016.6,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967903896
+      },
+      {
+        "id": "1825580685",
+        "price": 3016.61,
+        "amount": 0.0072,
+        "side": "buy",
+        "timestamp": 1764967903896
+      },
+      {
+        "id": "1825580686",
+        "price": 3016.62,
+        "amount": 0.9363,
+        "side": "buy",
+        "timestamp": 1764967903896
+      },
+      {
+        "id": "1825580687",
+        "price": 3016.62,
+        "amount": 0.0338,
+        "side": "buy",
+        "timestamp": 1764967903917
+      },
+      {
+        "id": "1825580688",
+        "price": 3016.63,
+        "amount": 1.1622,
+        "side": "buy",
+        "timestamp": 1764967903918
+      },
+      {
+        "id": "1825580689",
+        "price": 3016.63,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967903919
+      },
+      {
+        "id": "1825580690",
+        "price": 3016.65,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967903919
+      },
+      {
+        "id": "1825580691",
+        "price": 3016.67,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967903919
+      },
+      {
+        "id": "1825580692",
+        "price": 3016.72,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967903919
+      },
+      {
+        "id": "1825580693",
+        "price": 3016.77,
+        "amount": 0.0522,
+        "side": "buy",
+        "timestamp": 1764967904018
+      },
+      {
+        "id": "1825580694",
+        "price": 3016.78,
+        "amount": 0.0505,
+        "side": "buy",
+        "timestamp": 1764967904018
+      },
+      {
+        "id": "1825580695",
+        "price": 3016.79,
+        "amount": 0.0086,
+        "side": "buy",
+        "timestamp": 1764967904019
+      },
+      {
+        "id": "1825580696",
+        "price": 3016.8,
+        "amount": 0.0069,
+        "side": "buy",
+        "timestamp": 1764967904019
+      },
+      {
+        "id": "1825580697",
+        "price": 3016.88,
+        "amount": 3.3164,
+        "side": "buy",
+        "timestamp": 1764967904118
+      },
+      {
+        "id": "1825580698",
+        "price": 3016.87,
+        "amount": 0.0033,
+        "side": "sell",
+        "timestamp": 1764967904391
+      },
+      {
+        "id": "1825580699",
+        "price": 3016.88,
+        "amount": 0.0553,
+        "side": "buy",
+        "timestamp": 1764967904640
+      },
+      {
+        "id": "1825580700",
+        "price": 3016.89,
+        "amount": 0.0235,
+        "side": "buy",
+        "timestamp": 1764967904642
+      },
+      {
+        "id": "1825580701",
+        "price": 3016.9,
+        "amount": 0.0171,
+        "side": "buy",
+        "timestamp": 1764967904642
+      },
+      {
+        "id": "1825580702",
+        "price": 3016.91,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967904642
+      },
+      {
+        "id": "1825580703",
+        "price": 3016.92,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967904642
+      },
+      {
+        "id": "1825580704",
+        "price": 3016.93,
+        "amount": 0.0106,
+        "side": "buy",
+        "timestamp": 1764967904642
+      },
+      {
+        "id": "1825580705",
+        "price": 3016.94,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967904664
+      },
+      {
+        "id": "1825580706",
+        "price": 3016.93,
+        "amount": 0.0589,
+        "side": "sell",
+        "timestamp": 1764967905091
+      },
+      {
+        "id": "1825580707",
+        "price": 3016.94,
+        "amount": 0.0644,
+        "side": "buy",
+        "timestamp": 1764967905246
+      },
+      {
+        "id": "1825580708",
+        "price": 3016.94,
+        "amount": 0.0109,
+        "side": "buy",
+        "timestamp": 1764967905446
+      },
+      {
+        "id": "1825580709",
+        "price": 3016.94,
+        "amount": 0.0736,
+        "side": "buy",
+        "timestamp": 1764967906061
+      },
+      {
+        "id": "1825580710",
+        "price": 3016.94,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967906148
+      },
+      {
+        "id": "1825580711",
+        "price": 3016.94,
+        "amount": 3.3164,
+        "side": "buy",
+        "timestamp": 1764967906241
+      },
+      {
+        "id": "1825580712",
+        "price": 3016.94,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967906528
+      },
+      {
+        "id": "1825580713",
+        "price": 3016.94,
+        "amount": 0.042,
+        "side": "buy",
+        "timestamp": 1764967906574
+      },
+      {
+        "id": "1825580714",
+        "price": 3016.94,
+        "amount": 0.2289,
+        "side": "buy",
+        "timestamp": 1764967906771
+      },
+      {
+        "id": "1825580715",
+        "price": 3016.95,
+        "amount": 0.012,
+        "side": "buy",
+        "timestamp": 1764967906771
+      },
+      {
+        "id": "1825580716",
+        "price": 3016.96,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967906771
+      },
+      {
+        "id": "1825580717",
+        "price": 3016.97,
+        "amount": 0.031,
+        "side": "buy",
+        "timestamp": 1764967906771
+      },
+      {
+        "id": "1825580718",
+        "price": 3016.98,
+        "amount": 0.0106,
+        "side": "buy",
+        "timestamp": 1764967906771
+      },
+      {
+        "id": "1825580719",
+        "price": 3016.99,
+        "amount": 1.0668,
+        "side": "buy",
+        "timestamp": 1764967906772
+      },
+      {
+        "id": "1825580720",
+        "price": 3017,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967906772
+      },
+      {
+        "id": "1825580721",
+        "price": 3017.01,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967906772
+      },
+      {
+        "id": "1825580722",
+        "price": 3017.02,
+        "amount": 0.1159,
+        "side": "buy",
+        "timestamp": 1764967906772
+      },
+      {
+        "id": "1825580723",
+        "price": 3017.02,
+        "amount": 0.0346,
+        "side": "buy",
+        "timestamp": 1764967906774
+      },
+      {
+        "id": "1825580724",
+        "price": 3017.03,
+        "amount": 0.0421,
+        "side": "buy",
+        "timestamp": 1764967906774
+      },
+      {
+        "id": "1825580725",
+        "price": 3017.04,
+        "amount": 1.397,
+        "side": "buy",
+        "timestamp": 1764967906781
+      },
+      {
+        "id": "1825580726",
+        "price": 3017.04,
+        "amount": 0.0033,
+        "side": "buy",
+        "timestamp": 1764967906781
+      },
+      {
+        "id": "1825580727",
+        "price": 3017.05,
+        "amount": 0.0222,
+        "side": "buy",
+        "timestamp": 1764967906781
+      },
+      {
+        "id": "1825580728",
+        "price": 3017.06,
+        "amount": 0.0384,
+        "side": "buy",
+        "timestamp": 1764967906781
+      },
+      {
+        "id": "1825580729",
+        "price": 3017.07,
+        "amount": 0.0113,
+        "side": "buy",
+        "timestamp": 1764967906783
+      },
+      {
+        "id": "1825580730",
+        "price": 3017.08,
+        "amount": 0.0126,
+        "side": "buy",
+        "timestamp": 1764967906783
+      },
+      {
+        "id": "1825580731",
+        "price": 3017.09,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967906803
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967963140,
+    "recordedAt": "2025-12-05T20:52:43.140Z",
+    "trades": [
+      {
+        "id": "1825581207",
+        "price": 3017.1,
+        "amount": 0.0052,
+        "side": "sell",
+        "timestamp": 1764967931818
+      },
+      {
+        "id": "1825581208",
+        "price": 3017.09,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967931818
+      },
+      {
+        "id": "1825581209",
+        "price": 3017.08,
+        "amount": 0.0092,
+        "side": "sell",
+        "timestamp": 1764967931818
+      },
+      {
+        "id": "1825581210",
+        "price": 3017.07,
+        "amount": 0.1452,
+        "side": "sell",
+        "timestamp": 1764967931850
+      },
+      {
+        "id": "1825581211",
+        "price": 3017.06,
+        "amount": 0.1246,
+        "side": "sell",
+        "timestamp": 1764967931850
+      },
+      {
+        "id": "1825581212",
+        "price": 3017.07,
+        "amount": 3.3164,
+        "side": "buy",
+        "timestamp": 1764967932784
+      },
+      {
+        "id": "1825581213",
+        "price": 3017.07,
+        "amount": 3.3164,
+        "side": "buy",
+        "timestamp": 1764967933779
+      },
+      {
+        "id": "1825581214",
+        "price": 3017.07,
+        "amount": 0.502,
+        "side": "buy",
+        "timestamp": 1764967934049
+      },
+      {
+        "id": "1825581215",
+        "price": 3017.07,
+        "amount": 17.3363,
+        "side": "buy",
+        "timestamp": 1764967934648
+      },
+      {
+        "id": "1825581216",
+        "price": 3017.08,
+        "amount": 9.2948,
+        "side": "buy",
+        "timestamp": 1764967934648
+      },
+      {
+        "id": "1825581217",
+        "price": 3017.07,
+        "amount": 0.0158,
+        "side": "sell",
+        "timestamp": 1764967934657
+      },
+      {
+        "id": "1825581218",
+        "price": 3017.07,
+        "amount": 0.0158,
+        "side": "sell",
+        "timestamp": 1764967934657
+      },
+      {
+        "id": "1825581219",
+        "price": 3017.07,
+        "amount": 0.6107,
+        "side": "sell",
+        "timestamp": 1764967934701
+      },
+      {
+        "id": "1825581220",
+        "price": 3017.07,
+        "amount": 0.5704,
+        "side": "sell",
+        "timestamp": 1764967934703
+      },
+      {
+        "id": "1825581221",
+        "price": 3017.07,
+        "amount": 0.1,
+        "side": "sell",
+        "timestamp": 1764967934703
+      },
+      {
+        "id": "1825581222",
+        "price": 3017.07,
+        "amount": 1.1332,
+        "side": "sell",
+        "timestamp": 1764967934703
+      },
+      {
+        "id": "1825581223",
+        "price": 3017.07,
+        "amount": 0.5622,
+        "side": "sell",
+        "timestamp": 1764967934704
+      },
+      {
+        "id": "1825581224",
+        "price": 3017.07,
+        "amount": 0.7429,
+        "side": "sell",
+        "timestamp": 1764967934704
+      },
+      {
+        "id": "1825581225",
+        "price": 3017.07,
+        "amount": 2.7747,
+        "side": "sell",
+        "timestamp": 1764967934704
+      },
+      {
+        "id": "1825581226",
+        "price": 3017.07,
+        "amount": 0.3175,
+        "side": "sell",
+        "timestamp": 1764967934704
+      },
+      {
+        "id": "1825581227",
+        "price": 3017.07,
+        "amount": 0.5426,
+        "side": "sell",
+        "timestamp": 1764967934704
+      },
+      {
+        "id": "1825581228",
+        "price": 3017.07,
+        "amount": 0.2137,
+        "side": "sell",
+        "timestamp": 1764967934704
+      },
+      {
+        "id": "1825581229",
+        "price": 3017.07,
+        "amount": 1.9515,
+        "side": "sell",
+        "timestamp": 1764967934704
+      },
+      {
+        "id": "1825581230",
+        "price": 3017.07,
+        "amount": 0.1743,
+        "side": "sell",
+        "timestamp": 1764967934704
+      },
+      {
+        "id": "1825581231",
+        "price": 3017.06,
+        "amount": 0.0336,
+        "side": "sell",
+        "timestamp": 1764967934705
+      },
+      {
+        "id": "1825581232",
+        "price": 3017.05,
+        "amount": 0.0052,
+        "side": "sell",
+        "timestamp": 1764967934705
+      },
+      {
+        "id": "1825581233",
+        "price": 3017.04,
+        "amount": 0.0035,
+        "side": "sell",
+        "timestamp": 1764967934705
+      },
+      {
+        "id": "1825581234",
+        "price": 3017.02,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967934705
+      },
+      {
+        "id": "1825581235",
+        "price": 3017.01,
+        "amount": 0.0018,
+        "side": "sell",
+        "timestamp": 1764967934705
+      },
+      {
+        "id": "1825581236",
+        "price": 3017,
+        "amount": 0.0035,
+        "side": "sell",
+        "timestamp": 1764967934705
+      },
+      {
+        "id": "1825581237",
+        "price": 3016.96,
+        "amount": 0.0403,
+        "side": "sell",
+        "timestamp": 1764967934705
+      },
+      {
+        "id": "1825581238",
+        "price": 3016.95,
+        "amount": 0.1227,
+        "side": "sell",
+        "timestamp": 1764967934705
+      },
+      {
+        "id": "1825581239",
+        "price": 3016.92,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967934705
+      },
+      {
+        "id": "1825581240",
+        "price": 3016.91,
+        "amount": 0.0105,
+        "side": "sell",
+        "timestamp": 1764967934708
+      },
+      {
+        "id": "1825581241",
+        "price": 3016.9,
+        "amount": 0.07,
+        "side": "sell",
+        "timestamp": 1764967934708
+      },
+      {
+        "id": "1825581242",
+        "price": 3016.9,
+        "amount": 0.0083,
+        "side": "sell",
+        "timestamp": 1764967934724
+      },
+      {
+        "id": "1825581243",
+        "price": 3016.9,
+        "amount": 0.0083,
+        "side": "sell",
+        "timestamp": 1764967934724
+      },
+      {
+        "id": "1825581244",
+        "price": 3016.9,
+        "amount": 0.0202,
+        "side": "sell",
+        "timestamp": 1764967934724
+      },
+      {
+        "id": "1825581245",
+        "price": 3016.89,
+        "amount": 0.0051,
+        "side": "sell",
+        "timestamp": 1764967934724
+      },
+      {
+        "id": "1825581246",
+        "price": 3016.86,
+        "amount": 0.002,
+        "side": "sell",
+        "timestamp": 1764967934724
+      },
+      {
+        "id": "1825581247",
+        "price": 3016.82,
+        "amount": 0.0099,
+        "side": "sell",
+        "timestamp": 1764967934724
+      },
+      {
+        "id": "1825581248",
+        "price": 3016.9,
+        "amount": 3.3167,
+        "side": "buy",
+        "timestamp": 1764967934725
+      },
+      {
+        "id": "1825581249",
+        "price": 3016.75,
+        "amount": 0.0025,
+        "side": "sell",
+        "timestamp": 1764967934726
+      },
+      {
+        "id": "1825581250",
+        "price": 3016.71,
+        "amount": 0.1034,
+        "side": "sell",
+        "timestamp": 1764967934726
+      },
+      {
+        "id": "1825581251",
+        "price": 3016.67,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967934726
+      },
+      {
+        "id": "1825581252",
+        "price": 3016.8,
+        "amount": 0.0195,
+        "side": "sell",
+        "timestamp": 1764967934728
+      },
+      {
+        "id": "1825581253",
+        "price": 3016.74,
+        "amount": 0.0133,
+        "side": "sell",
+        "timestamp": 1764967934728
+      },
+      {
+        "id": "1825581254",
+        "price": 3016.65,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764967934728
+      },
+      {
+        "id": "1825581255",
+        "price": 3016.64,
+        "amount": 0.2567,
+        "side": "sell",
+        "timestamp": 1764967934731
+      },
+      {
+        "id": "1825581256",
+        "price": 3016.64,
+        "amount": 0.1129,
+        "side": "sell",
+        "timestamp": 1764967934740
+      }
+    ]
+  },
+  {
+    "timestamp": 1764967993112,
+    "recordedAt": "2025-12-05T20:53:13.112Z",
+    "trades": [
+      {
+        "id": "1825581583",
+        "price": 3019.03,
+        "amount": 0.0276,
+        "side": "buy",
+        "timestamp": 1764967956074
+      },
+      {
+        "id": "1825581584",
+        "price": 3019.04,
+        "amount": 0.8386,
+        "side": "buy",
+        "timestamp": 1764967956078
+      },
+      {
+        "id": "1825581585",
+        "price": 3019.05,
+        "amount": 0.0324,
+        "side": "buy",
+        "timestamp": 1764967956080
+      },
+      {
+        "id": "1825581586",
+        "price": 3019.06,
+        "amount": 0.0089,
+        "side": "buy",
+        "timestamp": 1764967956080
+      },
+      {
+        "id": "1825581587",
+        "price": 3019.08,
+        "amount": 0.0316,
+        "side": "buy",
+        "timestamp": 1764967956080
+      },
+      {
+        "id": "1825581588",
+        "price": 3019.09,
+        "amount": 0.0157,
+        "side": "buy",
+        "timestamp": 1764967956081
+      },
+      {
+        "id": "1825581589",
+        "price": 3019.1,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764967956081
+      },
+      {
+        "id": "1825581590",
+        "price": 3019.11,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967956081
+      },
+      {
+        "id": "1825581591",
+        "price": 3019.12,
+        "amount": 0.0106,
+        "side": "buy",
+        "timestamp": 1764967956081
+      },
+      {
+        "id": "1825581592",
+        "price": 3019.13,
+        "amount": 0.1214,
+        "side": "buy",
+        "timestamp": 1764967956081
+      },
+      {
+        "id": "1825581593",
+        "price": 3019.13,
+        "amount": 0.0397,
+        "side": "buy",
+        "timestamp": 1764967956092
+      },
+      {
+        "id": "1825581594",
+        "price": 3019.14,
+        "amount": 0.0256,
+        "side": "buy",
+        "timestamp": 1764967956092
+      },
+      {
+        "id": "1825581595",
+        "price": 3019.16,
+        "amount": 0.0142,
+        "side": "buy",
+        "timestamp": 1764967956094
+      },
+      {
+        "id": "1825581596",
+        "price": 3019.17,
+        "amount": 0.0339,
+        "side": "buy",
+        "timestamp": 1764967956094
+      },
+      {
+        "id": "1825581597",
+        "price": 3019.18,
+        "amount": 0.068,
+        "side": "buy",
+        "timestamp": 1764967956094
+      },
+      {
+        "id": "1825581598",
+        "price": 3019.19,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967956095
+      },
+      {
+        "id": "1825581599",
+        "price": 3019.2,
+        "amount": 0.0763,
+        "side": "buy",
+        "timestamp": 1764967956216
+      },
+      {
+        "id": "1825581600",
+        "price": 3019.21,
+        "amount": 0.0239,
+        "side": "buy",
+        "timestamp": 1764967956216
+      },
+      {
+        "id": "1825581601",
+        "price": 3019.22,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764967956216
+      },
+      {
+        "id": "1825581602",
+        "price": 3019.23,
+        "amount": 0.0054,
+        "side": "buy",
+        "timestamp": 1764967956216
+      },
+      {
+        "id": "1825581603",
+        "price": 3019.24,
+        "amount": 0.0417,
+        "side": "buy",
+        "timestamp": 1764967956230
+      },
+      {
+        "id": "1825581604",
+        "price": 3019.25,
+        "amount": 0.0256,
+        "side": "buy",
+        "timestamp": 1764967956230
+      },
+      {
+        "id": "1825581605",
+        "price": 3019.26,
+        "amount": 0.0218,
+        "side": "buy",
+        "timestamp": 1764967956230
+      },
+      {
+        "id": "1825581606",
+        "price": 3019.27,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764967956230
+      },
+      {
+        "id": "1825581607",
+        "price": 3019.28,
+        "amount": 0.0038,
+        "side": "buy",
+        "timestamp": 1764967956230
+      },
+      {
+        "id": "1825581608",
+        "price": 3019.29,
+        "amount": 0.0339,
+        "side": "buy",
+        "timestamp": 1764967956230
+      },
+      {
+        "id": "1825581609",
+        "price": 3019.29,
+        "amount": 3.3142,
+        "side": "buy",
+        "timestamp": 1764967956718
+      },
+      {
+        "id": "1825581610",
+        "price": 3019.29,
+        "amount": 0.0639,
+        "side": "buy",
+        "timestamp": 1764967956834
+      },
+      {
+        "id": "1825581611",
+        "price": 3019.29,
+        "amount": 3.3142,
+        "side": "buy",
+        "timestamp": 1764967957856
+      },
+      {
+        "id": "1825581612",
+        "price": 3019.29,
+        "amount": 0.1656,
+        "side": "buy",
+        "timestamp": 1764967958391
+      },
+      {
+        "id": "1825581613",
+        "price": 3019.29,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967958756
+      },
+      {
+        "id": "1825581614",
+        "price": 3019.29,
+        "amount": 2,
+        "side": "buy",
+        "timestamp": 1764967958759
+      },
+      {
+        "id": "1825581615",
+        "price": 3019.29,
+        "amount": 3.3139,
+        "side": "buy",
+        "timestamp": 1764967958893
+      },
+      {
+        "id": "1825581616",
+        "price": 3019.29,
+        "amount": 3.3139,
+        "side": "buy",
+        "timestamp": 1764967959924
+      },
+      {
+        "id": "1825581617",
+        "price": 3019.28,
+        "amount": 0.0165,
+        "side": "sell",
+        "timestamp": 1764967960849
+      },
+      {
+        "id": "1825581618",
+        "price": 3019.29,
+        "amount": 3.3139,
+        "side": "buy",
+        "timestamp": 1764967961017
+      },
+      {
+        "id": "1825581619",
+        "price": 3019.29,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967961050
+      },
+      {
+        "id": "1825581620",
+        "price": 3019.29,
+        "amount": 0.0026,
+        "side": "buy",
+        "timestamp": 1764967961079
+      },
+      {
+        "id": "1825581621",
+        "price": 3019.29,
+        "amount": 3.3139,
+        "side": "buy",
+        "timestamp": 1764967962012
+      },
+      {
+        "id": "1825581622",
+        "price": 3019.29,
+        "amount": 0.1656,
+        "side": "buy",
+        "timestamp": 1764967962303
+      },
+      {
+        "id": "1825581623",
+        "price": 3019.29,
+        "amount": 0.2,
+        "side": "buy",
+        "timestamp": 1764967962540
+      },
+      {
+        "id": "1825581624",
+        "price": 3019.29,
+        "amount": 3.3139,
+        "side": "buy",
+        "timestamp": 1764967963075
+      },
+      {
+        "id": "1825581625",
+        "price": 3019.28,
+        "amount": 0.0041,
+        "side": "sell",
+        "timestamp": 1764967963393
+      },
+      {
+        "id": "1825581626",
+        "price": 3019.29,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764967963576
+      },
+      {
+        "id": "1825581627",
+        "price": 3019.29,
+        "amount": 0.0025,
+        "side": "buy",
+        "timestamp": 1764967963960
+      },
+      {
+        "id": "1825581628",
+        "price": 3019.29,
+        "amount": 3.3139,
+        "side": "buy",
+        "timestamp": 1764967964018
+      },
+      {
+        "id": "1825581629",
+        "price": 3019.28,
+        "amount": 0.1618,
+        "side": "sell",
+        "timestamp": 1764967964404
+      },
+      {
+        "id": "1825581630",
+        "price": 3019.28,
+        "amount": 1.6618,
+        "side": "sell",
+        "timestamp": 1764967964422
+      },
+      {
+        "id": "1825581631",
+        "price": 3019.29,
+        "amount": 12.0427,
+        "side": "buy",
+        "timestamp": 1764967964805
+      },
+      {
+        "id": "1825581632",
+        "price": 3019.29,
+        "amount": 3.3142,
+        "side": "buy",
+        "timestamp": 1764967965011
+      }
+    ]
+  },
+  {
+    "timestamp": 1764968026989,
+    "recordedAt": "2025-12-05T20:53:46.989Z",
+    "trades": [
+      {
+        "id": "1825582538",
+        "price": 3021.15,
+        "amount": 1.4733,
+        "side": "buy",
+        "timestamp": 1764968020101
+      },
+      {
+        "id": "1825582539",
+        "price": 3021.16,
+        "amount": 0.8,
+        "side": "buy",
+        "timestamp": 1764968020101
+      },
+      {
+        "id": "1825582540",
+        "price": 3021.2,
+        "amount": 0.0534,
+        "side": "buy",
+        "timestamp": 1764968020101
+      },
+      {
+        "id": "1825582541",
+        "price": 3021.21,
+        "amount": 0.0786,
+        "side": "buy",
+        "timestamp": 1764968020101
+      },
+      {
+        "id": "1825582542",
+        "price": 3021.21,
+        "amount": 0.0019,
+        "side": "buy",
+        "timestamp": 1764968020106
+      },
+      {
+        "id": "1825582543",
+        "price": 3021.21,
+        "amount": 1.3931,
+        "side": "buy",
+        "timestamp": 1764968020136
+      },
+      {
+        "id": "1825582544",
+        "price": 3021.22,
+        "amount": 0.0068,
+        "side": "buy",
+        "timestamp": 1764968020139
+      },
+      {
+        "id": "1825582545",
+        "price": 3021.23,
+        "amount": 0.0533,
+        "side": "buy",
+        "timestamp": 1764968020140
+      },
+      {
+        "id": "1825582546",
+        "price": 3021.24,
+        "amount": 0.0103,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582547",
+        "price": 3021.26,
+        "amount": 0.0097,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582548",
+        "price": 3021.28,
+        "amount": 0.0411,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582549",
+        "price": 3021.29,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582550",
+        "price": 3021.3,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582551",
+        "price": 3021.31,
+        "amount": 0.0182,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582552",
+        "price": 3021.32,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764968020145
+      },
+      {
+        "id": "1825582553",
+        "price": 3021.33,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764968020148
+      },
+      {
+        "id": "1825582554",
+        "price": 3021.34,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764968020148
+      },
+      {
+        "id": "1825582555",
+        "price": 3021.37,
+        "amount": 0.0316,
+        "side": "buy",
+        "timestamp": 1764968020149
+      },
+      {
+        "id": "1825582556",
+        "price": 3021.39,
+        "amount": 0.0331,
+        "side": "buy",
+        "timestamp": 1764968020153
+      },
+      {
+        "id": "1825582557",
+        "price": 3021.39,
+        "amount": 0.01,
+        "side": "buy",
+        "timestamp": 1764968020199
+      },
+      {
+        "id": "1825582558",
+        "price": 3021.39,
+        "amount": 0.0582,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582559",
+        "price": 3021.4,
+        "amount": 0.0256,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582560",
+        "price": 3021.42,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582561",
+        "price": 3021.44,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582562",
+        "price": 3021.45,
+        "amount": 0.0069,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582563",
+        "price": 3021.46,
+        "amount": 0.0377,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582564",
+        "price": 3021.45,
+        "amount": 0.24,
+        "side": "sell",
+        "timestamp": 1764968020790
+      },
+      {
+        "id": "1825582565",
+        "price": 3021.45,
+        "amount": 0.0331,
+        "side": "sell",
+        "timestamp": 1764968020847
+      },
+      {
+        "id": "1825582566",
+        "price": 3021.45,
+        "amount": 0.05,
+        "side": "sell",
+        "timestamp": 1764968020847
+      },
+      {
+        "id": "1825582567",
+        "price": 3021.45,
+        "amount": 0.033,
+        "side": "sell",
+        "timestamp": 1764968020877
+      },
+      {
+        "id": "1825582568",
+        "price": 3021.44,
+        "amount": 0.4166,
+        "side": "sell",
+        "timestamp": 1764968020877
+      },
+      {
+        "id": "1825582569",
+        "price": 3021.44,
+        "amount": 0.076,
+        "side": "sell",
+        "timestamp": 1764968020971
+      },
+      {
+        "id": "1825582570",
+        "price": 3021.43,
+        "amount": 0.033,
+        "side": "sell",
+        "timestamp": 1764968021078
+      },
+      {
+        "id": "1825582571",
+        "price": 3021.42,
+        "amount": 0.1247,
+        "side": "sell",
+        "timestamp": 1764968021078
+      },
+      {
+        "id": "1825582572",
+        "price": 3021.36,
+        "amount": 0.0054,
+        "side": "sell",
+        "timestamp": 1764968021078
+      },
+      {
+        "id": "1825582573",
+        "price": 3021.35,
+        "amount": 0.7925,
+        "side": "sell",
+        "timestamp": 1764968021081
+      },
+      {
+        "id": "1825582574",
+        "price": 3021.35,
+        "amount": 0.0135,
+        "side": "sell",
+        "timestamp": 1764968021081
+      },
+      {
+        "id": "1825582575",
+        "price": 3021.33,
+        "amount": 0.0222,
+        "side": "sell",
+        "timestamp": 1764968021116
+      },
+      {
+        "id": "1825582576",
+        "price": 3021.32,
+        "amount": 0.022,
+        "side": "sell",
+        "timestamp": 1764968021116
+      },
+      {
+        "id": "1825582577",
+        "price": 3021.3,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764968021116
+      },
+      {
+        "id": "1825582578",
+        "price": 3021.27,
+        "amount": 0.1642,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582579",
+        "price": 3021.26,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582580",
+        "price": 3021.25,
+        "amount": 0.0023,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582581",
+        "price": 3021.21,
+        "amount": 0.0099,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582582",
+        "price": 3021.15,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582583",
+        "price": 3021.12,
+        "amount": 0.0083,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582584",
+        "price": 3021.05,
+        "amount": 0.0054,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582585",
+        "price": 3021.05,
+        "amount": 0.0084,
+        "side": "buy",
+        "timestamp": 1764968025349
+      },
+      {
+        "id": "1825582586",
+        "price": 3021.05,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764968026230
+      },
+      {
+        "id": "1825582587",
+        "price": 3021.05,
+        "amount": 0.0525,
+        "side": "buy",
+        "timestamp": 1764968026350
+      }
+    ]
+  },
+  {
+    "timestamp": 1764968053126,
+    "recordedAt": "2025-12-05T20:54:13.126Z",
+    "trades": [
+      {
+        "id": "1825582538",
+        "price": 3021.15,
+        "amount": 1.4733,
+        "side": "buy",
+        "timestamp": 1764968020101
+      },
+      {
+        "id": "1825582539",
+        "price": 3021.16,
+        "amount": 0.8,
+        "side": "buy",
+        "timestamp": 1764968020101
+      },
+      {
+        "id": "1825582540",
+        "price": 3021.2,
+        "amount": 0.0534,
+        "side": "buy",
+        "timestamp": 1764968020101
+      },
+      {
+        "id": "1825582541",
+        "price": 3021.21,
+        "amount": 0.0786,
+        "side": "buy",
+        "timestamp": 1764968020101
+      },
+      {
+        "id": "1825582542",
+        "price": 3021.21,
+        "amount": 0.0019,
+        "side": "buy",
+        "timestamp": 1764968020106
+      },
+      {
+        "id": "1825582543",
+        "price": 3021.21,
+        "amount": 1.3931,
+        "side": "buy",
+        "timestamp": 1764968020136
+      },
+      {
+        "id": "1825582544",
+        "price": 3021.22,
+        "amount": 0.0068,
+        "side": "buy",
+        "timestamp": 1764968020139
+      },
+      {
+        "id": "1825582545",
+        "price": 3021.23,
+        "amount": 0.0533,
+        "side": "buy",
+        "timestamp": 1764968020140
+      },
+      {
+        "id": "1825582546",
+        "price": 3021.24,
+        "amount": 0.0103,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582547",
+        "price": 3021.26,
+        "amount": 0.0097,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582548",
+        "price": 3021.28,
+        "amount": 0.0411,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582549",
+        "price": 3021.29,
+        "amount": 0.0052,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582550",
+        "price": 3021.3,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582551",
+        "price": 3021.31,
+        "amount": 0.0182,
+        "side": "buy",
+        "timestamp": 1764968020144
+      },
+      {
+        "id": "1825582552",
+        "price": 3021.32,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764968020145
+      },
+      {
+        "id": "1825582553",
+        "price": 3021.33,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764968020148
+      },
+      {
+        "id": "1825582554",
+        "price": 3021.34,
+        "amount": 0.0035,
+        "side": "buy",
+        "timestamp": 1764968020148
+      },
+      {
+        "id": "1825582555",
+        "price": 3021.37,
+        "amount": 0.0316,
+        "side": "buy",
+        "timestamp": 1764968020149
+      },
+      {
+        "id": "1825582556",
+        "price": 3021.39,
+        "amount": 0.0331,
+        "side": "buy",
+        "timestamp": 1764968020153
+      },
+      {
+        "id": "1825582557",
+        "price": 3021.39,
+        "amount": 0.01,
+        "side": "buy",
+        "timestamp": 1764968020199
+      },
+      {
+        "id": "1825582558",
+        "price": 3021.39,
+        "amount": 0.0582,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582559",
+        "price": 3021.4,
+        "amount": 0.0256,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582560",
+        "price": 3021.42,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582561",
+        "price": 3021.44,
+        "amount": 0.0018,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582562",
+        "price": 3021.45,
+        "amount": 0.0069,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582563",
+        "price": 3021.46,
+        "amount": 0.0377,
+        "side": "buy",
+        "timestamp": 1764968020337
+      },
+      {
+        "id": "1825582564",
+        "price": 3021.45,
+        "amount": 0.24,
+        "side": "sell",
+        "timestamp": 1764968020790
+      },
+      {
+        "id": "1825582565",
+        "price": 3021.45,
+        "amount": 0.0331,
+        "side": "sell",
+        "timestamp": 1764968020847
+      },
+      {
+        "id": "1825582566",
+        "price": 3021.45,
+        "amount": 0.05,
+        "side": "sell",
+        "timestamp": 1764968020847
+      },
+      {
+        "id": "1825582567",
+        "price": 3021.45,
+        "amount": 0.033,
+        "side": "sell",
+        "timestamp": 1764968020877
+      },
+      {
+        "id": "1825582568",
+        "price": 3021.44,
+        "amount": 0.4166,
+        "side": "sell",
+        "timestamp": 1764968020877
+      },
+      {
+        "id": "1825582569",
+        "price": 3021.44,
+        "amount": 0.076,
+        "side": "sell",
+        "timestamp": 1764968020971
+      },
+      {
+        "id": "1825582570",
+        "price": 3021.43,
+        "amount": 0.033,
+        "side": "sell",
+        "timestamp": 1764968021078
+      },
+      {
+        "id": "1825582571",
+        "price": 3021.42,
+        "amount": 0.1247,
+        "side": "sell",
+        "timestamp": 1764968021078
+      },
+      {
+        "id": "1825582572",
+        "price": 3021.36,
+        "amount": 0.0054,
+        "side": "sell",
+        "timestamp": 1764968021078
+      },
+      {
+        "id": "1825582573",
+        "price": 3021.35,
+        "amount": 0.7925,
+        "side": "sell",
+        "timestamp": 1764968021081
+      },
+      {
+        "id": "1825582574",
+        "price": 3021.35,
+        "amount": 0.0135,
+        "side": "sell",
+        "timestamp": 1764968021081
+      },
+      {
+        "id": "1825582575",
+        "price": 3021.33,
+        "amount": 0.0222,
+        "side": "sell",
+        "timestamp": 1764968021116
+      },
+      {
+        "id": "1825582576",
+        "price": 3021.32,
+        "amount": 0.022,
+        "side": "sell",
+        "timestamp": 1764968021116
+      },
+      {
+        "id": "1825582577",
+        "price": 3021.3,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764968021116
+      },
+      {
+        "id": "1825582578",
+        "price": 3021.27,
+        "amount": 0.1642,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582579",
+        "price": 3021.26,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582580",
+        "price": 3021.25,
+        "amount": 0.0023,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582581",
+        "price": 3021.21,
+        "amount": 0.0099,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582582",
+        "price": 3021.15,
+        "amount": 0.0017,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582583",
+        "price": 3021.12,
+        "amount": 0.0083,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582584",
+        "price": 3021.05,
+        "amount": 0.0054,
+        "side": "sell",
+        "timestamp": 1764968022266
+      },
+      {
+        "id": "1825582585",
+        "price": 3021.05,
+        "amount": 0.0084,
+        "side": "buy",
+        "timestamp": 1764968025349
+      },
+      {
+        "id": "1825582586",
+        "price": 3021.05,
+        "amount": 0.132,
+        "side": "buy",
+        "timestamp": 1764968026230
+      },
+      {
+        "id": "1825582587",
+        "price": 3021.05,
+        "amount": 0.0525,
+        "side": "buy",
+        "timestamp": 1764968026350
+      }
+    ]
+  }
+]

@@ -18,6 +18,8 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '' // Empty = same origin
+
 interface AutomationPreviewProps {
   automationId: string | null
   generatedCode: string | null
@@ -52,7 +54,16 @@ export function AutomationPreview({
   useEffect(() => {
     if (!automationId || status !== 'testing') return
 
-    const ws = new WebSocket(`ws://localhost:8000/api/v1/automations/${automationId}/ws/output`)
+    // Build WebSocket URL from current location or API_BASE
+    let wsUrl: string
+    if (typeof window !== 'undefined') {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const host = API_BASE || window.location.host
+      wsUrl = API_BASE ? API_BASE.replace(/^https?:/, protocol) : `${protocol}//${host}`
+    } else {
+      wsUrl = API_BASE || 'ws://localhost:8000'
+    }
+    const ws = new WebSocket(`${wsUrl}/api/v1/automations/${automationId}/ws/output`)
     
     ws.onmessage = (event) => {
       setOutput(prev => [...prev, event.data])
@@ -75,7 +86,7 @@ export function AutomationPreview({
 
     const fetchOutput = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/automations/${automationId}/output?lines=50`)
+        const res = await fetch(`${API_BASE}/api/v1/automations/${automationId}/output?lines=50`)
         if (res.ok) {
           const data = await res.json()
           if (data.output?.length > 0) {

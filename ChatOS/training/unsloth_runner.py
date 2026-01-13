@@ -42,7 +42,7 @@ def write_temp_config(job_spec: TrainingJobSpec) -> Path:
         if "mistral" in job_spec.base_model_name.lower() and job_spec.preset_name == "STANDALONE":
             base_config_path = settings.unsloth_configs_dir / "persrm_standalone_mistral.yaml"
         else:
-        base_config_path = settings.unsloth_configs_dir / "persrm_qlora.yaml"
+            base_config_path = settings.unsloth_configs_dir / "persrm_qlora.yaml"
     else:
         base_config_path = settings.unsloth_configs_dir / "chatos_qlora.yaml"
     
@@ -53,8 +53,8 @@ def write_temp_config(job_spec: TrainingJobSpec) -> Path:
             settings.unsloth_configs_dir / "chatos_qlora.yaml",
         ]
         for fallback_path in fallback_paths:
-        if fallback_path.exists():
-            base_config_path = fallback_path
+            if fallback_path.exists():
+                base_config_path = fallback_path
                 break
         else:
             raise FileNotFoundError(f"No config found. Tried: {base_config_path}, {fallback_paths}")
