@@ -1,0 +1,18 @@
+Cursor MCP Verification - Paste this into Python terminal in any Cursor workspace:
+
+import sys; sys.path.insert(0, '/home/kr/Desktop/cursor-mcp'); from mcp.agent_integration import store, search, get_memory; mid = store("Test", "Verification"); mem = get_memory(); print(f"✅ MCP OPERATIONAL: Stored {mid[:8]}..., Retrieved {mem.retrieve(mid)['title']}, Search found {len(search('Verification'))} result(s), Stats: {mem.stats()['total']} memories")
+
+---
+
+Or run this script from any terminal:
+python3 /home/kr/Desktop/cursor-mcp/verify_mcp.py
+
+---
+
+Expected output if operational:
+✅ ALL TESTS PASSED - MCP IS OPERATIONAL
+
+If you get errors:
+1. Make sure Python 3 is installed
+2. Check that /home/kr/Desktop/cursor-mcp exists
+3. Run: python3 /home/kr/Desktop/cursor-mcp/verify_mcp.py for detailed diagnostics
