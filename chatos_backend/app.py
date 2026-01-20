@@ -100,6 +100,7 @@ from chatos_backend.api.routes_training_exercises import router as training_exer
 from chatos_backend.api.routes_training_local import router as training_local_router
 from chatos_backend.api.routes_ip_whitelist import router as ip_whitelist_router
 from chatos_backend.api.routes_monitoring import router as monitoring_router
+from chatos_backend.api.routes_thought_lines import router as thought_lines_router
 
 # =============================================================================
 # Lifecycle Management
@@ -112,15 +113,46 @@ async def lifespan(app: FastAPI):
     
     Handles:
     - Resource initialization on startup
+    - Event bus and scraper sync service startup
     - Graceful cleanup on shutdown (HTTP clients, caches, etc.)
     """
-    # Startup
     import logging
     logging.info("ChatOS starting up...")
+    
+    # Initialize Event Bus
+    try:
+        from chatos_backend.core.event_bus import init_event_bus
+        await init_event_bus()
+        logging.info("Event bus initialized")
+    except Exception as e:
+        logging.warning(f"Error initializing event bus: {e}")
+    
+    # Start Scraper Sync Service
+    try:
+        from chatos_backend.services.scraper_sync_service import start_scraper_sync
+        await start_scraper_sync()
+        logging.info("Scraper sync service started")
+    except Exception as e:
+        logging.warning(f"Error starting scraper sync: {e}")
+    
     yield
     
     # Shutdown - cleanup resources
     logging.info("ChatOS shutting down, cleaning up resources...")
+    
+    # Stop Scraper Sync Service
+    try:
+        from chatos_backend.services.scraper_sync_service import stop_scraper_sync
+        await stop_scraper_sync()
+    except Exception as e:
+        logging.warning(f"Error stopping scraper sync: {e}")
+    
+    # Shutdown Event Bus
+    try:
+        from chatos_backend.core.event_bus import shutdown_event_bus
+        await shutdown_event_bus()
+    except Exception as e:
+        logging.warning(f"Error shutting down event bus: {e}")
     
     # Close LLM client connections
     try:
@@ -194,6 +226,8 @@ app.include_router(notes_router)
 # Admin routers for IP whitelist and monitoring
 app.include_router(ip_whitelist_router)
 app.include_router(monitoring_router)
+# Thought-line processing system
+app.include_router(thought_lines_router)
 
 
 # =============================================================================

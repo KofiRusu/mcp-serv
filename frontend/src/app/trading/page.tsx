@@ -8,6 +8,7 @@ import { LeftPanel } from '@/components/trading/left-panel'
 import { CenterPanel } from '@/components/trading/center-panel'
 import { RightPanel } from '@/components/trading/right-panel'
 import { BottomBar } from '@/components/trading/bottom-bar'
+import { ThoughtNetworkPanel } from '@/components/trading/thought-network'
 import { ConnectExchangeModal } from '@/components/trading/connect-exchange-modal'
 import { OnboardingCard } from '@/components/trading/onboarding-card'
 
@@ -53,6 +54,9 @@ export default function TradingPage() {
           </>
         )}
       </div>
+
+      {/* Thought Network Panel - Chat Model Data Processing */}
+      {(hasConnectedExchange || currentAccountId) && <ThoughtNetworkPanel />}
 
       {/* Bottom Global Bar */}
       <BottomBar />
