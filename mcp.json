@@ -1,0 +1,64 @@
+{
+  "name": "Cursor MCP - Multi-Context Protocol",
+  "description": "Persistent cross-chat memory system for Cursor IDE",
+  "version": "1.0.0",
+  "type": "tool",
+  "mcp": {
+    "enabled": true,
+    "module": "mcp",
+    "entry_point": "mcp",
+    "python_version": "3.8+",
+    "database": {
+      "type": "sqlite",
+      "path": "./data/mcp/memories.db",
+      "auto_create": true
+    },
+    "features": {
+      "persistent_memory": true,
+      "auto_classification": true,
+      "full_text_search": true,
+      "context_aware_loading": true,
+      "agent_awareness": true,
+      "conflict_detection": true,
+      "statistics_tracking": true
+    },
+    "memory_domains": [
+      "Project Knowledge",
+      "Communication Style",
+      "Progress Tracking",
+      "Domain-Specific Knowledge",
+      "Repository-Specific Context",
+      "Learnings and Insights",
+      "Code Patterns",
+      "Tools and Configuration"
+    ],
+    "api": {
+      "interface": "python",
+      "functions": [
+        "store",
+        "search",
+        "context",
+        "get_memory",
+        "stats",
+        "list_by_domain",
+        "delete",
+        "classify"
+      ],
+      "agent_ready": true
+    },
+    "paths": {
+      "mcp_root": "./mcp",
+      "data": "./data/mcp",
+      "logs": "./logs/mcp",
+      "config": "./data/mcp/mcp_config.json"
+    }
+  },
+  "integration": {
+    "cursor_ide": {
+      "auto_start": true,
+      "load_on_project_open": true,
+      "sync_across_chats": true,
+      "agent_access": true
+    }
+  }
+}

@@ -7,9 +7,8 @@ This script configures the Cursor MCP system for proper integration with Cursor 
 
 import os
 import json
-import shutil
+import sys
 from pathlib import Path
-import subprocess
 
 
 def setup_mcp():
@@ -28,23 +27,19 @@ def setup_mcp():
     print(f"📍 Project Path: {project_path}")
     print()
     
-    # 1. Verify directory structure
-    print("1️⃣  Verifying Directory Structure...")
-    required_files = [
-        "models.py",
-        "memory_store.py",
-        "classifier.py",
-        "tools.py",
-        "server.py",
-        "cli.py",
-        "agent_integration.py",
-        "context_loader.py",
-        ".mcp-config.json",
-        "requirements.txt",
+    # 1. Verify MCP module structure
+    print("1️⃣  Verifying MCP Module Structure...")
+    mcp_files = [
+        "mcp/__init__.py",
+        "mcp/models.py",
+        "mcp/memory_store.py",
+        "mcp/classifier.py",
+        "mcp/agent_integration.py",
+        "mcp/setup.py",
     ]
     
     missing = []
-    for file in required_files:
+    for file in mcp_files:
         if not (project_path / file).exists():
             missing.append(file)
             print(f"   ❌ {file}")
@@ -55,18 +50,18 @@ def setup_mcp():
         print(f"\n❌ Missing files: {missing}")
         return False
     
-    print("\n✅ All required files present\n")
+    print("\n✅ All MCP module files present\n")
     
     # 2. Create data directory
     print("2️⃣  Setting up Data Directory...")
-    data_dir = project_path / "data"
-    data_dir.mkdir(exist_ok=True)
+    data_dir = project_path / "data" / "mcp"
+    data_dir.mkdir(parents=True, exist_ok=True)
     print(f"   ✅ {data_dir}")
     
     # 3. Create logs directory
     print("3️⃣  Setting up Logs Directory...")
-    logs_dir = project_path / "logs"
-    logs_dir.mkdir(exist_ok=True)
+    logs_dir = project_path / "logs" / "mcp"
+    logs_dir.mkdir(parents=True, exist_ok=True)
     print(f"   ✅ {logs_dir}")
     
     # 4. Verify Python environment
@@ -85,7 +80,8 @@ def setup_mcp():
     # 5. Initialize database
     print("\n5️⃣  Initializing Memory Database...")
     try:
-        from memory_store import MemoryStore
+        sys.path.insert(0, str(project_path))
+        from mcp.memory_store import MemoryStore
         store = MemoryStore(str(data_dir / "memories.db"))
         stats = store.get_stats()
         print(f"   ✅ Database initialized")
@@ -97,30 +93,16 @@ def setup_mcp():
     # 6. Verify agent integration
     print("\n6️⃣  Verifying Agent Integration...")
     try:
-        from agent_integration import AgentMemory, get_memory
-        mem = get_memory()
+        from mcp.agent_integration import AgentMemory, get_memory
+        mem = get_memory(str(data_dir / "memories.db"))
         print(f"   ✅ Agent integration ready")
         print(f"   📚 Memory system accessible")
     except Exception as e:
         print(f"   ❌ Integration error: {e}")
         return False
     
-    # 7. Verify server
-    print("\n7️⃣  Checking MCP Server...")
-    try:
-        from server import MCPServer
-        server = MCPServer(str(data_dir / "memories.db"))
-        tools = server.list_tools()
-        resources = server.list_resources()
-        print(f"   ✅ MCP Server loaded")
-        print(f"   🔧 Tools available: {len(tools)}")
-        print(f"   📦 Resources available: {len(resources)}")
-    except Exception as e:
-        print(f"   ❌ Server error: {e}")
-        return False
-    
-    # 8. Create configuration
-    print("\n8️⃣  Creating MCP Configuration...")
+    # 7. Create configuration
+    print("\n7️⃣  Creating MCP Configuration...")
     mcp_config = {
         "mcp_server": {
             "name": "cursor-mcp",
@@ -129,8 +111,7 @@ def setup_mcp():
             "enabled": True,
             "path": str(project_path),
             "database": str(data_dir / "memories.db"),
-            "server_script": str(project_path / "server.py"),
-            "agent_api": str(project_path / "agent_integration.py"),
+            "agent_api": str(project_path / "mcp" / "agent_integration.py"),
         },
         "features": {
             "persistent_memory": True,
@@ -148,13 +129,13 @@ def setup_mcp():
         },
     }
     
-    config_file = project_path / "mcp_setup.json"
+    config_file = data_dir / "mcp_config.json"
     with open(config_file, "w") as f:
         json.dump(mcp_config, f, indent=2)
     
     print(f"   ✅ Configuration saved to {config_file}")
     
-    # 9. Display setup summary
+    # 8. Display setup summary
     print("\n" + "="*80)
     print("✅ MCP SETUP COMPLETE")
     print("="*80)
@@ -163,6 +144,7 @@ def setup_mcp():
 📊 Setup Summary:
 ─────────────────────────────────────────────────────────────────────────────
   Project Path:          {project_path}
+  MCP Module:            {project_path / 'mcp'}
   Database:              {data_dir / "memories.db"}
   Logs Directory:        {logs_dir}
   Configuration:         {config_file}
@@ -171,45 +153,23 @@ def setup_mcp():
 ─────────────────────────────────────────────────────────────────────────────
   ✅ Memory Store (SQLite)
   ✅ Classifier (Auto-classification)
-  ✅ MCP Server (Protocol)
   ✅ Agent Integration (API)
-  ✅ CLI Interface
   ✅ Full Documentation
-
-🔧 Available Tools:
-─────────────────────────────────────────────────────────────────────────────
-  • memory_get
-  • memory_set
-  • memory_delete
-  • memory_list
-  • memory_search
-  • memory_update
-  • memory_promote
-  • memory_archive
-  • get_context_memories
-  • get_stats
-  • detect_conflicts
-  • classify_content
-  • cleanup_session_memories
-
-📦 MCP Resources:
-─────────────────────────────────────────────────────────────────────────────
-  • memory://list (List memories with filters)
-  • memory://search (Full-text search)
-  • memory://stats (Statistics)
-  • memory://domains (Available domains)
 
 🚀 Next Steps:
 ─────────────────────────────────────────────────────────────────────────────
-  1. Start MCP Server:
-     python3 server.py
-
-  2. Or use in your code:
-     from agent_integration import store, search, context
+  1. Use in your code:
+     from mcp.agent_integration import store, search, get_memory
      
-  3. Or use CLI:
-     python3 cli.py list
-     python3 cli.py search "query"
+  2. Store a memory:
+     store("Project Knowledge", "Your insight here")
+     
+  3. Search:
+     results = search("optimization")
+     
+  4. Get instance:
+     mem = get_memory()
+     stats = mem.stats()
 
 ═══════════════════════════════════════════════════════════════════════════════
 """)
