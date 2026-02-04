@@ -1,0 +1,10 @@
+name: cursor-mcp
+description: Senior Engineer MCP Server with git, ripgrep, repo memory
+command: python3
+args:
+  - ./mcp/server.py
+cwd: /Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp
+env:
+  PYTHONPATH: /Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp
+  MCP_WRITE_TOKEN: YOUR_SECURE_TOKEN_HERE
+  MCP_DRY_RUN: "false"

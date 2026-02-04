@@ -1,227 +1,233 @@
-# ChatOS v1.0
+# Senior Engineer MCP Server
 
-**AI Chat System with PersRM Training** - A comprehensive AI assistant platform with built-in model training capabilities.
+Production-hardened MCP server for Cursor/Continue IDEs with git, ripgrep, repo memory, and verification harness.
 
-## 🚀 Quick Start
+## Features
+
+- **Security Hardening**: Read-only by default, token-guarded writes, path sandboxing, dry-run mode
+- **Engineer Tools**: git_status, git_diff, git_show, ripgrep_search, run_cmd (with strict allowlist)
+- **Repo Memory**: Append-only MEMORY.md, decision log with timestamps/tags
+- **Verification**: Shell script and pytest smoke tests
+
+## Quick Start
+
+### 1. Configure Environment Variables
+
+Set the `MCP_WRITE_TOKEN` environment variable to enable write operations:
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/ChatOS-v1.0.git
-cd ChatOS-v1.0
-
-# Install (works on Linux and macOS)
-./install.sh
-
-# Start the server
-./run.sh
+export MCP_WRITE_TOKEN="your_secure_token_here"
 ```
 
-Open http://localhost:8000 in your browser.
+For dry-run mode (log writes without executing):
 
-## 📋 Requirements
-
-- **Python 3.9+** (3.11 recommended)
-- **8GB+ RAM** (16GB for training)
-- **GPU (optional)**: NVIDIA GPU with CUDA 12.1 for training, or Apple Silicon (MPS)
-
-## 🔧 Installation Options
-
-### Full Installation (Server + Training)
 ```bash
-./install.sh
+export MCP_DRY_RUN="true"
 ```
 
-### Server Only
-```bash
-./install.sh --server
-```
+### 2. Update Client Configurations
 
-### Training Only
-```bash
-./install.sh --training
-```
+**For Cursor** ([`mcp_config_macos.json`](mcp_config_macos.json:1)):
 
-### Docker Setup
-```bash
-./install.sh --docker
-docker-compose up -d
-```
-
-## 🏃 Running ChatOS
-
-### Development Server
-```bash
-./run.sh
-# Server starts at http://localhost:8000
-```
-
-### Production Server
-```bash
-./run.prod.sh 8000
-# Or with Docker:
-docker-compose --profile production up -d
-```
-
-### Docker
-```bash
-# Start server
-docker-compose up -d
-
-# Start with training (NVIDIA GPU)
-docker-compose --profile training up -d
-
-# Start with training (CPU/Mac)
-docker-compose --profile training-cpu up -d
-```
-
-## 🧠 PersRM Training
-
-### Start Training
-```bash
-# Activate environment
-source .venv/bin/activate
-
-# Start training (auto-detects GPU)
-python -u ChatOS/training/persrm_pytorch_trainer.py --epochs 100
-
-# Or with Docker (NVIDIA GPU):
-docker-compose up training
-
-# Or with Docker (CPU/Mac):
-docker-compose up training-cpu
-```
-
-### Training Data
-
-Place your training data in `data/persrm/`:
-
-```
-data/persrm/
-├── train.jsonl    # Training examples
-└── val.jsonl      # Validation examples
-```
-
-Format:
 ```json
-{"instruction": "Your question", "output": "Expected answer", "metadata": {"source": "custom", "quality": 0.9}}
+{
+  "mcpServers": {
+    "cursor-mcp": {
+      "command": "python3",
+      "args": ["./mcp/server.py"],
+      "cwd": "/Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp",
+      "env": {
+        "PYTHONPATH": "/Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp",
+        "MCP_WRITE_TOKEN": "YOUR_SECURE_TOKEN_HERE",
+        "MCP_DRY_RUN": "false"
+      }
+    }
+  }
+}
 ```
 
-### Monitor Training
+**For Continue** ([`.continue/mcpServers/cursor-mcp.yaml`](.continue/mcpServers/cursor-mcp.yaml:1)):
+
+```yaml
+name: cursor-mcp
+description: Senior Engineer MCP Server with git, ripgrep, repo memory
+command: python3
+args:
+  - ./mcp/server.py
+cwd: /Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp
+env:
+  PYTHONPATH: /Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp
+  MCP_WRITE_TOKEN: YOUR_SECURE_TOKEN_HERE
+  MCP_DRY_RUN: "false"
+```
+
+### 3. Available Tools
+
+| Tool | Description | Write Protected |
+|------|------------------|----------|
+| `store_memory` | Store memory in SQLite DB | ✓ Yes |
+| `search_memory` | Search SQLite memories | No |
+| `get_context` | Get contextual memories | No |
+| `get_stats` | Get system statistics | No |
+| `git_status` | Get git repository status | No |
+| `git_diff` | Get git diff | No |
+| `git_show` | Show commit details | No |
+| `ripgrep_search` | Search files with ripgrep | No |
+| `run_cmd` | Run allowed commands | No |
+| `memory_append` | Append to MEMORY.md | ✓ Yes |
+| `memory_search` | Search MEMORY.md | No |
+| `decision_log_add` | Add to decision log | ✓ Yes |
+| `decision_log_search` | Search decision log | No |
+
+### 4. Verification
+
+Run the verification script:
+
 ```bash
-# View training status
-trading persrm status
-
-# View logs
-tail -f models/persrm-continuous/training.log
-
-# Full system status
-trading status
+./scripts/verify_mcp.sh
 ```
 
-## 📊 CLI Tools
-
-ChatOS includes powerful CLI tools for monitoring:
+Run the smoke tests:
 
 ```bash
-# System status
-trading status          # Overall system status
-trading persrm status   # PersRM training status
-trading hf status       # HF Paper Trader status
-
-# Process control
-trading start           # Start all processes
-trading stop            # Stop all processes
-trading restart         # Restart all processes
-
-# Individual process control
-trading persrm start    # Start PersRM training
-trading persrm stop     # Stop PersRM training
-trading perpetual start # Start Perpetual Trader
-
-# Monitoring
-trading log             # View logs
-trading stats           # Trading statistics
-trading view            # Live dashboard
+python3 tests/test_mcp_smoke.py
 ```
 
-## 📁 Project Structure
+### 5. File Structure
 
 ```
-ChatOS-v1.0/
-├── ChatOS/                 # Main application
-│   ├── api/               # API routes
-│   ├── controllers/       # Business logic
-│   ├── training/          # Training pipeline
-│   └── app.py            # FastAPI app
-├── bin/                   # CLI tools
-│   ├── trading           # Main CLI
-│   └── hf-trading        # HF trading CLI
-├── data/                  # Training data
-│   └── persrm/           # PersRM training data
-├── models/                # Model checkpoints
-├── docker-compose.yml     # Docker orchestration
-├── Dockerfile            # Multi-stage Dockerfile
-├── install.sh            # Universal installer
-├── run.sh                # Development server
-└── run.prod.sh           # Production server
+.cursor/                      # Cursor plans
+.continue/                    # Continue MCP server configs
+data/                         # Data directory
+docs/                         # Documentation
+mcp/                          # MCP server modules
+    ├── __init__.py
+    ├── agent_integration.py
+    ├── classifier.py
+    ├── memory_store.py
+    ├── models.py
+    ├── path_sandbox.py
+    ├── repo_memory.py
+    ├── server.py
+    └── engineer_tools.py
+plans/                        # Implementation plans
+scripts/                       # Verification scripts
+tests/                         # Test suites
+    ├── test_phase1_security.py
+    ├── test_phase2_engineer_tools.py
+    ├── test_phase3_repo_memory.py
+    └── test_mcp_smoke.py
+context/                       # Repo memory files
+    ├── DECISIONS.md
+    └── MEMORY.md
 ```
 
-## 🌐 API Endpoints
+### 6. Security Model
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /` | Main chat interface |
-| `GET /training` | Training dashboard |
-| `GET /settings` | Settings page |
-| `POST /api/chat` | Chat API |
-| `POST /api/training/start` | Start training |
-| `GET /api/training/status` | Training status |
-| `GET /docs` | API documentation |
+- **Read-Only Default**: Server starts in read-only mode unless `MCP_WRITE_TOKEN` is set
+- **Write Protection**: All write operations (`store_memory`, `memory_append`, `decision_log_add`) require valid `MCP_WRITE_TOKEN`
+- **Dry-Run Mode**: When `MCP_DRY_RUN=true`, writes are logged but not executed
+- **Path Sandbox**: All file operations are validated to stay within repo root
 
-## 🔒 Environment Variables
+### 7. Environment Variables
 
 | Variable | Description | Default |
-|----------|-------------|---------|
-| `CHATOS_ENV` | Environment (development/production) | development |
-| `OLLAMA_HOST` | Ollama server URL | http://localhost:11434 |
-| `OPENAI_API_KEY` | OpenAI API key (optional) | - |
-| `PERSRM_API_URL` | PersRM API URL | http://localhost:8080 |
+|---------|--------|----------|
+| `MCP_WRITE_TOKEN` | Write authorization token (required for write ops) | `null` (no writes allowed) |
+| `MCP_DRY_RUN` | Enable dry-run mode (log only, no execution) | `false` | (execute writes) |
 
-## 🛠 Development
+### 8. Usage Examples
 
-### Run Tests
-```bash
-./test.sh
-# Or:
-pytest tests/ -v
+#### Write to Memory
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "memory_append",
+    "arguments": {
+      "content": "Important project decision: Use MCP_WRITE_TOKEN env var for writes",
+      "tags": ["architecture", "security"],
+      "write_token": "YOUR_SECURE_TOKEN_HERE"
+    }
+  }
+}
 ```
 
-### Code Style
-```bash
-# Format code
-ruff format ChatOS/
+#### Search Memory
 
-# Check linting
-ruff check ChatOS/
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "memory_search",
+    "arguments": {
+      "query": "architecture"
+    }
+  }
+}
 ```
 
-## 📝 License
+#### Git Status
 
-MIT License - see LICENSE file.
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "method": "tools/call",
+  "params": {
+    "name": "git_status",
+    "arguments": {
+      "cwd": "/Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp"
+    }
+  }
+}
+```
 
-## 🤝 Contributing
+#### Run Command (Allowed)
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 4,
+  "method": "tools/call",
+  "params": {
+    "name": "run_cmd",
+    "arguments": {
+      "cmd": ["python3", "--version"],
+      "cwd": "/Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp"
+    }
+  }
+}
+```
 
-## 📞 Support
+### 9. Troubleshooting
 
-- Documentation: `./docs/`
-- Training guide: `./TRAINING.md`
-- Issues: GitHub Issues
+**Problem**: Tools not appearing in Cursor/Continue UI
 
----
+**Solution**: Ensure config files are in the correct location:
+- Cursor: `~/.cursor/mcpServers/cursor-mcp.yaml` or user settings
+- Continue: `~/.continue/mcpServers/cursor-mcp.yaml` or user settings
 
-**ChatOS v1.0** - Built for AI enthusiasts and researchers.
+**Problem**: Write operations failing
+
+**Solution**: Set `MCP_WRITE_TOKEN` environment variable in the config
+
+**Problem**: Git operations failing
+
+**Solution**: Ensure you're in a git repository when using git tools
+
+### 10. Development Status
+
+- **Phase 1**: ✅ Security Hardening (COMPLETE)
+- **Phase 2**: ✅ Engineer Tools (COMPLETE)
+- **Phase 3**: ✅ Repo Memory System (COMPLETE)
+- **Phase 4**: ✅ Verification Harness (COMPLETE)
+- **Phase 5**: ✅ Client Configuration (COMPLETE)
+- **Phase 6**: ✅ Documentation (COMPLETE)
+
+All phases completed successfully!

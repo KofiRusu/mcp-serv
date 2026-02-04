@@ -1,0 +1,6 @@
+pyproject.toml
+ChatOS.egg-info/PKG-INFO
+ChatOS.egg-info/SOURCES.txt
+ChatOS.egg-info/dependency_links.txt
+ChatOS.egg-info/requires.txt
+ChatOS.egg-info/top_level.txt

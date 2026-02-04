@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "cursor-mcp": {
+      "command": "python3",
+      "args": ["./mcp/server.py"],
+      "cwd": "/Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp",
+      "env": {
+        "PYTHONPATH": "/Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp",
+        "MCP_WRITE_TOKEN": "YOUR_SECURE_TOKEN_HERE",
+        "MCP_DRY_RUN": "false"
+      }
+    }
+  },
+  "enabled": true,
+  "config": {
+    "database": "/Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp/data/memories.db",
+    "auto_start": true,
+    "load_on_startup": true
+  }
+}

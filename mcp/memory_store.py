@@ -48,7 +48,10 @@ class MemoryStore:
                 status TEXT DEFAULT 'active',
                 priority TEXT DEFAULT 'medium',
                 metadata TEXT,
-                access_count INTEGER DEFAULT 0
+                access_count INTEGER DEFAULT 0,
+                machine_id TEXT,
+                sync_version INTEGER DEFAULT 0,
+                deleted INTEGER DEFAULT 0
             )
             """)
             
@@ -61,10 +64,27 @@ class MemoryStore:
             )
             """)
             
+            # Sync log table for tracking changes
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS sync_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                operation TEXT NOT NULL,
+                memory_id TEXT NOT NULL,
+                sync_version INTEGER NOT NULL,
+                machine_id TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
+                synced INTEGER DEFAULT 0,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+            """)
+            
             # Indexes
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_domain ON memories(domain)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_workspace ON memories(workspace)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_priority ON memories(priority)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_sync_log_synced ON sync_log(synced)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_sync_log_machine ON sync_log(machine_id)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_sync_log_memory ON sync_log(memory_id)")
             
             conn.commit()
     
@@ -72,20 +92,24 @@ class MemoryStore:
         """Store a memory"""
         memory_id = kwargs.get('memory_id') or str(uuid.uuid4())
         now = datetime.utcnow().isoformat()
+        machine_id = kwargs.get('machine_id', 'unknown')
         
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
             INSERT OR REPLACE INTO memories 
             (id, domain, title, content, created_at, updated_at, workspace, 
-             repository, status, priority, metadata)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             repository, status, priority, metadata, machine_id, sync_version, deleted)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 memory_id, domain, title, content, now, now,
                 kwargs.get('workspace'), kwargs.get('repository'),
                 kwargs.get('status', 'active'),
                 kwargs.get('priority', 'medium'),
-                json.dumps(kwargs.get('metadata', {}))
+                json.dumps(kwargs.get('metadata', {})),
+                machine_id,
+                kwargs.get('sync_version', 0),
+                0
             ))
             
             # Handle tags

@@ -1,0 +1,25 @@
+{
+  "mcp_server": {
+    "name": "cursor-mcp",
+    "description": "Cursor Multi-Context Protocol - Persistent Cross-Chat Memory",
+    "version": "1.0",
+    "enabled": true,
+    "path": "/home/kr/Desktop/cursor-mcp",
+    "database": "/home/kr/Desktop/cursor-mcp/data/mcp/memories.db",
+    "agent_api": "/home/kr/Desktop/cursor-mcp/mcp/agent_integration.py"
+  },
+  "features": {
+    "persistent_memory": true,
+    "auto_classification": true,
+    "full_text_search": true,
+    "context_aware_loading": true,
+    "agent_awareness": true,
+    "conflict_detection": true,
+    "statistics_tracking": true
+  },
+  "directories": {
+    "project": "/home/kr/Desktop/cursor-mcp",
+    "data": "/home/kr/Desktop/cursor-mcp/data/mcp",
+    "logs": "/home/kr/Desktop/cursor-mcp/logs/mcp"
+  }
+}
