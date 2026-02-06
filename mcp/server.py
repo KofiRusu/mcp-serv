@@ -9,12 +9,21 @@ import os
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+SERVER_PATH = Path(__file__).resolve()
+SCRIPT_DIR = SERVER_PATH.parent
+DEFAULT_SERVER_HOME = SCRIPT_DIR.parent
+MCP_HOME = Path(os.environ.get("MCP_HOME", str(DEFAULT_SERVER_HOME))).expanduser().resolve()
+
+# Add MCP_HOME to path for imports
+if str(MCP_HOME) not in sys.path:
+    sys.path.insert(0, str(MCP_HOME))
 
 from mcp.agent_integration import get_memory
+from mcp.codex_client import CodexClient
+from mcp.verdent_client import VerdentClient
+from mcp.extension_context import ExtensionContextStore
 from mcp.path_sandbox import PathSandbox
 from mcp import engineer_tools
 from mcp.repo_memory import RepoMemory
@@ -28,18 +37,71 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _find_git_root(start: Path) -> Optional[Path]:
+    current = start
+    while True:
+        if (current / ".git").exists():
+            return current
+        if current.parent == current:
+            return None
+        current = current.parent
+
+
+def resolve_workspace_root(input_cwd: Optional[str]) -> str:
+    """
+    Resolve workspace root using priority order:
+    1) explicit input_cwd (if provided)
+    2) MCP_WORKSPACE_ROOT env var
+    3) nearest git root from os.getcwd() or script location
+    4) fallback to os.getcwd()
+    """
+    if input_cwd:
+        return str(Path(input_cwd).expanduser().resolve())
+
+    env_root = os.environ.get("MCP_WORKSPACE_ROOT")
+    if env_root:
+        return str(Path(env_root).expanduser().resolve())
+
+    git_root = _find_git_root(Path.cwd())
+    if git_root is None:
+        git_root = _find_git_root(SCRIPT_DIR)
+    if git_root is not None:
+        return str(git_root.resolve())
+
+    return str(Path.cwd().resolve())
+
+
+def _coerce_under_root(path_value: str, root: str) -> str:
+    candidate = Path(path_value).expanduser()
+    if not candidate.is_absolute():
+        candidate = Path(root) / candidate
+    return str(candidate)
+
+
 class MCPServer:
     """MCP Protocol server for Cursor IDE with security hardening"""
 
     # Write operations that require MCP_WRITE_TOKEN
-    WRITE_OPERATIONS = {"store_memory", "memory_append", "decision_log_add"}
+    WRITE_OPERATIONS = {
+        "store_memory",
+        "memory_append",
+        "decision_log_add",
+        "ext_set_context",
+        "ext_clear_context",
+    }
+    MAX_CODEX_CHARS = 50_000
+    MAX_VERDENT_CHARS = 50_000
+    MAX_EXT_CHARS = 50_000
 
     def __init__(self):
-        self.memory = get_memory()
+        self.server_home = MCP_HOME
+        self.memory = get_memory(
+            db_path=str(self.server_home / "data" / "mcp" / "memories.db")
+        )
         self.request_id = 0
 
         # Repo memory system
-        context_dir = Path(__file__).parent.parent / "context"
+        context_dir = self.server_home / "context"
         self.repo_memory = RepoMemory(
             memory_file=str(context_dir / "MEMORY.md"),
             decision_file=str(context_dir / "DECISIONS.md")
@@ -51,8 +113,8 @@ class MCPServer:
         # Security: Dry-run mode
         self.dry_run = os.environ.get("MCP_DRY_RUN", "false").lower() == "true"
 
-        # Security: Path sandbox (use current working directory as root)
-        self.sandbox = PathSandbox(str(Path.cwd()))
+        # Security: Default workspace root (resolved once for logging/default use)
+        self.default_workspace_root = resolve_workspace_root(None)
 
         # Log security status
         if self.write_token:
@@ -66,6 +128,13 @@ class MCPServer:
         # Canonical tool registry (kept in sync with tools/list)
         self._tools_list = self._build_tools()
         self.tools = {tool["name"]: tool for tool in self._tools_list}
+
+        # In-memory extension context store (sanitized + size capped)
+        self.extension_context = ExtensionContextStore(
+            sanitize_fn=self._sanitize_payload,
+            count_fn=self._count_string_chars,
+            max_chars=self.MAX_EXT_CHARS,
+        )
     
     def is_write_allowed(self, provided_token: Optional[str]) -> bool:
         """
@@ -166,9 +235,8 @@ class MCPServer:
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "cwd": {"type": "string", "description": "Working directory"}
-                    },
-                    "required": ["cwd"]
+                        "cwd": {"type": "string", "description": "Working directory (default: workspace root)"}
+                    }
                 }
             },
             {
@@ -177,10 +245,9 @@ class MCPServer:
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "cwd": {"type": "string", "description": "Working directory"},
+                        "cwd": {"type": "string", "description": "Working directory (default: workspace root)"},
                         "ref": {"type": "string", "description": "Git reference (default: HEAD)"}
-                    },
-                    "required": ["cwd"]
+                    }
                 }
             },
             {
@@ -189,10 +256,9 @@ class MCPServer:
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "cwd": {"type": "string", "description": "Working directory"},
+                        "cwd": {"type": "string", "description": "Working directory (default: workspace root)"},
                         "ref": {"type": "string", "description": "Git reference (default: HEAD)"}
-                    },
-                    "required": ["cwd"]
+                    }
                 }
             },
             {
@@ -202,7 +268,7 @@ class MCPServer:
                     "type": "object",
                     "properties": {
                         "query": {"type": "string", "description": "Search pattern"},
-                        "path": {"type": "string", "description": "Directory to search (default: current)"},
+                        "path": {"type": "string", "description": "Directory to search (default: workspace root)"},
                         "glob": {"type": "string", "description": "File pattern (default: *)"},
                         "context_lines": {"type": "integer", "description": "Context lines (default: 2)"}
                     },
@@ -216,10 +282,10 @@ class MCPServer:
                     "type": "object",
                     "properties": {
                         "cmd": {"type": "array", "items": {"type": "string"}, "description": "Command as array (e.g., [\"git\", \"status\"])"},
-                        "cwd": {"type": "string", "description": "Working directory"},
+                        "cwd": {"type": "string", "description": "Working directory (default: workspace root)"},
                         "timeout_sec": {"type": "integer", "description": "Timeout in seconds (default: 60)"}
                     },
-                    "required": ["cmd", "cwd"]
+                    "required": ["cmd"]
                 }
             },
             {
@@ -270,6 +336,103 @@ class MCPServer:
                     },
                     "required": ["query"]
                 }
+            },
+            {
+                "name": "codex_analyze",
+                "description": "Run a read-only analysis via Codex",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "input": {"type": "string", "description": "Analysis input"},
+                        "context": {"type": "string", "description": "Optional context"}
+                    },
+                    "required": ["input"]
+                }
+            },
+            {
+                "name": "codex_plan",
+                "description": "Generate a read-only plan via Codex",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "input": {"type": "string", "description": "Planning input"},
+                        "context": {"type": "string", "description": "Optional context"}
+                    },
+                    "required": ["input"]
+                }
+            },
+            {
+                "name": "codex_diff",
+                "description": "Generate a read-only diff via Codex",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "before": {"type": "string", "description": "Original content"},
+                        "after": {"type": "string", "description": "Updated content"},
+                        "context": {"type": "string", "description": "Optional context"}
+                    },
+                    "required": ["before", "after"]
+                }
+            },
+            {
+                "name": "verdent_search",
+                "description": "Search Verdent traces (read-only)",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "query": {"type": "string", "description": "Search query"},
+                        "limit": {"type": "integer", "description": "Max results"}
+                    },
+                    "required": ["query"]
+                }
+            },
+            {
+                "name": "verdent_get_trace",
+                "description": "Get a Verdent trace by ID (read-only)",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "trace_id": {"type": "string", "description": "Trace identifier"}
+                    },
+                    "required": ["trace_id"]
+                }
+            },
+            {
+                "name": "verdent_recent",
+                "description": "Get recent Verdent traces (read-only)",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {"type": "integer", "description": "Max results"}
+                    }
+                }
+            },
+            {
+                "name": "ext_set_context",
+                "description": "Set extension-provided context (write-token required)",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "payload": {"type": "object", "description": "Context payload"},
+                        "write_token": {"type": "string", "description": "Write authorization token (set MCP_WRITE_TOKEN env var)"}
+                    },
+                    "required": ["payload"]
+                }
+            },
+            {
+                "name": "ext_get_context",
+                "description": "Get extension-provided context",
+                "inputSchema": {"type": "object", "properties": {}}
+            },
+            {
+                "name": "ext_clear_context",
+                "description": "Clear extension-provided context (write-token required)",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "write_token": {"type": "string", "description": "Write authorization token (set MCP_WRITE_TOKEN env var)"}
+                    }
+                }
             }
         ]
 
@@ -277,6 +440,120 @@ class MCPServer:
         """List available tools"""
         return {
             "tools": self._tools_list
+        }
+
+    def _sanitize_payload(self, value: Any) -> Any:
+        if isinstance(value, dict):
+            return {str(k): self._sanitize_payload(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [self._sanitize_payload(v) for v in value]
+        if isinstance(value, bytes):
+            return value.decode("utf-8", errors="replace")
+        if isinstance(value, str):
+            return value.replace("\x00", "")
+        if isinstance(value, (int, float, bool)) or value is None:
+            return value
+        return str(value)
+
+    def _count_string_chars(self, value: Any) -> int:
+        if isinstance(value, dict):
+            total = 0
+            for k, v in value.items():
+                total += len(str(k))
+                total += self._count_string_chars(v)
+            return total
+        if isinstance(value, list):
+            return sum(self._count_string_chars(v) for v in value)
+        if isinstance(value, str):
+            return len(value)
+        if isinstance(value, bytes):
+            return len(value)
+        return 0
+
+    def _workspace_and_sandbox(self, input_cwd: Optional[str]) -> Tuple[str, PathSandbox]:
+        workspace_root = resolve_workspace_root(input_cwd)
+        return workspace_root, PathSandbox(workspace_root)
+
+    def _sanitize_tool_path(
+        self,
+        sandbox: PathSandbox,
+        workspace_root: str,
+        path_value: Optional[str]
+    ) -> Tuple[Optional[str], str]:
+        raw_value = path_value or workspace_root
+        candidate = _coerce_under_root(raw_value, workspace_root)
+        safe = sandbox.sanitize_path(candidate)
+        return safe, raw_value
+
+    def _handle_codex_tool(self, tool_name: str, tool_input: Dict[str, Any]) -> Dict[str, Any]:
+        client = CodexClient()
+        if not client.is_configured():
+            return {
+                "content": [
+                    {"type": "text", "text": "CODEX_ENDPOINT not configured. Set CODEX_ENDPOINT to enable Codex tools."}
+                ],
+                "isError": True
+            }
+
+        sanitized = self._sanitize_payload(tool_input)
+        total_chars = self._count_string_chars(sanitized)
+        if total_chars > self.MAX_CODEX_CHARS:
+            return {
+                "content": [
+                    {"type": "text", "text": f"Payload too large: {total_chars} chars (limit {self.MAX_CODEX_CHARS})"}
+                ],
+                "isError": True
+            }
+
+        result = client.request(tool_name, sanitized)
+        text = json.dumps(result, indent=2)
+        is_error = "error" in result
+        return {
+            "content": [
+                {"type": "text", "text": f"Codex result:\n{text}"}
+            ],
+            "isError": is_error
+        }
+
+    def _handle_verdent_tool(self, tool_name: str, tool_input: Dict[str, Any]) -> Dict[str, Any]:
+        client = VerdentClient()
+        if not client.is_configured():
+            return {
+                "content": [
+                    {"type": "text", "text": "VERDENT_ENDPOINT not configured. Set VERDENT_ENDPOINT to enable Verdent tools."}
+                ],
+                "isError": True
+            }
+
+        sanitized = self._sanitize_payload(tool_input)
+        total_chars = self._count_string_chars(sanitized)
+        if total_chars > self.MAX_VERDENT_CHARS:
+            return {
+                "content": [
+                    {"type": "text", "text": f"Payload too large: {total_chars} chars (limit {self.MAX_VERDENT_CHARS})"}
+                ],
+                "isError": True
+            }
+
+        if tool_name == "verdent_search":
+            result = client.search(
+                query=sanitized.get("query", ""),
+                limit=sanitized.get("limit", 20),
+            )
+        elif tool_name == "verdent_get_trace":
+            result = client.get_trace(trace_id=sanitized.get("trace_id", ""))
+        elif tool_name == "verdent_recent":
+            result = client.get_recent(limit=sanitized.get("limit", 20))
+        else:
+            result = {"error": f"Unknown Verdent tool: {tool_name}"}
+
+        text = json.dumps(result, indent=2)
+        is_error = "error" in result
+        return {
+            "content": [
+                {"type": "text", "text": f"Verdent result:\n{text}"}
+            ],
+            "isError": is_error
         }
     
     def handle_call_tool(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -372,8 +649,16 @@ class MCPServer:
                 }
 
             elif tool_name == "git_status":
-                cwd = tool_input.get("cwd", str(Path.cwd()))
-                result = engineer_tools.git_status(cwd)
+                workspace_root, sandbox = self._workspace_and_sandbox(tool_input.get("cwd"))
+                safe_cwd, raw_cwd = self._sanitize_tool_path(sandbox, workspace_root, tool_input.get("cwd"))
+                if safe_cwd is None:
+                    return {
+                        "content": [
+                            {"type": "text", "text": sandbox.get_error_message(raw_cwd)}
+                        ],
+                        "isError": True
+                    }
+                result = engineer_tools.git_status(safe_cwd)
                 text = json.dumps(result, indent=2)
                 return {
                     "content": [
@@ -382,9 +667,17 @@ class MCPServer:
                 }
 
             elif tool_name == "git_diff":
-                cwd = tool_input.get("cwd", str(Path.cwd()))
+                workspace_root, sandbox = self._workspace_and_sandbox(tool_input.get("cwd"))
+                safe_cwd, raw_cwd = self._sanitize_tool_path(sandbox, workspace_root, tool_input.get("cwd"))
+                if safe_cwd is None:
+                    return {
+                        "content": [
+                            {"type": "text", "text": sandbox.get_error_message(raw_cwd)}
+                        ],
+                        "isError": True
+                    }
                 ref = tool_input.get("ref", "HEAD")
-                result = engineer_tools.git_diff(cwd, ref)
+                result = engineer_tools.git_diff(safe_cwd, ref)
                 text = json.dumps(result, indent=2)
                 return {
                     "content": [
@@ -393,9 +686,17 @@ class MCPServer:
                 }
 
             elif tool_name == "git_show":
-                cwd = tool_input.get("cwd", str(Path.cwd()))
+                workspace_root, sandbox = self._workspace_and_sandbox(tool_input.get("cwd"))
+                safe_cwd, raw_cwd = self._sanitize_tool_path(sandbox, workspace_root, tool_input.get("cwd"))
+                if safe_cwd is None:
+                    return {
+                        "content": [
+                            {"type": "text", "text": sandbox.get_error_message(raw_cwd)}
+                        ],
+                        "isError": True
+                    }
                 ref = tool_input.get("ref", "HEAD")
-                result = engineer_tools.git_show(cwd, ref)
+                result = engineer_tools.git_show(safe_cwd, ref)
                 text = json.dumps(result, indent=2)
                 return {
                     "content": [
@@ -405,10 +706,18 @@ class MCPServer:
 
             elif tool_name == "ripgrep_search":
                 query = tool_input.get("query", "")
-                path = tool_input.get("path", ".")
+                workspace_root, sandbox = self._workspace_and_sandbox(None)
+                safe_path, raw_path = self._sanitize_tool_path(sandbox, workspace_root, tool_input.get("path"))
+                if safe_path is None:
+                    return {
+                        "content": [
+                            {"type": "text", "text": sandbox.get_error_message(raw_path)}
+                        ],
+                        "isError": True
+                    }
                 glob = tool_input.get("glob", "*")
                 context_lines = tool_input.get("context_lines", 2)
-                result = engineer_tools.ripgrep_search(query, path, glob, context_lines)
+                result = engineer_tools.ripgrep_search(query, safe_path, glob, context_lines)
                 text = json.dumps(result, indent=2)
                 return {
                     "content": [
@@ -418,9 +727,17 @@ class MCPServer:
 
             elif tool_name == "run_cmd":
                 cmd = tool_input.get("cmd", [])
-                cwd = tool_input.get("cwd", str(Path.cwd()))
+                workspace_root, sandbox = self._workspace_and_sandbox(tool_input.get("cwd"))
+                safe_cwd, raw_cwd = self._sanitize_tool_path(sandbox, workspace_root, tool_input.get("cwd"))
+                if safe_cwd is None:
+                    return {
+                        "content": [
+                            {"type": "text", "text": sandbox.get_error_message(raw_cwd)}
+                        ],
+                        "isError": True
+                    }
                 timeout_sec = tool_input.get("timeout_sec", 60)
-                result = engineer_tools.run_cmd(cmd, cwd, self.sandbox, timeout_sec)
+                result = engineer_tools.run_cmd(cmd, safe_cwd, sandbox, timeout_sec)
                 text = json.dumps(result, indent=2)
 
                 # Check if command was rejected (returncode -1 indicates allowlist/sandbox rejection)
@@ -543,6 +860,60 @@ class MCPServer:
                 return {
                     "content": [
                         {"type": "text", "text": f"Decision log results:\n{text}"}
+                    ]
+                }
+            
+            elif tool_name == "codex_analyze":
+                return self._handle_codex_tool(tool_name, tool_input)
+            
+            elif tool_name == "codex_plan":
+                return self._handle_codex_tool(tool_name, tool_input)
+            
+            elif tool_name == "codex_diff":
+                return self._handle_codex_tool(tool_name, tool_input)
+
+            elif tool_name == "verdent_search":
+                return self._handle_verdent_tool(tool_name, tool_input)
+
+            elif tool_name == "verdent_get_trace":
+                return self._handle_verdent_tool(tool_name, tool_input)
+
+            elif tool_name == "verdent_recent":
+                return self._handle_verdent_tool(tool_name, tool_input)
+
+            elif tool_name == "ext_set_context":
+                payload = tool_input.get("payload", {})
+                result = self.extension_context.set_context(payload)
+                text = json.dumps(result, indent=2)
+                is_error = "error" in result
+                return {
+                    "content": [
+                        {"type": "text", "text": f"Extension context set:\n{text}"}
+                    ],
+                    "isError": is_error
+                }
+
+            elif tool_name == "ext_get_context":
+                result = self.extension_context.get_context()
+                if result.get("status") == "none set":
+                    return {
+                        "content": [
+                            {"type": "text", "text": "Extension context: none set"}
+                        ]
+                    }
+                text = json.dumps(result, indent=2)
+                return {
+                    "content": [
+                        {"type": "text", "text": f"Extension context:\n{text}"}
+                    ]
+                }
+
+            elif tool_name == "ext_clear_context":
+                result = self.extension_context.clear()
+                text = json.dumps(result, indent=2)
+                return {
+                    "content": [
+                        {"type": "text", "text": f"Extension context cleared:\n{text}"}
                     ]
                 }
 

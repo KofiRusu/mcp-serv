@@ -9,7 +9,34 @@ Production-hardened MCP server for Cursor/Continue IDEs with git, ripgrep, repo 
 - **Repo Memory**: Append-only MEMORY.md, decision log with timestamps/tags
 - **Verification**: Shell script and pytest smoke tests
 
+## Architecture Overview
+
+- Single-process MCP server using stdio JSON-RPC for IDE clients.
+- Entry point is `mcp/server.py` with initialize/tools/resources handlers.
+- Tool registry is centralized and used by verifiers and tests.
+- Memory storage uses SQLite via `mcp/memory_store.py`.
+- Repo memory is append-only markdown in `context/`.
+- Engineer tools are allowlisted and path-sandboxed.
+- Codex/Verdent integrations are optional and env-gated.
+- Extension context is in-memory and write-token gated.
+- Tests cover protocol, tools, and security gates.
+- Verification script mirrors expected tool list and behavior.
+
+## Security Model (Summary)
+
+The server defaults to read-only with no writes allowed. Write-capable tools require a valid `MCP_WRITE_TOKEN` and are checked before any handler runs. Optional integrations are disabled unless their endpoints are configured.
+
 ## Quick Start
+
+```bash
+export MCP_WRITE_TOKEN="your_secure_token_here"
+export MCP_DRY_RUN="false"
+python -m compileall .
+./scripts/verify_mcp.sh
+python3 tests/test_mcp_smoke.py
+```
+
+## Detailed Setup
 
 ### 1. Configure Environment Variables
 
@@ -34,10 +61,12 @@ export MCP_DRY_RUN="true"
   "mcpServers": {
     "cursor-mcp": {
       "command": "python3",
-      "args": ["./mcp/server.py"],
-      "cwd": "/Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp",
+      "args": ["/ABS/PATH/TO/cursor-mcp/mcp/server.py"],
+      "cwd": "/ABS/PATH/TO/cursor-mcp",
       "env": {
-        "PYTHONPATH": "/Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp",
+        "PYTHONPATH": "/ABS/PATH/TO/cursor-mcp",
+        "MCP_WORKSPACE_ROOT": "",
+        "MCP_HOME": "/ABS/PATH/TO/cursor-mcp",
         "MCP_WRITE_TOKEN": "YOUR_SECURE_TOKEN_HERE",
         "MCP_DRY_RUN": "false"
       }
@@ -53,10 +82,12 @@ name: cursor-mcp
 description: Senior Engineer MCP Server with git, ripgrep, repo memory
 command: python3
 args:
-  - ./mcp/server.py
-cwd: /Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp
+  - /ABS/PATH/TO/cursor-mcp/mcp/server.py
+cwd: /ABS/PATH/TO/cursor-mcp
 env:
-  PYTHONPATH: /Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp
+  PYTHONPATH: /ABS/PATH/TO/cursor-mcp
+  MCP_WORKSPACE_ROOT: ${workspaceFolder}
+  MCP_HOME: /ABS/PATH/TO/cursor-mcp
   MCP_WRITE_TOKEN: YOUR_SECURE_TOKEN_HERE
   MCP_DRY_RUN: "false"
 ```
@@ -78,6 +109,12 @@ env:
 | `memory_search` | Search MEMORY.md | No |
 | `decision_log_add` | Add to decision log | ✓ Yes |
 | `decision_log_search` | Search decision log | No |
+| `verdent_search` | Search Verdent traces | No |
+| `verdent_get_trace` | Get Verdent trace by ID | No |
+| `verdent_recent` | Get recent Verdent traces | No |
+| `ext_set_context` | Set IDE/extension context (in-memory) | ✓ Yes |
+| `ext_get_context` | Get IDE/extension context | No |
+| `ext_clear_context` | Clear IDE/extension context | ✓ Yes |
 
 ### 4. Verification
 
@@ -135,6 +172,10 @@ context/                       # Repo memory files
 |---------|--------|----------|
 | `MCP_WRITE_TOKEN` | Write authorization token (required for write ops) | `null` (no writes allowed) |
 | `MCP_DRY_RUN` | Enable dry-run mode (log only, no execution) | `false` | (execute writes) |
+| `VERDENT_ENDPOINT` | Verdent API endpoint (enables Verdent tools) | `null` (tools disabled) |
+| `VERDENT_API_KEY` | Verdent API key (optional bearer token) | `null` |
+| `CODEX_ENDPOINT` | Codex API endpoint (enables Codex tools) | `null` (tools disabled) |
+| `CODEX_API_KEY` | Codex API key (optional bearer token) | `null` |
 
 ### 8. Usage Examples
 
@@ -182,7 +223,7 @@ context/                       # Repo memory files
   "params": {
     "name": "git_status",
     "arguments": {
-      "cwd": "/Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp"
+      "cwd": "/ABS/PATH/TO/WORKSPACE"
     }
   }
 }
@@ -199,7 +240,33 @@ context/                       # Repo memory files
     "name": "run_cmd",
     "arguments": {
       "cmd": ["python3", "--version"],
-      "cwd": "/Users/kofirusu/Desktop/Aux./linux mcp-server/cursor-mcp"
+      "cwd": "/ABS/PATH/TO/WORKSPACE"
+    }
+  }
+}
+```
+
+#### Extension Context (IDE/Editor)
+
+Use IDE extensions to set short-lived, in-memory context (no file writes). Recommended flow:
+- Call `ext_set_context` on selection change or diagnostics update.
+- Call `ext_get_context` before asking the agent to act.
+- Call `ext_clear_context` when context becomes stale (file closed, selection cleared).
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 5,
+  "method": "tools/call",
+  "params": {
+    "name": "ext_set_context",
+    "arguments": {
+      "payload": {
+        "file": "src/app.py",
+        "selection": "def handle_request(...):",
+        "diagnostics": []
+      },
+      "write_token": "YOUR_SECURE_TOKEN_HERE"
     }
   }
 }

@@ -4,6 +4,7 @@ MCP Agent Integration - Simple API for agent access to memory system
 
 from typing import List, Dict, Any, Optional
 from pathlib import Path
+import os
 
 from .memory_store import MemoryStore
 from .classifier import MemoryClassifier
@@ -15,7 +16,10 @@ class AgentMemory:
     
     def __init__(self, db_path: Optional[str] = None):
         if db_path is None:
-            db_path = str(Path(__file__).parent.parent / "data" / "mcp" / "memories.db")
+            mcp_home = Path(
+                os.environ.get("MCP_HOME", str(Path(__file__).resolve().parent.parent))
+            ).expanduser().resolve()
+            db_path = str(mcp_home / "data" / "mcp" / "memories.db")
         
         self.store_instance = MemoryStore(db_path)
         self.classifier = MemoryClassifier()
